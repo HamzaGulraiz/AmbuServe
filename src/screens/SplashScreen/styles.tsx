@@ -10,13 +10,15 @@ import fontsizes from '../../../assets/fontsizes/fontsizes';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   image: {
-    height: hp(16.5),
-    width: wp(35.8),
-    borderRadius: wp(35.8),
+    marginHorizontal: wp(5),
+    height: hp(10),
+    marginBottom: hp(28),
+    // backgroundColor: 'red',
   },
 });
 

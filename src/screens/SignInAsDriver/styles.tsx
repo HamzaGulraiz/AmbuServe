@@ -10,24 +10,26 @@ import fontsizes from '../../../assets/fontsizes/fontsizes';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: colors.backGround,
   },
-  card: {
-    height: hp(9.2),
-    width: wp(21.7),
+  input: {
+    marginHorizontal: wp(5),
+    height: hp(6),
+    borderRadius: wp(2),
+    paddingLeft: wp(4),
+    backgroundColor: colors.TRANSPARENT,
+    color: colors.BLUE,
+    fontWeight: '300',
+    fontFamily: fonts.REGULAR,
+    borderWidth: hp(0.15),
+  },
+  passwordInputView: {
+    marginBottom: hp(0.5),
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  cardIcon: {
-    height: hp(4.9),
-    width: wp(10.6),
-  },
-  cardTitle: {
-    fontWeight: '400',
-    fontSize: fontsizes.px_12,
-    fontFamily: fonts.Bold,
-    color: colors.WHITE_LIGHT_TEXT,
-    textAlign: 'center',
+  eyeIcon: {
+    tintColor: colors.BLUE,
+    height: hp(2),
+    width: wp(3.8),
   },
 });
 

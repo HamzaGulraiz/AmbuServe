@@ -10,31 +10,29 @@ import fontsizes from '../../../assets/fontsizes/fontsizes';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  TMView: {
-    width: '100%',
-    position: 'absolute',
-    // alignItems: 'center',
+
     // justifyContent: 'center',
-    bottom: hp(2),
-  },
-  TM_VERSION: {
-    fontSize: fontsizes.px_12,
-    fontWeight: '500',
-    textAlign: 'center',
-    fontFamily: fonts.REGULAR,
-    marginBottom: wp(2.5),
-  },
-  logoView: {
-    // backgroundColor: 'red',
-    // width: '100%',
-    alignItems: 'center',
-    marginHorizontal: wp(30),
-    marginBottom: hp(1),
+    // alignItems: 'center',
   },
   image: {
-    height: hp(5),
-    width: hp(6.9),
+    marginHorizontal: wp(5),
+    height: hp(30),
+    width: wp(90),
+    borderRadius: wp(30),
+    marginTop: hp(16),
+    marginBottom: hp(5),
+    // backgroundColor: 'red',
+  },
+  SOSView: {
+    marginHorizontal: wp(20),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: hp(2),
+    // backgroundColor: 'red',
+  },
+  SOSButton: {
+    height: hp(14),
+    width: wp(28),
   },
 });
 

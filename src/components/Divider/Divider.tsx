@@ -30,7 +30,7 @@ const Divider: React.FC<DividerProps> = ({
   return (
     <View
       style={{
-        backgroundColor: dividerColor ? dividerColor : colors.DARK.DIVIDER,
+        backgroundColor: dividerColor ? dividerColor : colors.DIVIDER,
         height: height ? height : 0,
         width: width ? width : 0,
         alignSelf: alignSelf ? alignSelf : 'center',

@@ -10,24 +10,15 @@ import fontsizes from '../../../assets/fontsizes/fontsizes';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: colors.backGround,
+
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
-  card: {
-    height: hp(9.2),
-    width: wp(21.7),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardIcon: {
-    height: hp(4.9),
-    width: wp(10.6),
-  },
-  cardTitle: {
-    fontWeight: '400',
-    fontSize: fontsizes.px_12,
-    fontFamily: fonts.Bold,
-    color: colors.WHITE_LIGHT_TEXT,
-    textAlign: 'center',
+  image: {
+    marginHorizontal: wp(5),
+    height: hp(10),
+    marginBottom: hp(28),
+    // backgroundColor: 'red',
   },
 });
 

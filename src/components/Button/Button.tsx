@@ -19,7 +19,7 @@ type CustomButtonProps = {
   onPress: () => void;
   title: string;
   height: number;
-  width: number;
+  width?: number;
   backgroundColor: string;
   activityIndicator?: boolean;
   leftIcon?: any;
@@ -52,9 +52,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     <TouchableOpacity
       style={{
         ...styles.button,
-        backgroundColor: backgroundColor
-          ? backgroundColor
-          : colors.DARK.TRANSPARENT,
+        backgroundColor: backgroundColor ? backgroundColor : colors.TRANSPARENT,
         width: width ? width : '100%',
         marginHorizontal: marginHorizontal ? marginHorizontal : 0,
         height: height ? height : 0,
@@ -62,11 +60,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         marginBottom: marginBottom ? marginBottom : 0,
         borderRadius: borderRadius ? borderRadius : 0,
         borderWidth: borderWidth ? borderWidth : 0,
-        borderColor: borderColor ? borderColor : colors.DARK.TRANSPARENT,
+        borderColor: borderColor ? borderColor : colors.TRANSPARENT,
       }}
       onPress={onPress}>
       {activityIndicator ? (
-        <ActivityIndicator size="small" color={colors.DARK.BLACK_TEXT} />
+        <ActivityIndicator size="small" color={colors.BLACK} />
       ) : (
         <>
           {leftIcon ? (
@@ -75,7 +73,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
           <Text
             style={{
               ...styles.text,
-              color: textColor ? textColor : colors.DARK.BLACK_TEXT,
+              color: textColor ? textColor : colors.BLACK,
               marginLeft: leftIcon ? wp(2) : 0,
             }}>
             {title}
@@ -96,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: fontsizes.px_15,
+    fontSize: fontsizes.px_18,
     fontWeight: '600',
     textAlign: 'center',
     fontFamily: fonts.REGULAR,

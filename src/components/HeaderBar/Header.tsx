@@ -22,10 +22,6 @@ type CustomHeaderProps = {
   onPressLeftIcon?(): void;
   rightIcon?: ImageSourcePropType;
   onPressRightIcon?(): void;
-  secondRightIcon?: ImageSourcePropType;
-  onPressSecondRightIcon?(): void;
-  thirdRightIcon?: ImageSourcePropType;
-  onPressThirdRightIcon?(): void;
   marginTop?: number;
   marginBottom?: number;
   pictureIcon?: ImageSourcePropType;
@@ -38,10 +34,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   onPressLeftIcon,
   rightIcon,
   onPressRightIcon,
-  secondRightIcon,
-  onPressSecondRightIcon,
-  thirdRightIcon,
-  onPressThirdRightIcon,
   marginTop,
   marginBottom,
   pictureIcon,
@@ -51,9 +43,29 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
     <View
       style={{
         ...styles.container,
-        marginTop: marginTop ? marginTop : hp(3),
+        marginTop: marginTop ? marginTop : 0,
         marginBottom: marginBottom ? marginBottom : 0,
       }}>
+      {leftIcon ? (
+        <TouchableOpacity
+          style={{
+            ...styles.icon,
+            position: 'absolute',
+            left: wp(0),
+            top: hp(1),
+          }}
+          onPress={onPressLeftIcon}>
+          <Image source={leftIcon} resizeMode="contain" style={styles.image} />
+        </TouchableOpacity>
+      ) : null}
+      {rightIcon ? (
+        <TouchableOpacity
+          style={{...styles.rightIcon, position: 'absolute', right: wp(0)}}
+          onPress={onPressRightIcon}>
+          <Image source={rightIcon} resizeMode="contain" style={styles.image} />
+        </TouchableOpacity>
+      ) : null}
+      {title ? <Text style={styles.title}>{title}</Text> : null}
       {pictureIcon ? (
         <TouchableOpacity
           style={styles.pictureIcon}
@@ -65,41 +77,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
           />
         </TouchableOpacity>
       ) : null}
-      {leftIcon ? (
-        <TouchableOpacity style={styles.icon} onPress={onPressLeftIcon}>
-          <Image source={leftIcon} resizeMode="contain" style={styles.image} />
-        </TouchableOpacity>
-      ) : null}
-      {rightIcon ? (
-        <TouchableOpacity
-          style={{...styles.rightIcon, position: 'absolute', right: wp(0)}}
-          onPress={onPressRightIcon}>
-          <Image source={rightIcon} resizeMode="contain" style={styles.image} />
-        </TouchableOpacity>
-      ) : null}
-      {secondRightIcon ? (
-        <TouchableOpacity
-          style={{...styles.rightIcon, position: 'absolute', right: wp(12)}}
-          onPress={onPressSecondRightIcon}>
-          <Image
-            source={secondRightIcon}
-            resizeMode="contain"
-            style={styles.image}
-          />
-        </TouchableOpacity>
-      ) : null}
-      {thirdRightIcon ? (
-        <TouchableOpacity
-          style={{...styles.rightIcon, position: 'absolute', right: wp(24)}}
-          onPress={onPressThirdRightIcon}>
-          <Image
-            source={thirdRightIcon}
-            resizeMode="contain"
-            style={styles.image}
-          />
-        </TouchableOpacity>
-      ) : null}
-      {title ? <Text style={styles.title}>{title}</Text> : null}
     </View>
   );
 };
@@ -108,18 +85,18 @@ export default CustomHeader;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    marginHorizontal: wp(5.5),
+    // flexDirection: 'row',
+    marginHorizontal: wp(5),
     alignItems: 'center',
+    justifyContent: 'center',
     // backgroundColor: 'blue',
   },
   title: {
-    // marginRight: wp(2),
-    marginLeft: wp(6),
     fontWeight: '700',
     fontSize: fontsizes.px_22,
     fontFamily: fonts.BOLD,
-    color: colors.DARK.WHITE_TEXT,
+    color: colors.BLACK,
+    textAlign: 'right',
   },
   icon: {
     height: hp(2),

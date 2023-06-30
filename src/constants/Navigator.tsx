@@ -1,11 +1,7 @@
 export const SPLASH_SCREEN = 'SplashScreen';
-export const GET_STARTED = 'GetStarted';
-/////////BOTTOM TAB SCREENS
-export const MY_BOTTOM_TABS = 'MyBottomTabs';
-export const HOME = 'Home';
-export const WALLET = 'Wallet';
-export const TRADES = 'Trades';
-export const ACTIVITY = 'Activity';
-export const SETTINGS = 'Settings';
-export const THEME = 'Theme';
-export const LANGUAGE = 'Language';
+export const SIGN_IN = 'SignIn';
+export const SIGN_UP = 'SignUp';
+export const SIGN_IN_AS_DRIVER = 'SignInAsDriver';
+export const SIGN_UP_AS_DRIVER = 'SignUpAsDriver';
+export const DASHBOARD = 'DashBoard';
+export const MAPS = 'Maps';

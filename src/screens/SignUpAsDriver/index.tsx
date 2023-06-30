@@ -17,7 +17,6 @@ import images from '../../../assets/images/images';
 import colors from '../../../assets/colors/colors';
 
 import CustomButton from '../../components/Button/Button';
-import {SIGN_IN, SIGN_IN_AS_DRIVER, SIGN_UP} from '../../constants/Navigator';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -27,7 +26,7 @@ type NavigationProps = {
   jumpTo: any;
 };
 
-const SplashScreen = () => {
+const SignUpAsDriver = () => {
   const navigation = useNavigation<NavigationProps>();
 
   // useEffect(() => {
@@ -41,36 +40,32 @@ const SplashScreen = () => {
         title="Sign in as Driver"
         textColor={colors.BLUE}
         backgroundColor={colors.TRANSPARENT}
-        height={hp(6)}
+        height={hp(5)}
         width={wp(90)}
         marginHorizontal={wp(5)}
         borderRadius={wp(2)}
         marginTop={hp(2)}
         marginBottom={hp(35)}
-        onPress={() => {
-          navigation.navigate(SIGN_IN_AS_DRIVER);
-        }}
+        onPress={() => {}}
       />
       <Image resizeMode="contain" source={images.LOGO} style={styles.image} />
       <CustomButton
         title="Create and account"
         textColor={colors.WHITE}
         backgroundColor={colors.BLUE}
-        height={hp(6)}
+        height={hp(5)}
         width={wp(90)}
         borderRadius={wp(2)}
         marginHorizontal={wp(5)}
         // marginTop={hp(2)}
         marginBottom={hp(2)}
-        onPress={() => {
-          navigation.navigate(SIGN_UP);
-        }}
+        onPress={() => {}}
       />
       <CustomButton
-        title="Sign in"
+        title="Sign in as user"
         textColor={colors.BLUE}
         backgroundColor={colors.TRANSPARENT}
-        height={hp(6)}
+        height={hp(5)}
         width={wp(90)}
         marginHorizontal={wp(5)}
         borderRadius={wp(2)}
@@ -78,12 +73,10 @@ const SplashScreen = () => {
         borderColor={colors.BLUE}
         // marginTop={hp(2)}
         // marginBottom={hp(35)}
-        onPress={() => {
-          navigation.navigate(SIGN_IN);
-        }}
+        onPress={() => {}}
       />
     </SafeAreaView>
   );
 };
 
-export default SplashScreen;
+export default SignUpAsDriver;
