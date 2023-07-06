@@ -14,38 +14,46 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
   },
-  userImage: {
-    height: hp(6),
-    width: wp(14),
-    alignSelf: 'flex-end',
-  },
-  logoutButton: {
-    // backgroundColor: 'red',
-    marginTop: hp(2),
+  logOutButton: {
     marginHorizontal: wp(5),
-    marginBottom: hp(8),
+    marginTop: hp(4),
+    marginBottom: hp(2),
+  },
+  userImage: {
+    height: hp(14),
+    width: wp(30),
+    alignSelf: 'center',
+  },
+  imageButton: {
+    // backgroundColor: 'red',
+    marginHorizontal: wp(35),
+    marginBottom: hp(2),
     // justifyContent: 'flex-end',
     // alignContent: 'center',
   },
-  image: {
+  editButton: {
     marginHorizontal: wp(5),
-    height: hp(30),
-    width: wp(90),
-    borderRadius: wp(30),
-    // marginTop: hp(14),
-    marginBottom: hp(5),
-    // backgroundColor: 'red',
+    marginBottom: wp(2),
   },
-  SOSView: {
-    marginHorizontal: wp(20),
+  input: {
+    marginHorizontal: wp(5),
+    height: hp(6),
+    borderRadius: wp(2),
+    paddingLeft: wp(4),
+    backgroundColor: colors.TRANSPARENT,
+
+    fontWeight: '300',
+    fontFamily: fonts.REGULAR,
+    borderWidth: hp(0.15),
+  },
+  passwordInputView: {
+    marginBottom: hp(0.5),
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: hp(2),
-    // backgroundColor: 'red',
   },
-  SOSButton: {
-    height: hp(14),
-    width: wp(28),
+  eyeIcon: {
+    tintColor: colors.BLUE,
+    height: hp(2),
+    width: wp(3.8),
   },
 });
 

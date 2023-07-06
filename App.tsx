@@ -1,31 +1,32 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
+import {AppState, StyleSheet, Text, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import StackNavigator from './src/routes/StackNavigator/Navigators';
 import {getData} from './src/asyncStorage/AsyncStorage';
 import {useDispatch} from 'react-redux';
-import {setTheme} from './src/redux/Action';
 
-const App = () => {
+import {DASHBOARD, SPLASH_SCREEN} from './src/constants/Navigator';
+import {setAppState, setUserInfo} from './src/redux/Action';
+import UserInformation from './src/screens/UserInformation';
+
+type Props = {
+  routeName: any;
+  userInformation: any;
+  appState: string;
+};
+const App: React.FC<Props> = ({routeName, userInformation, appState}) => {
   const dispatch = useDispatch();
+  console.log('routname on app => ', routeName);
+  console.log('AppState & userInfo', userInformation, appState);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const value = await getData({storageKey: 'THEME'});
+  useEffect(() => {
+    const settingDataToRedux = () => {
+      dispatch(setAppState(appState));
+      dispatch(setUserInfo(userInformation));
+    };
+    settingDataToRedux();
+  }, []);
 
-  //     if (typeof value === 'string') {
-  //       console.log('async value in app.tsx', value);
-  //       dispatch(setTheme(value));
-  //     } else {
-  //       // Handle the case when value is void or undefined
-  //       console.log('Error occurred or value is undefined');
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
-  return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
-  );
+  return <StackNavigator routeName={routeName} />;
 };
 export default App;

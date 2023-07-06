@@ -1,7 +1,6 @@
-// store.ts
-import { createStore, combineReducers, Store } from 'redux';
-import { useSelector, TypedUseSelectorHook } from 'react-redux';
-import reducer, { State as AppState } from './Reducer';
+import {createStore, combineReducers, Store} from 'redux';
+import {useSelector, TypedUseSelectorHook} from 'react-redux';
+import reducer, {State as AppState} from './Reducer';
 
 export interface RootState {
   app: AppState;

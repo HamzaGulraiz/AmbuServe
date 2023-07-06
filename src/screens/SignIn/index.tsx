@@ -27,8 +27,12 @@ import Divider from '../../components/Divider/Divider';
 import fonts from '../../../assets/fonts/fonts';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import {DASHBOARD, SIGN_IN, SIGN_UP} from '../../constants/Navigator';
-
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import axios from 'axios';
+import Toast from 'react-native-simple-toast';
+import {BASE_URL} from '../../../config';
+import {setData} from '../../asyncStorage/AsyncStorage';
+import {useDispatch} from 'react-redux';
+import {setUserInfo} from '../../redux/Action';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -54,6 +58,7 @@ type NavigationProps = {
 
 const SignIn = () => {
   const navigation = useNavigation<NavigationProps>();
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,70 +87,74 @@ const SignIn = () => {
         setPasswordError('');
       }, 2000);
     } else {
-      signUpUser(email, password);
+      signInUser(email, password);
     }
   };
 
-  const signUpUser = (email?: string, password?: string) => {
+  const signInUser = (email?: string, password?: string) => {
     setSignUpIsLoaded(true);
-    let data = JSON.stringify({
-      email: email,
-      password: password,
-    });
-
-    setTimeout(() => {
-      console.log(data);
-      setSignUpIsLoaded(false);
-      navigation.replace(DASHBOARD);
-    }, 2000);
+    // let data = JSON.stringify({
+    //   email: email,
+    //   password: password,
+    // });
 
     // let config = {
-    //   method: 'post',
+    //   method: 'get',
     //   maxBodyLength: Infinity,
-    //   url: `${Config.base_Url}register`,
+    //   url: `${BASE_URL}/login`,
     //   headers: {
     //     'Content-Type': 'application/json',
     //   },
     //   data: data,
     // };
 
-    // axios
-    //   .request(config)
-    //   .then(response => {
-    //     //setErrorMessage(response.data.message);
-    //     console.log('axios then', JSON.stringify(response.data));
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/login`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        email: email,
+        password: password,
+      },
+    };
 
-    //     ////Storing token in async/////
-    //     const tokenValue = response.data.data.token;
-    //     console.log('token sent by async register', tokenValue);
-    //     AsyncStorage.setItem('userToken', tokenValue);
-    //     /////////Userinformation
-    //     const userInfo = JSON.stringify(response.data.data);
-    //     console.log('user Info sent from login', userInfo);
-    //     AsyncStorage.setItem('userInfo', userInfo);
-    //     ////Redux storage
-    //     dispatch(
-    //       userTokenRedux({
-    //         token: tokenValue,
-    //       }),
-    //     );
+    axios
+      .request(config)
+      .then(response => {
+        // console.log(JSON.stringify(response.data));
+        if (response.data === 'Email does not exist') {
+          Toast.showWithGravity(
+            'This user does not exist on our record',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignUpIsLoaded(false);
+        } else if (response.data === 'Password does not match') {
+          Toast.showWithGravity(
+            'Password does not match',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignUpIsLoaded(false);
+        } else {
+          console.log(
+            'data came from node response in sign in =>',
+            response.data,
+          );
+          dispatch(setUserInfo(response.data));
+          setData({value: response.data, storageKey: 'USER_INFO'});
+          navigation.replace(DASHBOARD);
+          setSignUpIsLoaded(false);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
-    //     setIsLoaded(true);
-    //     navigation.navigate('DrawerNavigation');
-    //   })
-    //   .catch(error => {
-    //     console.log('Register Catch', error.response);
-    //     setIsLoaded(true);
-    //     setErrorMessage(error.response.data.message);
-    //     Toast.show(errorMessage, {
-    //       duration: Toast.durations.LONG,
-    //       position: Toast.positions.BOTTOM,
-    //       shadow: true,
-    //       animation: true,
-    //       hideOnPress: true,
-    //       delay: 0,
-    //     });
-    //   });
+    setSignUpIsLoaded(false);
   };
 
   const [emailError, setEmailError] = useState('');
@@ -232,108 +241,6 @@ const SignIn = () => {
       // code block
     }
   };
-
-  // const handleGoogleSignIN = async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices();
-  //     const userInfo = await GoogleSignin.signIn();
-  //     console.log('Google signin =>', userInfo);
-  //     // setState({ userInfo });
-  //   } catch (error: any) {
-  //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-  //       // user cancelled the login flow
-  //     } else if (error.code === statusCodes.IN_PROGRESS) {
-  //       // operation (e.g. sign in) is in progress already
-  //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-  //       // play services not available or outdated
-  //     } else {
-  //       // some other error happened
-  //     }
-  //   }
-  // };
-
-  // const handleGoodleSignOut = async () => {
-  //   try {
-  //     await GoogleSignin.signOut();
-  //     // setState({ user: null }); // Remember to remove the user from your app's state as well
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  useEffect(() => {
-    // Configure GoogleSignin
-    GoogleSignin.configure({
-      webClientId:
-        '202538919074-ib0e9pej33eugb41k92lenmgvtcq47jl.apps.googleusercontent.com',
-      scopes: ['profile', 'email'],
-      // offlineAccess: true,
-      // accessType: "offline", // add this line
-      // forceCodeForRefreshToken: true,
-    });
-    isSignedIN();
-  }, []);
-
-  // Sign in with Google
-  const signIn = async () => {
-    await GoogleSignin.hasPlayServices()
-      .then(hasPlayService => {
-        if (hasPlayService) {
-          getUSerINfo();
-        }
-      })
-      .catch(e => {
-        console.log('ERROR IS on 299: ' + JSON.stringify(e));
-      });
-  };
-  const getUSerINfo = async () => {
-    await GoogleSignin.signIn()
-      .then(userInfo => {
-        let res = userInfo;
-        console.log('getuserinfo =>>', res);
-
-        // console.log('=======>>>>>', userInfo?.user);
-        // dispatch(userData(userInfo?.user))
-        // _storeData(userInfo)
-
-        // navigation.navigate('HamburgerMenu');
-      })
-      .catch(e => {
-        console.log('ERROR IS on 315: ' + e);
-      });
-  };
-
-  const isSignedIN = async () => {
-    // await GoogleSignin.signOut();
-    const isSignedIN = await GoogleSignin.isSignedIn();
-    if (!!isSignedIN) {
-      // await GoogleSignin.signOut()
-      getCurrentUserInto();
-    } else {
-      console.log('Please Login');
-    }
-  };
-
-  const getCurrentUserInto = async () => {
-    try {
-      const userInfo = await GoogleSignin.signInSilently();
-      console.log('GEt USer DATA', userInfo);
-      // _storeData(userInfo)
-      // setUser(userInfo);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  // const _storeData = async (userInfo) => {
-  //   try {
-  //     await AsyncStorage.setItem(
-  //       'userInfo',
-  //       JSON.stringify(userInfo),
-  //     );
-  //   } catch (error) {
-  //     // Error saving data
-  //   }
-  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -461,7 +368,7 @@ const SignIn = () => {
             marginLeft={wp(1.6)}
           />
         </View>
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             marginHorizontal: wp(5),
@@ -482,23 +389,25 @@ const SignIn = () => {
             // marginTop={hp(2)}
             // marginBottom={hp(2)}
             onPress={() => {}}
-          />
-          <CustomButton
-            title="Google"
-            textColor={colors.RED}
-            backgroundColor={colors.TRANSPARENT}
-            leftIcon={icons.GMAIL}
-            borderWidth={hp(0.1)}
-            borderColor={colors.RED}
-            height={hp(6)}
-            width={wp(40)}
-            borderRadius={wp(2)}
-            // marginHorizontal={wp(5)}
-            // marginTop={hp(2)}
-            // marginBottom={hp(2)}
-            onPress={signIn}
-          />
-        </View>
+          /> */}
+        {/* <CustomButton
+          title="Google"
+          textColor={colors.RED}
+          backgroundColor={colors.TRANSPARENT}
+          leftIcon={icons.GMAIL}
+          borderWidth={hp(0.1)}
+          borderColor={colors.RED}
+          height={hp(6)}
+          width={wp(90)}
+          borderRadius={wp(2)}
+          // marginHorizontal={wp(5)}
+          // marginTop={hp(2)}
+          // marginBottom={hp(2)}
+          onPress={() => {
+            handleGoogleSignIn();
+          }}
+        /> */}
+        {/* </View> */}
         <View
           style={{
             flexDirection: 'row',

@@ -3,16 +3,17 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {
-  View,
   Image,
   Text,
   ImageBackground,
   SafeAreaView,
   StatusBar,
   Dimensions,
+  ToastAndroid,
   TextInput,
-  TouchableOpacity,
   ScrollView,
+  View,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import styles from './styles';
@@ -21,18 +22,15 @@ import images from '../../../assets/images/images';
 import colors from '../../../assets/colors/colors';
 
 import CustomButton from '../../components/Button/Button';
-import CustomHeader from '../../components/HeaderBar/Header';
-import icons from '../../../assets/icons/icons';
-import Divider from '../../components/Divider/Divider';
-import fonts from '../../../assets/fonts/fonts';
+import {MAPS, SPLASH_SCREEN} from '../../constants/Navigator';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
-import {DASHBOARD, SIGN_IN} from '../../constants/Navigator';
-import {BASE_URL} from '../../../config';
-import axios from 'axios';
-import Toast from 'react-native-simple-toast';
-import {setData} from '../../asyncStorage/AsyncStorage';
-import {setUserInfo} from '../../redux/Action';
-import {useDispatch} from 'react-redux';
+import fonts from '../../../assets/fonts/fonts';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {PermissionsAndroid} from 'react-native';
+import {getData, removeData} from '../../asyncStorage/AsyncStorage';
+import icons from '../../../assets/icons/icons';
+import {useTypedSelector} from '../../redux/Store';
+import {set} from 'mongoose';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -42,21 +40,93 @@ type NavigationProps = {
   jumpTo: any;
 };
 
-const SignUp = () => {
+interface UserInfo {
+  __v: number;
+  _id: string;
+  address: string;
+  cnic: string;
+  contact: string;
+  email: string;
+  full_name: string;
+  password: string;
+  token: string;
+}
+
+// useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       const result = await getData({storageKey: 'USER_INFO'}); // Call the getData function
+//       if (result === null) {
+//         console.log(result, 'null');
+//       } else if (typeof result === 'string') {
+//         // console.log('Data on splash screen ==>', result);
+//         const responseObj = JSON.parse(result);
+//         setFullName(responseObj.full_name);
+//         setEmail(responseObj.email);
+//         setPassword(responseObj.password);
+//         setContact(responseObj.contact);
+//         setAddress(responseObj.address);
+//         setEmercencyContact(responseObj.emercency_contact);
+//         setCNIC(responseObj.cnic);
+//         // console.log(responseObj.token);
+//       }
+//     } catch (error) {
+//       console.log('Error occurred:', error);
+//     }
+//   };
+//   fetchData();
+// }, []);
+
+const UserInformation = () => {
   const navigation = useNavigation<NavigationProps>();
-  const dispatch = useDispatch();
+  const userInfo = useTypedSelector(state => state.app.userInfo) as UserInfo;
+  const appState = useTypedSelector(state => state.app.appState);
+  const [editButton, setEditButton] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
-  const [emergencyContact, setEmergencyContact] = useState('');
+  const [emercencyContact, setEmercencyContact] = useState('');
   const [CNIC, setCNIC] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [signInIsLoaded, setSignInIsLoaded] = useState(false);
-  const [facebookIsLoaded, setFacebookIsLoaded] = useState(false);
-  const [gmailIsLoaded, setGmailIsLoaded] = useState(false);
+
+  // useEffect(() => {
+  //   setFullName(userInfo.full_name);
+  //   setEmail(userInfo.email);
+  //   setPassword(userInfo.password);
+  //   setContact(userInfo.contact);
+  //   setAddress(userInfo.address);
+  //   // setEmercencyContact(userInfo.emergency_contact);
+  //   setCNIC(userInfo.cnic);
+  //   console.log('userInfo page', appState, userInfo);
+  // }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getData({storageKey: 'USER_INFO'});
+        if (result === null) {
+          console.log('no result on userinformation Screen from storage');
+        } else {
+          const responseObj = JSON.parse(result);
+          setFullName(responseObj.full_name);
+          setEmail(responseObj.email);
+          setPassword(responseObj.password);
+          setContact(responseObj.contact);
+          setAddress(responseObj.address);
+          setEmercencyContact(responseObj.emergency_contact);
+          setCNIC(responseObj.cnic);
+          console.log('Data on userinfo screen ==>', responseObj);
+        }
+      } catch (error) {
+        console.log('Error occurred at userinfo screen from storage', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   //User Information After Validation
   const [userInfoValid, setUserInfoValid] = useState({
@@ -65,7 +135,7 @@ const SignUp = () => {
     passwordValid: false,
     contactValid: false,
     addressValid: false,
-    emergencyValid: false,
+    emercencyValid: false,
     CNICValid: false,
   });
 
@@ -76,7 +146,7 @@ const SignUp = () => {
       userInfoValid.passwordValid === false ||
       userInfoValid.contactValid === false ||
       userInfoValid.addressValid === false ||
-      userInfoValid.emergencyValid === false ||
+      userInfoValid.emercencyValid === false ||
       userInfoValid.CNICValid === false
     ) {
       setFullNameError('  ');
@@ -103,7 +173,7 @@ const SignUp = () => {
         password,
         contact,
         address,
-        emergencyContact,
+        emercencyContact,
         CNIC,
       );
     }
@@ -115,63 +185,58 @@ const SignUp = () => {
     password?: string,
     contact?: string,
     address?: string,
-    emergencyContact?: string,
+    emercencyContact?: string,
     CNIC?: string,
   ) => {
-    setSignInIsLoaded(true);
+    // setSignInIsLoaded(true);
     let data = JSON.stringify({
       full_name: fullName,
       email: email,
       password: password,
       contact: contact,
       address: address,
-      emergency_contact: emergencyContact,
+      emercency_contact: emercencyContact,
       cnic: CNIC,
     });
 
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: `${BASE_URL}/create`,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-    };
+    // let config = {
+    //   method: 'post',
+    //   maxBodyLength: Infinity,
+    //   url: `${BASE_URL}/create`,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   data: data,
+    // };
 
-    axios
-      .request(config)
-      .then(response => {
-        //setErrorMessage(response.data.message);
-        // console.log('axios then', response.data);
-        if (response.data === 'Email already exists') {
-          Toast.showWithGravity(
-            'Email already exists. Try another email',
-            Toast.SHORT,
-            Toast.BOTTOM,
-          );
-          setSignInIsLoaded(false);
-        } else {
-          console.log(
-            'data came from node response in signup =>',
-            response.data,
-          );
-          dispatch(setUserInfo(response.data));
-          setData({value: response.data, storageKey: 'USER_INFO'});
-          setSignInIsLoaded(false);
-          navigation.replace(DASHBOARD);
-        }
-      })
-      .catch(error => {
-        console.log('Register Catch', error);
-        setSignInIsLoaded(false);
-        Toast.showWithGravity(
-          'some error occuoured. Try again',
-          Toast.SHORT,
-          Toast.BOTTOM,
-        );
-      });
-    // setSignInIsLoaded(false);
+    // axios
+    //   .request(config)
+    //   .then(response => {
+    //     //setErrorMessage(response.data.message);
+    //     // console.log('axios then', response.data);
+    //     if (response.data === 'Email already exists') {
+    //       Toast.showWithGravity(
+    //         'Email already exists. Try another email',
+    //         Toast.SHORT,
+    //         Toast.BOTTOM,
+    //       );
+    //       setSignInIsLoaded(false);
+    //     } else {
+    //       setData({value: response.data, storageKey: 'USER_INFO'});
+    //       navigation.replace(DASHBOARD);
+    //       setSignInIsLoaded(false);
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.log('Register Catch', error);
+    //     setSignInIsLoaded(false);
+    //     Toast.showWithGravity(
+    //       'some error occuoured. Try again',
+    //       Toast.SHORT,
+    //       Toast.BOTTOM,
+    //     );
+    //   });
+    // // setSignInIsLoaded(false);
   };
 
   const [fullNameError, setFullNameError] = useState('');
@@ -348,7 +413,7 @@ const SignUp = () => {
       }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        emergencyValid: false,
+        emercencyValid: false,
       });
     } else if (value.length > 11) {
       setEmergencyContactError('Invalid format');
@@ -357,14 +422,14 @@ const SignUp = () => {
       }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        emergencyValid: false,
+        emercencyValid: false,
       });
       //  console.log(userInfoValid);
     } else {
       setEmergencyContactError('');
       setUserInfoValid({
         ...userInfoValid,
-        emergencyValid: true,
+        emercencyValid: true,
       });
       //  console.log(userInfoValid);
     }
@@ -429,17 +494,76 @@ const SignUp = () => {
     }
   };
 
+  const handleLogOut = () => {
+    Alert.alert('AmbuServe', 'See you soon', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          removeData({storageKey: 'USER_INFO'});
+          navigation.navigate(SPLASH_SCREEN);
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <CustomHeader
-        title="Sign up"
-        marginTop={hp(3)}
-        leftIcon={icons.BACK_ARROW}
-        onPressLeftIcon={() => {
-          navigation.goBack();
+      <TouchableOpacity onPress={handleLogOut} style={styles.logOutButton}>
+        <Text
+          style={{
+            textAlign: 'right',
+            color: colors.RED,
+            fontWeight: '300',
+            fontFamily: fonts.BOLD,
+            fontSize: fontsizes.px_16,
+          }}>
+          Log out
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.imageButton}
+        onPress={() => {
+          // handleLogOut();
+        }}>
+        <View
+          style={{
+            position: 'absolute',
+            height: hp(1.5),
+            width: wp(3),
+            borderRadius: wp(3),
+            backgroundColor: 'green',
+            bottom: hp(1),
+            right: hp(3),
+            zIndex: 1,
+          }}></View>
+        <Image
+          source={images.DEFAULT_USER}
+          resizeMode="contain"
+          style={styles.userImage}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          setEditButton(prev => !prev);
         }}
-        marginBottom={hp(6)}
-      />
+        style={styles.editButton}>
+        <Text
+          style={{
+            textAlign: 'right',
+            color: colors.BLUE,
+            fontWeight: '300',
+            fontFamily: fonts.BOLD,
+            fontSize: fontsizes.px_16,
+          }}>
+          Edit
+        </Text>
+      </TouchableOpacity>
       <ScrollView>
         <TextInput
           value={fullName}
@@ -450,12 +574,14 @@ const SignUp = () => {
             ...styles.input,
             borderColor: fullNameError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
+            color: editButton ? colors.BLUE : colors.BLACK,
           }}
           placeholder="Full Name"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          editable={editButton}
         />
         <TextInput
           value={email}
@@ -466,12 +592,14 @@ const SignUp = () => {
             ...styles.input,
             borderColor: emailError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
+            color: editButton ? colors.BLUE : colors.BLACK,
           }}
           placeholder="Email"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          editable={editButton}
         />
         <View style={styles.passwordInputView}>
           <TextInput
@@ -483,6 +611,7 @@ const SignUp = () => {
               ...styles.input,
               borderColor: passowrdError ? colors.RED : colors.BLUE,
               marginBottom: hp(2),
+              color: editButton ? colors.BLUE : colors.BLACK,
             }}
             placeholder="Enter your password"
             placeholderTextColor={colors.BLUE}
@@ -490,6 +619,7 @@ const SignUp = () => {
             numberOfLines={1}
             multiline={false}
             maxLength={30}
+            editable={editButton}
           />
           <TouchableOpacity
             style={{
@@ -516,6 +646,7 @@ const SignUp = () => {
             ...styles.input,
             borderColor: contactError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
+            color: editButton ? colors.BLUE : colors.BLACK,
           }}
           keyboardType="numeric"
           placeholder="Contact"
@@ -523,6 +654,7 @@ const SignUp = () => {
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          editable={editButton}
         />
         <TextInput
           value={address}
@@ -533,23 +665,26 @@ const SignUp = () => {
             ...styles.input,
             borderColor: addressError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
+            color: editButton ? colors.BLUE : colors.BLACK,
           }}
           placeholder="Address"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          editable={editButton}
         />
         <TextInput
-          value={emergencyContact}
+          value={emercencyContact}
           onChangeText={value => {
             handleOnChangeText(value, 'emergencyContact'),
-              setEmergencyContact(value);
+              setEmercencyContact(value);
           }}
           style={{
             ...styles.input,
             borderColor: emergencyContactError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
+            color: editButton ? colors.BLUE : colors.BLACK,
           }}
           keyboardType="numeric"
           placeholder="Emergency contact"
@@ -557,6 +692,7 @@ const SignUp = () => {
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          editable={editButton}
         />
         <TextInput
           value={CNIC}
@@ -567,15 +703,18 @@ const SignUp = () => {
             ...styles.input,
             borderColor: CNICError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
+            color: editButton ? colors.BLUE : colors.BLACK,
           }}
           placeholder="CNIC"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          editable={editButton}
         />
+
         <CustomButton
-          title="Sign Up"
+          title="Continue"
           textColor={colors.WHITE}
           backgroundColor={colors.BLUE}
           activityIndicator={signInIsLoaded}
@@ -583,115 +722,13 @@ const SignUp = () => {
           width={wp(90)}
           borderRadius={wp(2)}
           marginHorizontal={wp(5)}
-          marginTop={hp(2)}
+          // marginTop={hp(2)}
           marginBottom={hp(2)}
           onPress={signInValidation}
         />
-        {/* <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginHorizontal: wp(5),
-            marginBottom: hp(2),
-          }}>
-          <Divider
-            height={hp(0.1)}
-            dividerColor={colors.BLACK}
-            width={wp(36)}
-            marginRight={wp(1.6)}
-          />
-          <Text
-            style={{
-              fontWeight: '400',
-              fontSize: fontsizes.px_12,
-              fontFamily: fonts.REGULAR,
-              color: colors.GREY,
-            }}>
-            OR
-          </Text>
-          <Divider
-            height={hp(0.1)}
-            dividerColor={colors.BLACK}
-            width={wp(36)}
-            marginLeft={wp(1.6)}
-          />
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginHorizontal: wp(5),
-            justifyContent: 'space-evenly',
-            marginBottom: hp(2),
-          }}>
-          <CustomButton
-            title="FaceBook"
-            textColor={colors.BLUE}
-            backgroundColor={colors.TRANSPARENT}
-            leftIcon={icons.FACEBOOK}
-            borderWidth={hp(0.1)}
-            borderColor={colors.BLUE}
-            height={hp(6)}
-            width={wp(40)}
-            borderRadius={wp(2)}
-            // marginHorizontal={wp(5)}
-            // marginTop={hp(2)}
-            // marginBottom={hp(2)}
-            onPress={() => {
-              // navigation.navigate(SIGN_UP);
-            }}
-          />
-          <CustomButton
-            title="Google"
-            textColor={colors.RED}
-            backgroundColor={colors.TRANSPARENT}
-            leftIcon={icons.GMAIL}
-            borderWidth={hp(0.1)}
-            borderColor={colors.RED}
-            height={hp(6)}
-            width={wp(40)}
-            borderRadius={wp(2)}
-            // marginHorizontal={wp(5)}
-            // marginTop={hp(2)}
-            // marginBottom={hp(2)}
-            onPress={() => {
-              // navigation.navigate(SIGN_UP);
-            }}
-          />
-        </View> */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            // marginBottom: hp(5),
-          }}>
-          <Text
-            style={{
-              fontWeight: '400',
-              fontSize: fontsizes.px_15,
-              fontFamily: fonts.REGULAR,
-              color: colors.BLACK,
-            }}>
-            Already have an account?
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate(SIGN_IN);
-            }}>
-            <Text
-              style={{
-                fontWeight: '400',
-                fontSize: fontsizes.px_15,
-                fontFamily: fonts.REGULAR,
-                color: colors.BLUE,
-              }}>
-              {' '}
-              Sign in
-            </Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default SignUp;
+export default UserInformation;

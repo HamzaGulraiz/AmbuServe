@@ -1,20 +1,34 @@
-// reducer.ts
-import { ActionTypes, SET_THEME } from './Action';
+import {
+  ActionTypes,
+  SET_APP_STATE,
+  InfoActionTypes,
+  SET_USER_INFO,
+} from './Action';
 
 export interface State {
-  theme: string;
+  appState: string;
+  userInfo: object;
 }
 
 const initialState: State = {
-  theme: '',
+  appState: '',
+  userInfo: {},
 };
 
-const reducer = (state = initialState, action: ActionTypes): State => {
+const reducer = (
+  state = initialState,
+  action: ActionTypes | InfoActionTypes,
+): State => {
   switch (action.type) {
-    case SET_THEME:
+    case SET_APP_STATE:
       return {
         ...state,
-        theme: action.payload,
+        appState: action.payload,
+      };
+    case SET_USER_INFO:
+      return {
+        ...state,
+        userInfo: action.payload,
       };
     default:
       return state;

@@ -18,11 +18,12 @@ import images from '../../../assets/images/images';
 import colors from '../../../assets/colors/colors';
 
 import CustomButton from '../../components/Button/Button';
-import {MAPS} from '../../constants/Navigator';
+import {MAPS, SPLASH_SCREEN, USER_INFORMATION} from '../../constants/Navigator';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import fonts from '../../../assets/fonts/fonts';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {PermissionsAndroid} from 'react-native';
+import {removeData} from '../../asyncStorage/AsyncStorage';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -107,11 +108,23 @@ const DashBoard = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => {
+          navigation.navigate(USER_INFORMATION);
+        }}>
+        <Image
+          source={images.DEFAULT_USER}
+          resizeMode="contain"
+          style={styles.userImage}
+        />
+      </TouchableOpacity>
       <Image
         resizeMode="contain"
         source={images.AMBULANCE}
         style={styles.image}
       />
+
       <Text
         style={{
           marginHorizontal: wp(10),

@@ -7,30 +7,47 @@ type SetDataProps = {
 };
 
 export const setData = async (props: SetDataProps): Promise<void> => {
-  const { value, storageKey } = props;
+  const {value, storageKey} = props;
 
   try {
-    await AsyncStorage.setItem(storageKey, value);
-    console.log("value stored =>",value);
+    const serializedValue = JSON.stringify(value);
+    await AsyncStorage.setItem(storageKey, serializedValue);
+    console.log('object stored =>', value);
   } catch (e) {
-    console.log("some error occured",e);
-    
+    console.log('some error occured', e);
   }
 };
 
-
 type GetDataProps = {
-    storageKey: string;
-  };
-  
-  export const getData = async (props: GetDataProps): Promise<void | string> => {
-    const { storageKey } = props;
-    try {
-      const value = await AsyncStorage.getItem(storageKey);
-      if (value !== null) {
-        return value;
-      }
-    } catch (e) {
-        console.log("some error occured",e);
-    }
-  };
+  storageKey: string;
+};
+
+export const getData = async (props: GetDataProps): Promise<string | null> => {
+  const {storageKey} = props;
+
+  try {
+    const serializedValue = await AsyncStorage.getItem(storageKey);
+    // console.log('Serialized value:', serializedValue);
+    // console.log('Type of serialized value:', typeof serializedValue);
+
+    return serializedValue !== null ? serializedValue : null;
+  } catch (e) {
+    console.log('Error occurred:', e);
+    return null;
+  }
+};
+
+type RemoveDataProps = {
+  storageKey: string;
+};
+
+export const removeData = async (props: RemoveDataProps): Promise<void> => {
+  const {storageKey} = props;
+
+  try {
+    await AsyncStorage.removeItem(storageKey);
+    console.log('Data removed');
+  } catch (e) {
+    console.log('Error occurred:', e);
+  }
+};

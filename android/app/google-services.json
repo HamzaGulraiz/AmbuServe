@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "828596412871",
+    "project_id": "ambuserve",
+    "storage_bucket": "ambuserve.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828596412871:android:c02393371d3548ebb2f9e2",
+        "android_client_info": {
+          "package_name": "com.ambuserve"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828596412871-pec1j6vak7s2epda5bddpiqhb1go3mad.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ambuserve",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "828596412871-1l3fhli33rjojtvs176kofmngvkb9356.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3-1u3_tLMk3tOEj7-LQGxoMQTlLCMUDg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828596412871-1l3fhli33rjojtvs176kofmngvkb9356.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
