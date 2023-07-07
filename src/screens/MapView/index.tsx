@@ -132,9 +132,23 @@ const Maps = () => {
     <SafeAreaView style={styles.container}>
       {region.latitude != null ? (
         <>
-          <View style={styles.searchBar}>
+          <View style={styles.searchBarFrom}>
             <GooglePlacesAutocomplete
-              placeholder="Enter Location"
+              placeholder="Current location"
+              onPress={(data, details = null) => {
+                // 'details' is provided when fetchDetails = true
+                console.log(data, details);
+              }}
+              query={{
+                key: MY_KEY,
+                language: 'en',
+              }}
+              // predefinedPlaces={predefinedPlaces}
+            />
+          </View>
+          <View style={styles.searchBarTo}>
+            <GooglePlacesAutocomplete
+              placeholder="Where to"
               onPress={(data, details = null) => {
                 // 'details' is provided when fetchDetails = true
                 console.log(data, details);

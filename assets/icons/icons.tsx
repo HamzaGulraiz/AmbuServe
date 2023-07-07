@@ -7,6 +7,9 @@ const icons = {
   FORWARD_ARROW: require('./frontArrow.png'),
   STAR: require('./star.png'),
   CHECK: require('./check.png'),
+  MAP: require('./map.png'),
+  ACTIVITY: require('./activity.png'),
+  PROFILE: require('./profile.png'),
 };
 
 export default icons;

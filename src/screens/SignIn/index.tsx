@@ -152,9 +152,9 @@ const SignIn = () => {
       })
       .catch(error => {
         console.log(error);
+        Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
+        setSignUpIsLoaded(false);
       });
-
-    setSignUpIsLoaded(false);
   };
 
   const [emailError, setEmailError] = useState('');
@@ -171,9 +171,9 @@ const SignIn = () => {
       });
     } else if (regx.test(value) === false) {
       setEmailError('Invalid format');
-      setTimeout(() => {
-        setEmailError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setEmailError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         emailValid: false,
@@ -201,20 +201,29 @@ const SignIn = () => {
         ...userInfoValid,
         passwordValid: false,
       });
-    } else if (!value.trimEnd() || value.length <= 6 || value.length > 15) {
-      setPasswordError('6-15 characters');
-      setTimeout(() => {
-        setPasswordError('');
-      }, 2000);
+    } else if (!value.trimEnd() || value.length <= 6) {
+      setPasswordError('Atleast 6 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        passwordValid: false,
+      });
+    } else if (!value.trimEnd() || value.length > 30) {
+      setPasswordError('Max 30 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         passwordValid: false,
       });
     } else if (reg.test(value) === false) {
-      setPasswordError('Invalid password format');
-      setTimeout(() => {
-        setPasswordError('');
-      }, 2000);
+      setPasswordError('user Aplhabets,numbers and special characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         passwordValid: false,
@@ -254,6 +263,19 @@ const SignIn = () => {
         marginBottom={hp(10)}
       />
       <ScrollView>
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {emailError}
+        </Text>
         <TextInput
           value={email}
           onChangeText={value => {
@@ -262,14 +284,27 @@ const SignIn = () => {
           style={{
             ...styles.input,
             borderColor: emailError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
           }}
           placeholder="Email"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {passowrdError}
+        </Text>
         <View style={styles.passwordInputView}>
           <TextInput
             value={password}
@@ -287,6 +322,7 @@ const SignIn = () => {
             numberOfLines={1}
             multiline={false}
             maxLength={30}
+            autoCapitalize="none"
           />
           <TouchableOpacity
             style={{

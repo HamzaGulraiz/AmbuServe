@@ -9,7 +9,11 @@ import 'react-native-gesture-handler';
 import {Provider} from 'react-redux';
 import store from './src/redux/Store';
 import {NavigationContainer} from '@react-navigation/native';
-import {DASHBOARD, SPLASH_SCREEN} from './src/constants/Navigator';
+import {
+  DASHBOARD,
+  MY_BOTTOM_TABS,
+  SPLASH_SCREEN,
+} from './src/constants/Navigator';
 import {getData} from './src/asyncStorage/AsyncStorage';
 import React, {useEffect, useState, useRef} from 'react';
 import {AppState, StyleSheet, Text, View} from 'react-native';
@@ -46,8 +50,18 @@ const AppContainer = () => {
       try {
         const result = await getData({storageKey: 'USER_INFO'});
         if (result === null) {
-          setRouteName(SPLASH_SCREEN);
-          console.log('no result on index.js from storage =>');
+          try {
+            const driverInfo = await getData({storageKey: 'DRIVER_INFO'});
+            if (driverInfo === null) {
+              setRouteName(SPLASH_SCREEN);
+              console.log('no result on index.js from storage');
+            } else {
+              setRouteName(MY_BOTTOM_TABS);
+              console.log('driver result on index.js from storage');
+            }
+          } catch (e) {
+            console.log('drivers catch index', e);
+          }
         } else {
           const responseObj = JSON.parse(result);
           setUserInfornation(responseObj);

@@ -1,6 +1,7 @@
 const express = require('express');
 const DB = require('./config');
 const userRegister = require('./userRegister');
+const driverRegister = require('./driverRegister');
 // const userLogin = require('./userLogin');
 const app = express();
 const jwt = require('jsonwebtoken');
@@ -9,6 +10,8 @@ const secretKey = 'secretKey';
 DB();
 
 app.use(express.json());
+
+///////////////// user apis ////////////////////////////////
 app.post('/create', async (req, resp) => {
   let data = new userRegister(req.body);
   let email = data.email;
@@ -69,6 +72,26 @@ app.put('/update/:_id', async (req, resp) => {
   console.log(req.params);
   let data = await userRegister.updateOne(req.params, {$set: req.body});
   resp.send(data);
+});
+
+///////////// drivers api///////////////////////////
+
+app.post('/driver/register', async (req, resp) => {
+  let data = new driverRegister(req.body);
+  let company_email = data.company_email;
+  // console.log(email);
+  let findEmail = await driverRegister.findOne({company_email});
+  if (findEmail) {
+    console.log('Email already exists');
+    return resp.send('Email already exists');
+  }
+  // // console.log('posted', data.email);
+
+  const token = jwt.sign({data}, secretKey, {expiresIn: '10000s'});
+  data.token = token;
+  console.log('jwt =>', data);
+  const result = await data.save();
+  return resp.send(result);
 });
 
 const PORT = 8000;

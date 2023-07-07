@@ -103,7 +103,7 @@ const UserInformation = () => {
   //   setCNIC(userInfo.cnic);
   //   console.log('userInfo page', appState, userInfo);
   // }, []);
-
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -592,14 +592,14 @@ const UserInformation = () => {
             ...styles.input,
             borderColor: emailError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
-            color: editButton ? colors.BLUE : colors.BLACK,
+            color: colors.BLACK,
           }}
           placeholder="Email"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
-          editable={editButton}
+          editable={false}
         />
         <View style={styles.passwordInputView}>
           <TextInput

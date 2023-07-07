@@ -185,11 +185,11 @@ const SignUp = () => {
         ...userInfoValid,
         fullNameValid: false,
       });
-    } else if (value.length >= 15) {
-      setFullNameError('Invalid format');
-      setTimeout(() => {
-        setFullNameError('');
-      }, 2000);
+    } else if (value.length >= 30) {
+      setFullNameError('Max 30 characters');
+      // setTimeout(() => {
+      //   setFullNameError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         fullNameValid: false,
@@ -219,9 +219,9 @@ const SignUp = () => {
       });
     } else if (regx.test(value) === false) {
       setEmailError('Invalid format');
-      setTimeout(() => {
-        setEmailError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setEmailError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         emailValid: false,
@@ -249,20 +249,29 @@ const SignUp = () => {
         ...userInfoValid,
         passwordValid: false,
       });
-    } else if (!value.trimEnd() || value.length <= 6 || value.length > 15) {
-      setPasswordError('6-15 characters');
-      setTimeout(() => {
-        setPasswordError('');
-      }, 2000);
+    } else if (!value.trimEnd() || value.length <= 6) {
+      setPasswordError('Atleast 6 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        passwordValid: false,
+      });
+    } else if (!value.trimEnd() || value.length > 30) {
+      setPasswordError('Max 30 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         passwordValid: false,
       });
     } else if (reg.test(value) === false) {
-      setPasswordError('Invalid password format');
-      setTimeout(() => {
-        setPasswordError('');
-      }, 2000);
+      setPasswordError('user Aplhabets,numbers and special characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         passwordValid: false,
@@ -289,6 +298,16 @@ const SignUp = () => {
         contactValid: false,
       });
     } else if (value.length > 11) {
+      setContactError('Invalid format');
+      setTimeout(() => {
+        setContactError('');
+      }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        contactValid: false,
+      });
+      //  console.log(userInfoValid);
+    } else if (value.length < 11) {
       setContactError('Invalid format');
       setTimeout(() => {
         setContactError('');
@@ -360,6 +379,16 @@ const SignUp = () => {
         emergencyValid: false,
       });
       //  console.log(userInfoValid);
+    } else if (value.length < 11) {
+      setEmergencyContactError('Invalid format');
+      setTimeout(() => {
+        setEmergencyContactError('');
+      }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        emergencyValid: false,
+      });
+      //  console.log(userInfoValid);
     } else {
       setEmergencyContactError('');
       setUserInfoValid({
@@ -382,7 +411,17 @@ const SignUp = () => {
         CNICValid: false,
       });
     } else if (value.length > 13) {
-      setCNICError('Invalid format');
+      setCNICError('13 characters only');
+      // setTimeout(() => {
+      //   setCNICError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        CNICValid: false,
+      });
+      //  console.log(userInfoValid);
+    } else if (value.length < 13) {
+      setCNICError('13 characters');
       setTimeout(() => {
         setCNICError('');
       }, 2000);
@@ -441,6 +480,19 @@ const SignUp = () => {
         marginBottom={hp(6)}
       />
       <ScrollView>
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {fullNameError}
+        </Text>
         <TextInput
           value={fullName}
           onChangeText={value => {
@@ -449,14 +501,28 @@ const SignUp = () => {
           style={{
             ...styles.input,
             borderColor: fullNameError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Full Name"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {emailError}
+        </Text>
         <TextInput
           value={email}
           onChangeText={value => {
@@ -465,14 +531,28 @@ const SignUp = () => {
           style={{
             ...styles.input,
             borderColor: emailError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Email"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {passowrdError}
+        </Text>
         <View style={styles.passwordInputView}>
           <TextInput
             value={password}
@@ -482,7 +562,7 @@ const SignUp = () => {
             style={{
               ...styles.input,
               borderColor: passowrdError ? colors.RED : colors.BLUE,
-              marginBottom: hp(2),
+              // marginBottom: hp(2),
             }}
             placeholder="Enter your password"
             placeholderTextColor={colors.BLUE}
@@ -490,12 +570,13 @@ const SignUp = () => {
             numberOfLines={1}
             multiline={false}
             maxLength={30}
+            autoCapitalize="none"
           />
           <TouchableOpacity
             style={{
               position: 'absolute',
               right: wp(8),
-              bottom: hp(4),
+              bottom: hp(2),
             }}
             onPress={() => {
               setShowPassword(prevState => !prevState);
@@ -507,6 +588,19 @@ const SignUp = () => {
             />
           </TouchableOpacity>
         </View>
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {contactError}
+        </Text>
         <TextInput
           value={contact}
           onChangeText={value => {
@@ -515,7 +609,7 @@ const SignUp = () => {
           style={{
             ...styles.input,
             borderColor: contactError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           keyboardType="numeric"
           placeholder="Contact"
@@ -523,7 +617,21 @@ const SignUp = () => {
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          // autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {addressError}
+        </Text>
         <TextInput
           value={address}
           onChangeText={value => {
@@ -532,14 +640,28 @@ const SignUp = () => {
           style={{
             ...styles.input,
             borderColor: addressError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Address"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {emergencyContactError}
+        </Text>
         <TextInput
           value={emergencyContact}
           onChangeText={value => {
@@ -549,7 +671,7 @@ const SignUp = () => {
           style={{
             ...styles.input,
             borderColor: emergencyContactError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           keyboardType="numeric"
           placeholder="Emergency contact"
@@ -558,6 +680,19 @@ const SignUp = () => {
           multiline={false}
           maxLength={30}
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {CNICError}
+        </Text>
         <TextInput
           value={CNIC}
           onChangeText={value => {
@@ -568,6 +703,7 @@ const SignUp = () => {
             borderColor: CNICError ? colors.RED : colors.BLUE,
             marginBottom: hp(2),
           }}
+          keyboardType="numeric"
           placeholder="CNIC"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}

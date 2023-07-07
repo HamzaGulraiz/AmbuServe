@@ -2,11 +2,14 @@ import React, {useState, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   DASHBOARD,
+  DRIVER_Activity,
+  DRIVER_MAP,
+  DRIVER_Profile,
   MAPS,
+  MY_BOTTOM_TABS,
   SIGN_IN,
   SIGN_IN_AS_DRIVER,
   SIGN_UP,
-  SIGN_UP_AS_DRIVER,
   SPLASH_SCREEN,
   USER_INFORMATION,
 } from '../../constants/Navigator';
@@ -14,12 +17,14 @@ import SplashScreen from '../../screens/SplashScreen';
 import SignIn from '../../screens/SignIn';
 import SignUp from '../../screens/SignUp';
 import SignInAsDriver from '../../screens/SignInAsDriver';
-import SignUpAsDriver from '../../screens/SignUpAsDriver';
+
 import DashBoard from '../../screens/DashBoard';
 import Maps from '../../screens/MapView';
 import {getData} from '../../asyncStorage/AsyncStorage';
 import UserInformation from '../../screens/UserInformation';
 import {useTypedSelector} from '../../redux/Store';
+import MyBottomTabs from '../BottomTabNavigator/Navigators';
+
 // import { RootStackParams } from './types';
 
 export type RootStackParams = {
@@ -27,10 +32,10 @@ export type RootStackParams = {
   SignIn: any;
   SignUp: any;
   SignInAsDriver: any;
-  SignUpAsDriver: any;
   DashBoard: any;
   Maps: any;
   UserInformation: any;
+  MyBottomTabs: any;
 };
 
 // type RouteName = {
@@ -66,10 +71,11 @@ const StackNavigator: React.FC<RouteName> = ({routeName}) => {
       <Stack.Screen name={SIGN_IN} component={SignIn} />
       <Stack.Screen name={SIGN_UP} component={SignUp} />
       <Stack.Screen name={SIGN_IN_AS_DRIVER} component={SignInAsDriver} />
-      <Stack.Screen name={SIGN_UP_AS_DRIVER} component={SignUpAsDriver} />
+
       <Stack.Screen name={DASHBOARD} component={DashBoard} />
       <Stack.Screen name={MAPS} component={Maps} />
       <Stack.Screen name={USER_INFORMATION} component={UserInformation} />
+      <Stack.Screen name={MY_BOTTOM_TABS} component={MyBottomTabs} />
     </Stack.Navigator>
   );
 };

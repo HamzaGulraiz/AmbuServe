@@ -26,7 +26,18 @@ import icons from '../../../assets/icons/icons';
 import Divider from '../../components/Divider/Divider';
 import fonts from '../../../assets/fonts/fonts';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
-import {SIGN_IN, SIGN_UP} from '../../constants/Navigator';
+import {
+  DRIVER_MAP,
+  MY_BOTTOM_TABS,
+  SIGN_IN,
+  SIGN_UP,
+} from '../../constants/Navigator';
+import axios from 'axios';
+import Toast from 'react-native-simple-toast';
+import {setData} from '../../asyncStorage/AsyncStorage';
+import {setUserInfo} from '../../redux/Action';
+import {useDispatch} from 'react-redux';
+import {BASE_URL} from '../../../config';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -38,6 +49,7 @@ type NavigationProps = {
 
 const SignInAsDriver = () => {
   const navigation = useNavigation<NavigationProps>();
+  const dispatch = useDispatch();
 
   const [toogleCheck, setToogleCheck] = useState(false);
   const [toogleCheckError, setToogleCheckError] = useState('');
@@ -48,14 +60,12 @@ const SignInAsDriver = () => {
   const [driverNumber, setDriverNumber] = useState('');
   const [officeAddress, setOfficeAddress] = useState('');
   const [companyEmail, setCompanyEmail] = useState('');
-
+ 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
-  const [signUpIsLoaded, setSignUpIsLoaded] = useState(false);
-  const [facebookIsLoaded, setFacebookIsLoaded] = useState(false);
-  const [gmailIsLoaded, setGmailIsLoaded] = useState(false);
+  const [signInIsLoaded, setSignInIsLoaded] = useState(false);
 
   //User Information After Validation
   const [userInfoValid, setUserInfoValid] = useState({
@@ -117,69 +127,58 @@ const SignInAsDriver = () => {
     officeAddress?: string,
     companyEmail?: string,
   ) => {
-    setSignUpIsLoaded(true);
+    setSignInIsLoaded(true);
     let data = JSON.stringify({
-      companyName: companyName,
-      vehicleNumber: vehicleNumber,
-      driverName: driverName,
-      driverNumber: driverNumber,
-      officeAddress: officeAddress,
-      companyEmail: companyEmail,
+      company_name: companyName,
+      vehicle_number: vehicleNumber,
+      driver_name: driverName,
+      driver_contact: driverNumber,
+      office_address: officeAddress,
+      company_email: companyEmail,
     });
 
-    setTimeout(() => {
-      console.log(data);
-      setSignUpIsLoaded(false);
-      // navigation.replace(MY_TABS);
-    }, 2000);
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/driver/register`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    };
 
-    // let config = {
-    //   method: 'post',
-    //   maxBodyLength: Infinity,
-    //   url: `${Config.base_Url}register`,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   data: data,
-    // };
-
-    // axios
-    //   .request(config)
-    //   .then(response => {
-    //     //setErrorMessage(response.data.message);
-    //     console.log('axios then', JSON.stringify(response.data));
-
-    //     ////Storing token in async/////
-    //     const tokenValue = response.data.data.token;
-    //     console.log('token sent by async register', tokenValue);
-    //     AsyncStorage.setItem('userToken', tokenValue);
-    //     /////////Userinformation
-    //     const userInfo = JSON.stringify(response.data.data);
-    //     console.log('user Info sent from login', userInfo);
-    //     AsyncStorage.setItem('userInfo', userInfo);
-    //     ////Redux storage
-    //     dispatch(
-    //       userTokenRedux({
-    //         token: tokenValue,
-    //       }),
-    //     );
-
-    //     setIsLoaded(true);
-    //     navigation.navigate('DrawerNavigation');
-    //   })
-    //   .catch(error => {
-    //     console.log('Register Catch', error.response);
-    //     setIsLoaded(true);
-    //     setErrorMessage(error.response.data.message);
-    //     Toast.show(errorMessage, {
-    //       duration: Toast.durations.LONG,
-    //       position: Toast.positions.BOTTOM,
-    //       shadow: true,
-    //       animation: true,
-    //       hideOnPress: true,
-    //       delay: 0,
-    //     });
-    //   });
+    axios
+      .request(config)
+      .then(response => {
+        //setErrorMessage(response.data.message);
+        // console.log('axios then', response.data);
+        if (response.data === 'Email already exists') {
+          Toast.showWithGravity(
+            'Email already exists. Try another email',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignInIsLoaded(false);
+        } else {
+          console.log(
+            'data came from node response in signup =>',
+            response.data,
+          );
+          // dispatch(setUserInfo(response.data));
+          setData({value: response.data, storageKey: 'DRIVER_INFO'});
+          setSignInIsLoaded(false);
+          navigation.replace(MY_BOTTOM_TABS);
+        }
+      })
+      .catch(error => {
+        console.log('Register Catch', error);
+        setSignInIsLoaded(false);
+        Toast.showWithGravity(
+          'some error occuoured. Try again',
+          Toast.SHORT,
+          Toast.BOTTOM,
+        );
+      });
   };
 
   const [companyNameError, setCompanyNameError] = useState('');
@@ -193,11 +192,11 @@ const SignInAsDriver = () => {
         ...userInfoValid,
         companyNameValid: false,
       });
-    } else if (value.length > 20) {
-      setCompanyNameError('Invalid format');
-      setTimeout(() => {
-        setCompanyNameError('');
-      }, 2000);
+    } else if (value.length > 30) {
+      setCompanyNameError('Max 30 characters');
+      // setTimeout(() => {
+      //   setCompanyNameError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         companyNameValid: false,
@@ -225,10 +224,10 @@ const SignInAsDriver = () => {
         vehicleNumberValid: false,
       });
     } else if (value.length > 10) {
-      setVehicleNumberError('Invalid format');
-      setTimeout(() => {
-        setVehicleNumberError('');
-      }, 2000);
+      setVehicleNumberError('Max 10 characters');
+      // setTimeout(() => {
+      //   setVehicleNumberError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         vehicleNumberValid: false,
@@ -255,11 +254,11 @@ const SignInAsDriver = () => {
         ...userInfoValid,
         driverNameValid: false,
       });
-    } else if (value.length > 15) {
-      setDriverNameError('Invalid format');
-      setTimeout(() => {
-        setDriverNameError('');
-      }, 2000);
+    } else if (value.length > 30) {
+      setDriverNameError('Max 30 characters');
+      // setTimeout(() => {
+      //   setDriverNameError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         driverNameValid: false,
@@ -296,6 +295,16 @@ const SignInAsDriver = () => {
         driverNumberValid: false,
       });
       //  console.log(userInfoValid);
+    } else if (value.length < 11) {
+      setDriverNumberError('Invalid format');
+      setTimeout(() => {
+        setDriverNumberError('');
+      }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        driverNumberValid: false,
+      });
+      //  console.log(userInfoValid);
     } else {
       setDriverNumberError('');
       setUserInfoValid({
@@ -317,7 +326,7 @@ const SignInAsDriver = () => {
         ...userInfoValid,
         officeAddressValid: false,
       });
-    } else if (value.length > 40) {
+    } else if (value.length > 50) {
       setOfficeAddressError('Invalid format');
       setTimeout(() => {
         setOfficeAddressError('');
@@ -351,9 +360,9 @@ const SignInAsDriver = () => {
       });
     } else if (regx.test(value) === false) {
       setCompanyEmailError('Invalid format');
-      setTimeout(() => {
-        setCompanyEmailError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setCompanyEmailError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         companyEmailValid: false,
@@ -404,9 +413,22 @@ const SignInAsDriver = () => {
         onPressLeftIcon={() => {
           navigation.goBack();
         }}
-        marginBottom={hp(10)}
+        marginBottom={hp(6)}
       />
       <ScrollView>
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {companyNameError}
+        </Text>
         <TextInput
           value={companyName}
           onChangeText={value => {
@@ -415,14 +437,28 @@ const SignInAsDriver = () => {
           style={{
             ...styles.input,
             borderColor: companyNameError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Company Name"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {vehicleNumberError}
+        </Text>
         <TextInput
           value={vehicleNumber}
           onChangeText={value => {
@@ -431,14 +467,28 @@ const SignInAsDriver = () => {
           style={{
             ...styles.input,
             borderColor: vehicleNumberError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Vehicle Number"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
-          maxLength={30}
+          maxLength={10}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {driverNameError}
+        </Text>
         <TextInput
           value={driverName}
           onChangeText={value => {
@@ -447,14 +497,28 @@ const SignInAsDriver = () => {
           style={{
             ...styles.input,
             borderColor: driverNameError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Driver Name"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {driverNumberError}
+        </Text>
         <TextInput
           value={driverNumber}
           onChangeText={value => {
@@ -463,15 +527,28 @@ const SignInAsDriver = () => {
           style={{
             ...styles.input,
             borderColor: driverNumberError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Driver Number"
           keyboardType="numeric"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
-          maxLength={30}
+          maxLength={11}
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {officeAddressError}
+        </Text>
         <TextInput
           value={officeAddress}
           onChangeText={value => {
@@ -480,14 +557,28 @@ const SignInAsDriver = () => {
           style={{
             ...styles.input,
             borderColor: officeAddressError ? colors.RED : colors.BLUE,
-            marginBottom: hp(2),
+            // marginBottom: hp(2),
           }}
           placeholder="Office Address"
           placeholderTextColor={colors.BLUE}
           numberOfLines={1}
           multiline={false}
-          maxLength={30}
+          maxLength={50}
+          autoCapitalize="none"
         />
+        <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {companyEmailError}
+        </Text>
         <TextInput
           value={companyEmail}
           onChangeText={value => {
@@ -503,12 +594,13 @@ const SignInAsDriver = () => {
           numberOfLines={1}
           multiline={false}
           maxLength={30}
+          autoCapitalize="none"
         />
 
         <View
           style={{
             flexDirection: 'row',
-            marginHorizontal: wp(5),
+            marginHorizontal: wp(6),
             alignItems: 'center',
           }}>
           <TouchableOpacity
@@ -549,7 +641,7 @@ const SignInAsDriver = () => {
           title="Apply"
           textColor={colors.WHITE}
           backgroundColor={colors.BLUE}
-          activityIndicator={signUpIsLoaded}
+          activityIndicator={signInIsLoaded}
           height={hp(6)}
           width={wp(90)}
           borderRadius={wp(2)}

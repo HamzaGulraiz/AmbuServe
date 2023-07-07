@@ -11,17 +11,13 @@ import colors from '../../../assets/colors/colors';
 import fonts from '../../../assets/fonts/fonts';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import {
-  ACTIVITY,
-  HOME,
-  TRADES,
-  WALLET,
-  SETTINGS,
+  DRIVER_Activity,
+  DRIVER_MAP,
+  DRIVER_Profile,
 } from '../../constants/Navigator';
-import Home from '../../screens/Home';
-import Trades from '../../screens/Trades';
-import Activity from '../../screens/Activity';
-import Wallet from '../../screens/Wallet';
-import Settings from '../../screens/Settings';
+import DriverMap from '../../screens/DriversFlow/Maps';
+import Activity from '../../screens/DriversFlow/Activity';
+import Profile from '../../screens/DriversFlow/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,7 +29,7 @@ function MyBottomTabs() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: colors.DARK.BACKGROUND,
+          // backgroundColor: colors.DARK.BACKGROUND,
           // marginHorizontal: wp(4),
           // marginBottom: hp(2),
           // borderRadius: wp(5),
@@ -41,29 +37,29 @@ function MyBottomTabs() {
         },
       }}>
       <Tab.Screen
-        name={HOME}
-        component={Home}
+        name={DRIVER_MAP}
+        component={DriverMap}
         options={{
           tabBarIcon: ({focused}) =>
             focused ? (
               <>
                 <Image
-                  source={icons.HOME}
+                  source={icons.MAP}
                   resizeMode="contain"
                   style={{
                     ...styles.tabIcon,
-                    tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
+                    // tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
                   }}
                 />
               </>
             ) : (
               <>
                 <Image
-                  source={icons.HOME}
+                  source={icons.MAP}
                   resizeMode="contain"
                   style={{
                     ...styles.tabIcon,
-                    tintColor: colors.DARK.GREY_BUTTON,
+                    // tintColor: colors.DARK.GREY_BUTTON,
                   }}
                 />
               </>
@@ -71,67 +67,7 @@ function MyBottomTabs() {
         }}
       />
       <Tab.Screen
-        name={WALLET}
-        component={Wallet}
-        options={{
-          tabBarIcon: ({focused}) =>
-            focused ? (
-              <>
-                <Image
-                  source={icons.WALLET}
-                  resizeMode="contain"
-                  style={{
-                    ...styles.tabIcon,
-                    tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                <Image
-                  source={icons.WALLET}
-                  resizeMode="contain"
-                  style={{
-                    ...styles.tabIcon,
-                    tintColor: colors.DARK.GREY_BUTTON,
-                  }}
-                />
-              </>
-            ),
-        }}
-      />
-      <Tab.Screen
-        name={TRADES}
-        component={Trades}
-        options={{
-          tabBarIcon: ({focused}) =>
-            focused ? (
-              <>
-                <Image
-                  source={icons.TRADES}
-                  resizeMode="contain"
-                  style={{
-                    ...styles.tabIcon,
-                    tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                <Image
-                  source={icons.TRADES}
-                  resizeMode="contain"
-                  style={{
-                    ...styles.tabIcon,
-                    tintColor: colors.DARK.GREY_BUTTON,
-                  }}
-                />
-              </>
-            ),
-        }}
-      />
-      <Tab.Screen
-        name={ACTIVITY}
+        name={DRIVER_Activity}
         component={Activity}
         options={{
           tabBarIcon: ({focused}) =>
@@ -142,7 +78,7 @@ function MyBottomTabs() {
                   resizeMode="contain"
                   style={{
                     ...styles.tabIcon,
-                    tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
+                    // tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
                   }}
                 />
               </>
@@ -153,7 +89,7 @@ function MyBottomTabs() {
                   resizeMode="contain"
                   style={{
                     ...styles.tabIcon,
-                    tintColor: colors.DARK.GREY_BUTTON,
+                    // tintColor: colors.DARK.GREY_BUTTON,
                   }}
                 />
               </>
@@ -161,32 +97,29 @@ function MyBottomTabs() {
         }}
       />
       <Tab.Screen
-        name={SETTINGS}
-        component={Settings}
+        name={DRIVER_Profile}
+        component={Profile}
         options={{
-          tabBarStyle: {
-            display: 'none',
-          },
           tabBarIcon: ({focused}) =>
             focused ? (
               <>
                 <Image
-                  source={icons.SETTINGS}
+                  source={icons.PROFILE}
                   resizeMode="contain"
                   style={{
                     ...styles.tabIcon,
-                    tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
+                    // tintColor: colors.DARK.LIGHT_BLUE_BUTTON,
                   }}
                 />
               </>
             ) : (
               <>
                 <Image
-                  source={icons.SETTINGS}
+                  source={icons.PROFILE}
                   resizeMode="contain"
                   style={{
                     ...styles.tabIcon,
-                    tintColor: colors.DARK.GREY_BUTTON,
+                    // tintColor: colors.DARK.GREY_BUTTON,
                   }}
                 />
               </>

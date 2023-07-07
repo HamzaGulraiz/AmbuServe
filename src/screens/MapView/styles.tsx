@@ -14,8 +14,16 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
   },
-  searchBar: {
+  searchBarFrom: {
     marginTop: hp(2),
+    paddingHorizontal: wp(5),
+    position: 'absolute',
+    // height: hp(6),
+    width: '100%',
+    zIndex: 1,
+  },
+  searchBarTo: {
+    marginTop: hp(8),
     paddingHorizontal: wp(5),
     position: 'absolute',
     // height: hp(6),
