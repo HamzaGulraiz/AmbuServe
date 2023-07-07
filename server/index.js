@@ -11,7 +11,7 @@ DB();
 
 app.use(express.json());
 
-///////////////// user apis ////////////////////////////////
+///////////////// user apis //////////////////////////
 app.post('/create', async (req, resp) => {
   let data = new userRegister(req.body);
   let email = data.email;
@@ -97,5 +97,5 @@ app.post('/driver/register', async (req, resp) => {
 const PORT = 8000;
 
 app.listen(PORT, () => {
-  console.log('Server is running on port ' + PORT);
+  console.log('Server is running on live port ' + PORT);
 });
