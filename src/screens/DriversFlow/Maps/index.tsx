@@ -49,6 +49,18 @@ const DriverMap = () => {
 
   const MY_KEY = 'AIzaSyDmAPrOnDwMg0-3lKuTWHOAfwylLwLj6Yk';
 
+  const [region, setRegion] = useState({
+    latitude: 0,
+    longitude: 0,
+    latitudeDelta: 0.001,
+    longitudeDelta: 0.001,
+  });
+
+  const [markerposition, SetMarkerPosition] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
+
   useEffect(() => {
     locationAccess();
   }, []);
@@ -73,13 +85,19 @@ const DriverMap = () => {
         const {latitude, longitude} = position.coords;
         console.log(`Current location: ${latitude}, ${longitude}`);
         // Do something with the latitude and longitude values
+        setRegion({
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: 0,
+          longitudeDelta: 0,
+        });
       },
       error => {
         console.error(`Error getting location: ${error.message}`);
       },
       {
         enableHighAccuracy: true,
-        distanceFilter: 1, // Minimum distance (in meters) for an update event
+        distanceFilter: 5, // Minimum distance (in meters) for an update event
         interval: 5000, // Interval (in milliseconds) between updates
         fastestInterval: 2000, // Fastest interval (in milliseconds) for updates
         // timeout: 15000, // Maximum time (in milliseconds) to wait for an update
@@ -90,18 +108,6 @@ const DriverMap = () => {
       Geolocation.clearWatch(watchId); // Clear the location tracking when component unmounts
     };
   }, []);
-
-  const [region, setRegion] = useState({
-    latitude: 0,
-    longitude: 0,
-    latitudeDelta: 0.001,
-    longitudeDelta: 0.001,
-  });
-
-  const [markerposition, SetMarkerPosition] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
 
   const locationAccess = async () => {
     const granted = await PermissionsAndroid.check(
@@ -228,6 +234,24 @@ const DriverMap = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+        }}>
+        <Text
+          style={{
+            color: 'black',
+          }}>
+          Lat: {region.latitude}
+        </Text>
+        <Text
+          style={{
+            color: 'black',
+          }}>
+          Long: {region.longitude}
+        </Text>
+      </View>
       {region.latitude != null ? (
         <>
           <MapView
