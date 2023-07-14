@@ -11,6 +11,7 @@ import {
   SIGN_IN_AS_DRIVER,
   SIGN_UP,
   SPLASH_SCREEN,
+  TERMS_AND_CONDITIONS,
   USER_INFORMATION,
 } from '../../constants/Navigator';
 import SplashScreen from '../../screens/SplashScreen';
@@ -24,6 +25,7 @@ import {getData} from '../../asyncStorage/AsyncStorage';
 import UserInformation from '../../screens/UserInformation';
 import {useTypedSelector} from '../../redux/Store';
 import MyBottomTabs from '../BottomTabNavigator/Navigators';
+import TermsAndConditions from '../../screens/TermsandConditions';
 
 // import { RootStackParams } from './types';
 
@@ -32,6 +34,7 @@ export type RootStackParams = {
   SignIn: any;
   SignUp: any;
   SignInAsDriver: any;
+  TermsAndConditions:any,
   DashBoard: any;
   Maps: any;
   UserInformation: any;
@@ -71,6 +74,7 @@ const StackNavigator: React.FC<RouteName> = ({routeName}) => {
       <Stack.Screen name={SIGN_IN} component={SignIn} />
       <Stack.Screen name={SIGN_UP} component={SignUp} />
       <Stack.Screen name={SIGN_IN_AS_DRIVER} component={SignInAsDriver} />
+      <Stack.Screen name={TERMS_AND_CONDITIONS} component={TermsAndConditions} />
 
       <Stack.Screen name={DASHBOARD} component={DashBoard} />
       <Stack.Screen name={MAPS} component={Maps} />

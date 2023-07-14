@@ -8,6 +8,7 @@ export const MAPS = 'Maps';
 export const USER_INFORMATION = 'UserInformation';
 
 export const MY_BOTTOM_TABS = 'MyBottomTabs';
+export const TERMS_AND_CONDITIONS = 'TermsAndConditions';
 
 /////////// Drivers flow ////////////////
 

@@ -27,10 +27,16 @@ import fontsizes from '../../../assets/fontsizes/fontsizes';
 import fonts from '../../../assets/fonts/fonts';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {PermissionsAndroid} from 'react-native';
-import {getData, removeData} from '../../asyncStorage/AsyncStorage';
+import {getData, removeData,setData} from '../../asyncStorage/AsyncStorage';
 import icons from '../../../assets/icons/icons';
 import {useTypedSelector} from '../../redux/Store';
 import {set} from 'mongoose';
+import CustomHeader from '../../components/HeaderBar/Header';
+import axios from 'axios';
+import Toast from 'react-native-simple-toast';
+import {useDispatch} from 'react-redux';
+import {setUserInfo} from '../../redux/Action';
+import { BASE_URL } from '../../../config';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -52,33 +58,11 @@ interface UserInfo {
   token: string;
 }
 
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       const result = await getData({storageKey: 'USER_INFO'}); // Call the getData function
-//       if (result === null) {
-//         console.log(result, 'null');
-//       } else if (typeof result === 'string') {
-//         // console.log('Data on splash screen ==>', result);
-//         const responseObj = JSON.parse(result);
-//         setFullName(responseObj.full_name);
-//         setEmail(responseObj.email);
-//         setPassword(responseObj.password);
-//         setContact(responseObj.contact);
-//         setAddress(responseObj.address);
-//         setEmercencyContact(responseObj.emercency_contact);
-//         setCNIC(responseObj.cnic);
-//         // console.log(responseObj.token);
-//       }
-//     } catch (error) {
-//       console.log('Error occurred:', error);
-//     }
-//   };
-//   fetchData();
-// }, []);
+
 
 const UserInformation = () => {
   const navigation = useNavigation<NavigationProps>();
+  const dispatch = useDispatch();
   const userInfo = useTypedSelector(state => state.app.userInfo) as UserInfo;
   const appState = useTypedSelector(state => state.app.appState);
   const [editButton, setEditButton] = useState(false);
@@ -88,21 +72,11 @@ const UserInformation = () => {
   const [password, setPassword] = useState('');
   const [contact, setContact] = useState('');
   const [address, setAddress] = useState('');
-  const [emercencyContact, setEmercencyContact] = useState('');
+  const [emergencyContact, setEmergencyContact] = useState('');
   const [CNIC, setCNIC] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [signInIsLoaded, setSignInIsLoaded] = useState(false);
 
-  // useEffect(() => {
-  //   setFullName(userInfo.full_name);
-  //   setEmail(userInfo.email);
-  //   setPassword(userInfo.password);
-  //   setContact(userInfo.contact);
-  //   setAddress(userInfo.address);
-  //   // setEmercencyContact(userInfo.emergency_contact);
-  //   setCNIC(userInfo.cnic);
-  //   console.log('userInfo page', appState, userInfo);
-  // }, []);
  
   useEffect(() => {
     const fetchData = async () => {
@@ -117,7 +91,7 @@ const UserInformation = () => {
           setPassword(responseObj.password);
           setContact(responseObj.contact);
           setAddress(responseObj.address);
-          setEmercencyContact(responseObj.emergency_contact);
+          setEmergencyContact(responseObj.emergency_contact);
           setCNIC(responseObj.cnic);
           console.log('Data on userinfo screen ==>', responseObj);
         }
@@ -130,23 +104,23 @@ const UserInformation = () => {
 
   //User Information After Validation
   const [userInfoValid, setUserInfoValid] = useState({
-    fullNameValid: false,
-    emailValid: false,
-    passwordValid: false,
-    contactValid: false,
-    addressValid: false,
-    emercencyValid: false,
-    CNICValid: false,
+    fullNameValid: true,
+    emailValid: true,
+    passwordValid: true,
+    contactValid: true,
+    addressValid: true,
+    emergencyValid: true,
+    CNICValid: true,
   });
 
-  const signInValidation = () => {
+  const updateValidation = () => {
     if (
       userInfoValid.fullNameValid === false ||
       userInfoValid.emailValid === false ||
       userInfoValid.passwordValid === false ||
       userInfoValid.contactValid === false ||
       userInfoValid.addressValid === false ||
-      userInfoValid.emercencyValid === false ||
+      userInfoValid.emergencyValid === false ||
       userInfoValid.CNICValid === false
     ) {
       setFullNameError('  ');
@@ -167,76 +141,88 @@ const UserInformation = () => {
         setCNICError('');
       }, 2000);
     } else {
-      signInUser(
+      updateUserInfo(
         fullName,
         email,
         password,
         contact,
         address,
-        emercencyContact,
+        emergencyContact,
         CNIC,
       );
     }
   };
 
-  const signInUser = (
+  const updateUserInfo = (
     fullName?: string,
     email?: string,
     password?: string,
     contact?: string,
     address?: string,
-    emercencyContact?: string,
+    emergencyContact?: string,
     CNIC?: string,
   ) => {
-    // setSignInIsLoaded(true);
+    setSignInIsLoaded(true);
     let data = JSON.stringify({
       full_name: fullName,
       email: email,
       password: password,
       contact: contact,
       address: address,
-      emercency_contact: emercencyContact,
+      emercency_contact: emergencyContact,
       cnic: CNIC,
     });
 
-    // let config = {
-    //   method: 'post',
-    //   maxBodyLength: Infinity,
-    //   url: `${BASE_URL}/create`,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   data: data,
-    // };
+    let config = {
+      method: 'put',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/update`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    };
 
-    // axios
-    //   .request(config)
-    //   .then(response => {
-    //     //setErrorMessage(response.data.message);
-    //     // console.log('axios then', response.data);
-    //     if (response.data === 'Email already exists') {
-    //       Toast.showWithGravity(
-    //         'Email already exists. Try another email',
-    //         Toast.SHORT,
-    //         Toast.BOTTOM,
-    //       );
-    //       setSignInIsLoaded(false);
-    //     } else {
-    //       setData({value: response.data, storageKey: 'USER_INFO'});
-    //       navigation.replace(DASHBOARD);
-    //       setSignInIsLoaded(false);
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.log('Register Catch', error);
-    //     setSignInIsLoaded(false);
-    //     Toast.showWithGravity(
-    //       'some error occuoured. Try again',
-    //       Toast.SHORT,
-    //       Toast.BOTTOM,
-    //     );
-    //   });
-    // // setSignInIsLoaded(false);
+    // console.log("data sent on user info edit ===> " , data);
+    
+    axios
+      .request(config)
+      .then(response => {
+        //setErrorMessage(response.data.message);
+        // console.log('axios then', response);
+        Toast.showWithGravity(
+          "Updated",
+          Toast.SHORT,
+          Toast.BOTTOM,
+        );
+        dispatch(setUserInfo(response.data));
+        setData({value: response.data, storageKey: 'USER_INFO'});
+        setEditButton(false);
+        // if (response.data === 'Email already exists') {
+        //   Toast.showWithGravity(
+        //     'Email already exists. Try another email',
+        //     Toast.SHORT,
+        //     Toast.BOTTOM,
+        //   );
+          setSignInIsLoaded(false);
+        // } else {
+        //   setData({value: response.data, storageKey: 'USER_INFO'});
+        //   navigation.replace(DASHBOARD);
+        //   setSignInIsLoaded(false);
+        // }
+      })
+      .catch((error: any) => {
+        // console.log(error);
+        
+        console.log('user info update Catch', error);
+        setSignInIsLoaded(false);
+        Toast.showWithGravity(
+          'some error occuoured. Try again',
+          Toast.SHORT,
+          Toast.BOTTOM,
+        );
+      });
+    setSignInIsLoaded(false);
   };
 
   const [fullNameError, setFullNameError] = useState('');
@@ -250,11 +236,24 @@ const UserInformation = () => {
         ...userInfoValid,
         fullNameValid: false,
       });
-    } else if (value.length >= 15) {
-      setFullNameError('Invalid format');
-      setTimeout(() => {
-        setFullNameError('');
-      }, 2000);
+    } 
+    else if (value.length < 3) {
+      setFullNameError('Atleast 3 characters');
+      // setTimeout(() => {
+      //   setFullNameError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        fullNameValid: false,
+      });
+      //  console.log(userInfoValid);
+    }
+    
+    else if (value.length >= 30) {
+      setFullNameError('Max 30 characters');
+      // setTimeout(() => {
+      //   setFullNameError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         fullNameValid: false,
@@ -284,9 +283,9 @@ const UserInformation = () => {
       });
     } else if (regx.test(value) === false) {
       setEmailError('Invalid format');
-      setTimeout(() => {
-        setEmailError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setEmailError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         emailValid: false,
@@ -304,7 +303,7 @@ const UserInformation = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/;
+    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{8,}$/
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -314,20 +313,29 @@ const UserInformation = () => {
         ...userInfoValid,
         passwordValid: false,
       });
-    } else if (!value.trimEnd() || value.length <= 6 || value.length > 15) {
-      setPasswordError('6-15 characters');
-      setTimeout(() => {
-        setPasswordError('');
-      }, 2000);
+    } else if (!value.trimEnd() || value.length <= 6) {
+      setPasswordError('Atleast 6 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        passwordValid: false,
+      });
+    } else if (!value.trimEnd() || value.length > 30) {
+      setPasswordError('Max 30 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         passwordValid: false,
       });
     } else if (reg.test(value) === false) {
-      setPasswordError('Invalid password format');
-      setTimeout(() => {
-        setPasswordError('');
-      }, 2000);
+      setPasswordError('Use Aplhabets Numbers');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         passwordValid: false,
@@ -344,6 +352,7 @@ const UserInformation = () => {
 
   const [contactError, setContactError] = useState('');
   const contactValidation = (value: string) => {
+    let reg = /^(?=.*?[0-9])[0-9]{11}$/i;
     if (value.length == 0) {
       setContactError('Required!');
       setTimeout(() => {
@@ -353,17 +362,29 @@ const UserInformation = () => {
         ...userInfoValid,
         contactValid: false,
       });
-    } else if (value.length > 11) {
+    }
+    //  else if (value.length > 11) {
+    //   setContactError('Invalid format');
+    //   // setTimeout(() => {
+    //   //   setContactError('');
+    //   // }, 2000);
+    //   setUserInfoValid({
+    //     ...userInfoValid,
+    //     contactValid: false,
+    //   });
+    //   //  console.log(userInfoValid);
+    // } 
+    else if (reg.test(value) === false) {
       setContactError('Invalid format');
-      setTimeout(() => {
-        setContactError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setContactError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         contactValid: false,
       });
       //  console.log(userInfoValid);
-    } else {
+    } else if (reg.test(value) === true) {
       setContactError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -386,9 +407,9 @@ const UserInformation = () => {
       });
     } else if (value.length > 40) {
       setAddressError('Invalid format');
-      setTimeout(() => {
-        setAddressError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setAddressError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         addressValid: false,
@@ -406,6 +427,7 @@ const UserInformation = () => {
 
   const [emergencyContactError, setEmergencyContactError] = useState('');
   const emergencyContactValidation = (value: string) => {
+    let reg = /^(?=.*?[0-9])[0-9]{11}$/i;
     if (value.length == 0) {
       setEmergencyContactError('Required!');
       setTimeout(() => {
@@ -413,23 +435,35 @@ const UserInformation = () => {
       }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        emercencyValid: false,
+        emergencyValid: false,
       });
-    } else if (value.length > 11) {
+    }  else if (reg.test(value) === false) {
       setEmergencyContactError('Invalid format');
-      setTimeout(() => {
-        setEmergencyContactError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setEmergencyContactError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        emercencyValid: false,
+        emergencyValid: false,
       });
       //  console.log(userInfoValid);
-    } else {
+    } 
+    // else if (value.length < 11) {
+    //   setEmergencyContactError('Invalid format');
+    //   setTimeout(() => {
+    //     setEmergencyContactError('');
+    //   }, 2000);
+    //   setUserInfoValid({
+    //     ...userInfoValid,
+    //     emergencyValid: false,
+    //   });
+    //   //  console.log(userInfoValid);
+    // } 
+     else if (reg.test(value) === true) {
       setEmergencyContactError('');
       setUserInfoValid({
         ...userInfoValid,
-        emercencyValid: true,
+        emergencyValid: true,
       });
       //  console.log(userInfoValid);
     }
@@ -437,6 +471,8 @@ const UserInformation = () => {
 
   const [CNICError, setCNICError] = useState('');
   const CNICValidation = (value: string) => {
+    // let reg = /^(?=.*?[0-9])[0-9]{13}$/i;
+    let reg =/^[0-9]{5}-[0-9]{7}-[0-9]$/;
     if (value.length == 0) {
       setCNICError('Required!');
       setTimeout(() => {
@@ -446,17 +482,29 @@ const UserInformation = () => {
         ...userInfoValid,
         CNICValid: false,
       });
-    } else if (value.length > 13) {
-      setCNICError('Invalid format');
-      setTimeout(() => {
-        setCNICError('');
-      }, 2000);
+    }    else if (reg.test(value) === false) {
+      setCNICError('00000-0000000-0');
+      // setTimeout(() => {
+      //   setCNICError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         CNICValid: false,
       });
       //  console.log(userInfoValid);
-    } else {
+    }
+        // else if (reg.test(value) === true) {
+    //   setCNICError('13 characters');
+    //   setTimeout(() => {
+    //     setCNICError('');
+    //   }, 2000);
+    //   setUserInfoValid({
+    //     ...userInfoValid,
+    //     CNICValid: false,
+    //   });
+    //   //  console.log(userInfoValid);
+    // }    
+    else if (reg.test(value) === true) {
       setCNICError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -513,6 +561,17 @@ const UserInformation = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+        <CustomHeader
+        // title="Sign up"
+        marginTop={hp(3)}
+        leftIcon={icons.BACK_ARROW}
+        onPressLeftIcon={() => {
+          navigation.goBack();
+        }}
+        marginBottom={hp(6)}
+      />
+      <View style={styles.logOutButtonView}>
+
       <TouchableOpacity onPress={handleLogOut} style={styles.logOutButton}>
         <Text
           style={{
@@ -525,6 +584,7 @@ const UserInformation = () => {
           Log out
         </Text>
       </TouchableOpacity>
+            </View>
 
       <TouchableOpacity
         style={styles.imageButton}
@@ -615,13 +675,14 @@ const UserInformation = () => {
             }}
             placeholder="Enter your password"
             placeholderTextColor={colors.BLUE}
-            secureTextEntry={showPassword ? false : true}
+            secureTextEntry={editButton ? false : true}
             numberOfLines={1}
             multiline={false}
             maxLength={30}
             editable={editButton}
+
           />
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               position: 'absolute',
               right: wp(8),
@@ -635,7 +696,7 @@ const UserInformation = () => {
               resizeMode="contain"
               source={showPassword ? icons.EYE_OFF : icons.EYE}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <TextInput
           value={contact}
@@ -675,10 +736,10 @@ const UserInformation = () => {
           editable={editButton}
         />
         <TextInput
-          value={emercencyContact}
+          value={emergencyContact}
           onChangeText={value => {
             handleOnChangeText(value, 'emergencyContact'),
-              setEmercencyContact(value);
+              setEmergencyContact(value);
           }}
           style={{
             ...styles.input,
@@ -714,9 +775,9 @@ const UserInformation = () => {
         />
 
         <CustomButton
-          title="Continue"
+          title="Update"
           textColor={colors.WHITE}
-          backgroundColor={colors.BLUE}
+          backgroundColor={editButton? colors.BLUE : colors.GREY}
           activityIndicator={signInIsLoaded}
           height={hp(6)}
           width={wp(90)}
@@ -724,7 +785,8 @@ const UserInformation = () => {
           marginHorizontal={wp(5)}
           // marginTop={hp(2)}
           marginBottom={hp(2)}
-          onPress={signInValidation}
+          disable={!editButton}
+          onPress={updateValidation}
         />
       </ScrollView>
     </SafeAreaView>

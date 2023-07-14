@@ -17,13 +17,16 @@ const styles = StyleSheet.create({
   userImage: {
     height: hp(6),
     width: wp(14),
-    alignSelf: 'flex-end',
   },
-  logoutButton: {
+  logoutButtonView:{
     // backgroundColor: 'red',
     marginTop: hp(2),
     marginHorizontal: wp(5),
     marginBottom: hp(8),
+    alignSelf: 'flex-end',
+  },
+  logoutButton: {
+   
     // justifyContent: 'flex-end',
     // alignContent: 'center',
   },
@@ -36,11 +39,18 @@ const styles = StyleSheet.create({
     marginBottom: hp(5),
     // backgroundColor: 'red',
   },
-  SOSView: {
-    marginHorizontal: wp(20),
+  SOSButtonView:{
+    marginHorizontal: wp(5),
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: hp(2),
+    // backgroundColor: 'red',
+  },
+  SOSView: {
+    // marginHorizontal: wp(5),
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // marginBottom: hp(2),
     // backgroundColor: 'red',
   },
   SOSButton: {

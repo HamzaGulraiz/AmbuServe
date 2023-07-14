@@ -24,6 +24,7 @@ import {PermissionsAndroid} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {Database, child, push, ref, set} from 'firebase/database';
 import {db} from '../../../components/firebase/config';
+import images from '../../../../assets/images/images';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -234,7 +235,7 @@ const DriverMap = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-evenly',
@@ -251,12 +252,12 @@ const DriverMap = () => {
           }}>
           Long: {region.longitude}
         </Text>
-      </View>
+      </View> */}
       {region.latitude != null ? (
         <>
           <MapView
             style={styles.map}
-            showsUserLocation={true}
+            // showsUserLocation={true}
             provider="google"
             maxZoomLevel={12}
             onPress={event =>
@@ -266,13 +267,13 @@ const DriverMap = () => {
               })
             }
             region={region}
-            onRegionChangeComplete={region => setRegion(region)}
+            // onRegionChangeComplete={region => setRegion(region)}
             //onRegionChange={region}
           >
             <Marker
               coordinate={{
-                latitude: markerposition.latitude,
-                longitude: markerposition.longitude,
+                latitude: region.latitude,
+                longitude: region.longitude,
               }}
               //title="Home"
               //description="press button to save"
@@ -281,48 +282,11 @@ const DriverMap = () => {
               //   sendCoords({markerposition});
               // }}
             >
-              <Callout
-                onPress={() => {
-                  Alert.alert(
-                    'Home',
-                    'Are you sure you want to save this location as Home',
-                    [
-                      {
-                        text: 'Cancel',
-                        onPress: () => console.log('Cancel Pressed'),
-                        style: 'cancel',
-                      },
-                      {
-                        text: 'OK',
-                        onPress: () => {},
-                      },
-                    ],
-                  );
-                }}>
-                {/* <View style={styles.calloutStyle}>
-                  <Text style={{fontSize: 16, fontWeight: '800'}}>
-                    Save Home
-                  </Text>
-                </View> */}
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: '100%',
-                    width: '100%',
-                    backgroundColor: '#fff',
-                    borderColor: '#eee',
-                    borderRadius: 5,
-                    elevation: 10,
-                  }}>
-                  <TouchableOpacity style={styles.button}>
-                    <Text style={{alignSelf: 'center'}}>
-                      Save this location as Home
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </Callout>
+              <Image source={images.AMBULANCE_MARKER} resizeMode="contain" style={{
+                height:20,
+                width:20
+              }} />
+
             </Marker>
           </MapView>
         </>
@@ -345,3 +309,51 @@ const DriverMap = () => {
 };
 
 export default DriverMap;
+
+
+
+
+//////////////////////////////////////////////////////////////
+
+// <Callout
+// onPress={() => {
+//   Alert.alert(
+//     'Home',
+//     'Are you sure you want to save this location as Home',
+//     [
+//       {
+//         text: 'Cancel',
+//         onPress: () => console.log('Cancel Pressed'),
+//         style: 'cancel',
+//       },
+//       {
+//         text: 'OK',
+//         onPress: () => {},
+//       },
+//     ],
+//   );
+// }}>
+// {/* <View style={styles.calloutStyle}>
+//   <Text style={{fontSize: 16, fontWeight: '800'}}>
+//     Save Home
+//   </Text>
+// </View> */}
+// <View
+//   style={{
+//     display: 'flex',
+//     flexDirection: 'column',
+//     justifyContent: 'space-between',
+//     height: '100%',
+//     width: '100%',
+//     backgroundColor: '#fff',
+//     borderColor: '#eee',
+//     borderRadius: 5,
+//     elevation: 10,
+//   }}>
+//   <TouchableOpacity style={styles.button}>
+//     <Text style={{alignSelf: 'center'}}>
+//       Save this location as Home
+//     </Text>
+//   </TouchableOpacity>
+// </View>
+// </Callout>

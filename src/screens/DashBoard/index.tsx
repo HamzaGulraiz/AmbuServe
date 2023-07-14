@@ -10,6 +10,7 @@ import {
   StatusBar,
   Dimensions,
   ToastAndroid,
+  View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import styles from './styles';
@@ -108,6 +109,7 @@ const DashBoard = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.logoutButtonView}>
       <TouchableOpacity
         style={styles.logoutButton}
         onPress={() => {
@@ -117,8 +119,9 @@ const DashBoard = () => {
           source={images.DEFAULT_USER}
           resizeMode="contain"
           style={styles.userImage}
-        />
+          />
       </TouchableOpacity>
+          </View>
       <Image
         resizeMode="contain"
         source={images.AMBULANCE}
@@ -150,13 +153,16 @@ const DashBoard = () => {
         Lets give you a well deserve support in getting to the hospital in time
         of emergency
       </Text>
+      <View style={styles.SOSButtonView}>
+
       <TouchableOpacity style={styles.SOSView} onPress={handleSOS}>
         <Image
           source={images.SOS}
           resizeMode="contain"
           style={styles.SOSButton}
-        />
+          />
       </TouchableOpacity>
+          </View>
       <CustomButton
         title="Choose hospital"
         textColor={colors.WHITE}

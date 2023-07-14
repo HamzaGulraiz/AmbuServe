@@ -30,6 +30,7 @@ type CustomButtonProps = {
   borderRadius?: number;
   borderWidth?: number;
   borderColor?: string;
+  disable?:boolean
 };
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -47,6 +48,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   borderWidth,
   borderColor,
   activityIndicator,
+  disable,
 }) => {
   return (
     <TouchableOpacity
@@ -62,6 +64,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         borderWidth: borderWidth ? borderWidth : 0,
         borderColor: borderColor ? borderColor : colors.TRANSPARENT,
       }}
+      disabled={disable}
       onPress={onPress}>
       {activityIndicator ? (
         <ActivityIndicator size="small" color={colors.BLACK} />
