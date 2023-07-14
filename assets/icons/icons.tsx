@@ -10,6 +10,8 @@ const icons = {
   MAP: require('./map.png'),
   ACTIVITY: require('./activity.png'),
   PROFILE: require('./profile.png'),
+  CURRENT_LOCATION: require('./currentLocation.png'),
+  PERSON:require('./person.png'),
 };
 
 export default icons;
