@@ -15,7 +15,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState,useRef} from 'react';
 import styles from './styles';
 import {useNavigation} from '@react-navigation/native';
 import MapView, {Marker, Callout} from 'react-native-maps';
@@ -23,6 +23,8 @@ import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import colors from '../../../assets/colors/colors';
+import images from '../../../assets/images/images';
+import icons from '../../../assets/icons/icons';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -45,7 +47,7 @@ const predefinedPlaces = [
 
 const Maps = () => {
   const navigation = useNavigation<NavigationProps>();
-
+  const mapRef = useRef<any>(null);
   const MY_KEY = 'AIzaSyDmAPrOnDwMg0-3lKuTWHOAfwylLwLj6Yk';
 
   useEffect(() => {
@@ -129,6 +131,26 @@ const Maps = () => {
     }
   };
 
+  
+  const handleShowUserLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const region = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+        mapRef.current.animateToRegion(region, 1000); // Animate to the new region with a duration of 1 second (1000 milliseconds)
+      },
+      (error) => {
+        console.log('Error getting user location:', error);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {region.latitude != null ? (
@@ -171,7 +193,9 @@ const Maps = () => {
             style={styles.map}
             // showsUserLocation={true}
             provider="google"
-            maxZoomLevel={12}
+            ref={mapRef}
+            minZoomLevel={13}
+            maxZoomLevel={16}
             onPress={event =>
               SetMarkerPosition({
                 latitude: event.nativeEvent.coordinate.latitude,
@@ -179,13 +203,13 @@ const Maps = () => {
               })
             }
             region={region}
-            onRegionChangeComplete={region => setRegion(region)}
+            // onRegionChangeComplete={region => setRegion(region)}
             //onRegionChange={region}
           >
-            <Marker
+             <Marker
               coordinate={{
-                latitude: markerposition.latitude,
-                longitude: markerposition.longitude,
+                latitude: region.latitude,
+                longitude: region.longitude,
               }}
               //title="Home"
               //description="press button to save"
@@ -194,50 +218,27 @@ const Maps = () => {
               //   sendCoords({markerposition});
               // }}
             >
-              <Callout
-                onPress={() => {
-                  Alert.alert(
-                    'Home',
-                    'Are you sure you want to save this location as Home',
-                    [
-                      {
-                        text: 'Cancel',
-                        onPress: () => console.log('Cancel Pressed'),
-                        style: 'cancel',
-                      },
-                      {
-                        text: 'OK',
-                        onPress: () => {},
-                      },
-                    ],
-                  );
-                }}>
-                {/* <View style={styles.calloutStyle}>
-                  <Text style={{fontSize: 16, fontWeight: '800'}}>
-                    Save Home
-                  </Text>
-                </View> */}
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: '100%',
-                    width: '100%',
-                    backgroundColor: '#fff',
-                    borderColor: '#eee',
-                    borderRadius: 5,
-                    elevation: 10,
-                  }}>
-                  <TouchableOpacity style={styles.button}>
-                    <Text style={{alignSelf: 'center'}}>
-                      Save this location as Home
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </Callout>
+              <Image source={icons.PERSON} resizeMode="center" style={{
+                height:hp(2.5),
+                width:wp(5),
+                // backgroundColor:"red"
+
+              }} />
+
             </Marker>
           </MapView>
+          <TouchableOpacity 
+          onPress={handleShowUserLocation}
+          style={{
+            position:"absolute",
+            right:wp(4),
+            bottom:hp(2)
+          }}>
+            <Image source={icons.CURRENT_LOCATION} resizeMode="contain" style={{
+              height:hp(4),
+              width:wp(8)
+            }} />
+          </TouchableOpacity>
         </>
       ) : (
         <MapView

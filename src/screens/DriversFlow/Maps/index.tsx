@@ -15,7 +15,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState,useRef} from 'react';
 import styles from './styles';
 import {useNavigation} from '@react-navigation/native';
 import MapView, {Marker, Callout} from 'react-native-maps';
@@ -25,6 +25,7 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 import {Database, child, push, ref, set} from 'firebase/database';
 import {db} from '../../../components/firebase/config';
 import images from '../../../../assets/images/images';
+import icons from '../../../../assets/icons/icons';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -47,14 +48,14 @@ const predefinedPlaces = [
 
 const DriverMap = () => {
   const navigation = useNavigation<NavigationProps>();
-
+  const mapRef = useRef<any>(null);
   const MY_KEY = 'AIzaSyDmAPrOnDwMg0-3lKuTWHOAfwylLwLj6Yk';
 
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
-    latitudeDelta: 0.001,
-    longitudeDelta: 0.001,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
   });
 
   const [markerposition, SetMarkerPosition] = useState({
@@ -89,8 +90,8 @@ const DriverMap = () => {
         setRegion({
           latitude: latitude,
           longitude: longitude,
-          latitudeDelta: 0,
-          longitudeDelta: 0,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
         });
       },
       error => {
@@ -121,8 +122,8 @@ const DriverMap = () => {
           setRegion({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            latitudeDelta: 0.001,
-            longitudeDelta: 0.001,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
           });
           shareLiveLocation();
           console.log(position.coords.latitude);
@@ -175,8 +176,8 @@ const DriverMap = () => {
               setRegion({
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
-                latitudeDelta: 0.001,
-                longitudeDelta: 0.001,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
               });
 
               console.log(position.coords.latitude);
@@ -233,6 +234,26 @@ const DriverMap = () => {
     }
   };
 
+
+  const handleShowUserLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const region = {
+          latitude,
+          longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+        mapRef.current.animateToRegion(region, 1000); // Animate to the new region with a duration of 1 second (1000 milliseconds)
+      },
+      (error) => {
+        console.log('Error getting user location:', error);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* <View
@@ -257,9 +278,17 @@ const DriverMap = () => {
         <>
           <MapView
             style={styles.map}
-            // showsUserLocation={true}
+            // showsUserLoc  ation={true}
             provider="google"
-            maxZoomLevel={12}
+            // zoomEnabled={true}
+            // zoomControlEnabled={true}
+            // key={`${region.latitude},${region.longitude}`}
+            // showsUserLocation={true}
+            // showsMyLocationButton={true}
+            // showsCompass={true}
+            ref={mapRef}
+            minZoomLevel={13}
+            maxZoomLevel={16}
             onPress={event =>
               SetMarkerPosition({
                 latitude: event.nativeEvent.coordinate.latitude,
@@ -282,13 +311,27 @@ const DriverMap = () => {
               //   sendCoords({markerposition});
               // }}
             >
-              <Image source={images.AMBULANCE_MARKER} resizeMode="contain" style={{
-                height:20,
-                width:20
+              <Image source={images.AMBULANCE_MARKER} resizeMode="center" style={{
+                height:hp(2.5),
+                width:wp(5),
+                // backgroundColor:"red"
+
               }} />
 
             </Marker>
           </MapView>
+          <TouchableOpacity 
+          onPress={handleShowUserLocation}
+          style={{
+            position:"absolute",
+            right:wp(4),
+            bottom:hp(2)
+          }}>
+            <Image source={icons.CURRENT_LOCATION} resizeMode="contain" style={{
+              height:hp(4),
+              width:wp(8)
+            }} />
+          </TouchableOpacity>
         </>
       ) : (
         <MapView
