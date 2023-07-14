@@ -191,7 +191,9 @@ const SignIn = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/;
+    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/
+
+    
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -220,7 +222,7 @@ const SignIn = () => {
         passwordValid: false,
       });
     } else if (reg.test(value) === false) {
-      setPasswordError('user Aplhabets,numbers and special characters');
+      setPasswordError('Use Aplhabets and numbers');
       // setTimeout(() => {
       //   setPasswordError('');
       // }, 2000);
@@ -327,8 +329,13 @@ const SignIn = () => {
           <TouchableOpacity
             style={{
               position: 'absolute',
-              right: wp(8),
-              bottom: hp(2),
+              justifyContent:"center",
+              alignItems:"center",
+              right: wp(6),
+              // bottom: hp(2),
+              height: hp(4),
+              width: wp(8),
+              // backgroundColor:"red"
             }}
             onPress={() => {
               setShowPassword(prevState => !prevState);

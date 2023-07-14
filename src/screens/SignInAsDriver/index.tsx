@@ -31,6 +31,7 @@ import {
   MY_BOTTOM_TABS,
   SIGN_IN,
   SIGN_UP,
+  TERMS_AND_CONDITIONS,
 } from '../../constants/Navigator';
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
@@ -54,61 +55,35 @@ const SignInAsDriver = () => {
   const [toogleCheck, setToogleCheck] = useState(false);
   const [toogleCheckError, setToogleCheckError] = useState('');
 
-  const [companyName, setCompanyName] = useState('');
-  const [vehicleNumber, setVehicleNumber] = useState('');
-  const [driverName, setDriverName] = useState('');
-  const [driverNumber, setDriverNumber] = useState('');
-  const [officeAddress, setOfficeAddress] = useState('');
-  const [companyEmail, setCompanyEmail] = useState('');
- 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
+  const [driverName, setDriverName] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [signInIsLoaded, setSignInIsLoaded] = useState(false);
 
   //User Information After Validation
   const [userInfoValid, setUserInfoValid] = useState({
-    companyNameValid: false,
-    vehicleNumberValid: false,
     driverNameValid: false,
-    driverNumberValid: false,
-    officeAddressValid: false,
-    companyEmailValid: false,
+    passwordValid: false,
   });
 
   const signUpValidation = () => {
     if (
-      userInfoValid.companyNameValid === false ||
-      userInfoValid.vehicleNumberValid === false ||
       userInfoValid.driverNameValid === false ||
-      userInfoValid.driverNumberValid === false ||
-      userInfoValid.officeAddressValid === false ||
-      userInfoValid.companyEmailValid === false
+      userInfoValid.passwordValid === false 
     ) {
-      setCompanyNameError('    ');
-      setVehicleNumberError('    ');
       setDriverNameError('    ');
-      setDriverNumberError('    ');
-      setOfficeAddressError('    ');
-      setCompanyEmailError('    ');
+      setPasswordError("  ")
       setTimeout(() => {
-        setCompanyNameError('');
-        setVehicleNumberError('');
         setDriverNameError('');
-        setDriverNumberError('');
-        setOfficeAddressError('');
-        setCompanyEmailError('');
+        setPasswordError('');
+      
       }, 2000);
     } else {
       if (toogleCheck === true) {
         signUpUser(
-          companyName,
-          vehicleNumber,
           driverName,
-          driverNumber,
-          officeAddress,
-          companyEmail,
+          password,
         );
       } else {
         setToogleCheckError('    ');
@@ -120,131 +95,143 @@ const SignInAsDriver = () => {
   };
 
   const signUpUser = (
-    companyName?: string,
-    vehicleNumber?: string,
     driverName?: string,
-    driverNumber?: string,
-    officeAddress?: string,
-    companyEmail?: string,
+    password?: string,
+   
   ) => {
     setSignInIsLoaded(true);
-    let data = JSON.stringify({
-      company_name: companyName,
-      vehicle_number: vehicleNumber,
-      driver_name: driverName,
-      driver_contact: driverNumber,
-      office_address: officeAddress,
-      company_email: companyEmail,
-    });
+    // let data = JSON.stringify({
+    //   driver_name: driverName,
+    //   password: password,
+    // });
+
+
+ 
+    // let params = new URLSearchParams(data);
+
 
     let config = {
-      method: 'post',
+      method: 'get',
       maxBodyLength: Infinity,
-      url: `${BASE_URL}/driver/register`,
-      headers: {
-        'Content-Type': 'application/json',
+      url: `${BASE_URL}/driver/login`,
+      // url: 'http://192.168.100.21:8000/driver/login',
+      // url:`http://192.168.100.21:8000/driver/login?${params}`,
+      headers: { 
+        'Content-Type': 'application/json'
       },
-      data: data,
+      params: {
+        driver_name: driverName,
+        password: password,
+      },
     };
 
+
     axios
-      .request(config)
-      .then(response => {
-        //setErrorMessage(response.data.message);
-        // console.log('axios then', response.data);
-        if (response.data === 'Email already exists') {
-          Toast.showWithGravity(
-            'Email already exists. Try another email',
-            Toast.SHORT,
-            Toast.BOTTOM,
-          );
-          setSignInIsLoaded(false);
-        } else {
-          console.log(
-            'data came from node response in signup =>',
-            response.data,
-          );
-          // dispatch(setUserInfo(response.data));
-          setData({value: response.data, storageKey: 'DRIVER_INFO'});
-          setSignInIsLoaded(false);
-          navigation.replace(MY_BOTTOM_TABS);
-        }
-      })
-      .catch(error => {
-        console.log('Register Catch', error);
-        setSignInIsLoaded(false);
+    .request(config)
+    .then(response => {
+      // console.log(JSON.stringify(response.data));
+      if (response.data === 'Email does not exist') {
         Toast.showWithGravity(
-          'some error occuoured. Try again',
+          'This user does not exist on our record',
           Toast.SHORT,
           Toast.BOTTOM,
         );
-      });
+        setSignInIsLoaded(false);
+      } else if (response.data === 'Password does not match') {
+        Toast.showWithGravity(
+          'Password does not match',
+          Toast.SHORT,
+          Toast.BOTTOM,
+        );
+        setSignInIsLoaded(false);
+      } else {
+        console.log(
+          'data came from node response in sign in as driver =>',
+          response.data,
+        );
+        // dispatch(setUserInfo(response.data));
+        setData({value: response.data, storageKey: 'DRIVER_INFO'});
+        navigation.replace(MY_BOTTOM_TABS);
+        setSignInIsLoaded(false);
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
+      setSignInIsLoaded(false);
+    });
+
+
+
+    
+   
   };
 
-  const [companyNameError, setCompanyNameError] = useState('');
-  const companyNameValidation = (value: string) => {
-    if (value.length == 0) {
-      setCompanyNameError('Required!');
-      setTimeout(() => {
-        setCompanyNameError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        companyNameValid: false,
-      });
-    } else if (value.length > 30) {
-      setCompanyNameError('Max 30 characters');
-      // setTimeout(() => {
-      //   setCompanyNameError('');
-      // }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        companyNameValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
-      setCompanyNameError('');
-      setUserInfoValid({
-        ...userInfoValid,
-        companyNameValid: true,
-      });
-      //  console.log(userInfoValid);
-    }
-  };
+  // const [companyNameError, setCompanyNameError] = useState('');
+  // const companyNameValidation = (value: string) => {
+  //   if (value.length == 0) {
+  //     setCompanyNameError('Required!');
+  //     setTimeout(() => {
+  //       setCompanyNameError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       companyNameValid: false,
+  //     });
+  //   } else if (value.length > 30) {
+  //     setCompanyNameError('Max 30 characters');
+  //     // setTimeout(() => {
+  //     //   setCompanyNameError('');
+  //     // }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       companyNameValid: false,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   } else {
+  //     setCompanyNameError('');
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       companyNameValid: true,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   }
+  // };
 
-  const [vehicleNumberError, setVehicleNumberError] = useState('');
-  const vehicleNumberValidation = (value: string) => {
-    if (value.length == 0) {
-      setVehicleNumberError('Required!');
-      setTimeout(() => {
-        setVehicleNumberError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        vehicleNumberValid: false,
-      });
-    } else if (value.length > 10) {
-      setVehicleNumberError('Max 10 characters');
-      // setTimeout(() => {
-      //   setVehicleNumberError('');
-      // }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        vehicleNumberValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
-      setVehicleNumberError('');
-      setUserInfoValid({
-        ...userInfoValid,
-        vehicleNumberValid: true,
-      });
-      //  console.log(userInfoValid);
-    }
-  };
+  // const [vehicleNumberError, setVehicleNumberError] = useState('');
+  // const vehicleNumberValidation = (value: string) => {
+  //   if (value.length == 0) {
+  //     setVehicleNumberError('Required!');
+  //     setTimeout(() => {
+  //       setVehicleNumberError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       vehicleNumberValid: false,
+  //     });
+  //   } else if (value.length > 10) {
+  //     setVehicleNumberError('Max 10 characters');
+  //     // setTimeout(() => {
+  //     //   setVehicleNumberError('');
+  //     // }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       vehicleNumberValid: false,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   } else {
+  //     setVehicleNumberError('');
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       vehicleNumberValid: true,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   }
+  // };
 
   const [driverNameError, setDriverNameError] = useState('');
   const driverNameValidation = (value: string) => {
+    let reg = /^[a-zA-Z ]{3,30}$/
     if (value.length == 0) {
       setDriverNameError('Required!');
       setTimeout(() => {
@@ -254,8 +241,8 @@ const SignInAsDriver = () => {
         ...userInfoValid,
         driverNameValid: false,
       });
-    } else if (value.length > 30) {
-      setDriverNameError('Max 30 characters');
+    } else if (reg.test(value) === false) {
+      setDriverNameError('3-30 characters');
       // setTimeout(() => {
       //   setDriverNameError('');
       // }, 2000);
@@ -264,7 +251,7 @@ const SignInAsDriver = () => {
         driverNameValid: false,
       });
       //  console.log(userInfoValid);
-    } else {
+    } else if (reg.test(value) === true) {
       setDriverNameError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -274,130 +261,184 @@ const SignInAsDriver = () => {
     }
   };
 
-  const [driverNumberError, setDriverNumberError] = useState('');
-  const driverNumberValidation = (value: string) => {
-    if (value.length == 0) {
-      setDriverNumberError('Required!');
-      setTimeout(() => {
-        setDriverNumberError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        driverNumberValid: false,
-      });
-    } else if (value.length > 11) {
-      setDriverNumberError('Invalid format');
-      setTimeout(() => {
-        setDriverNumberError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        driverNumberValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else if (value.length < 11) {
-      setDriverNumberError('Invalid format');
-      setTimeout(() => {
-        setDriverNumberError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        driverNumberValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
-      setDriverNumberError('');
-      setUserInfoValid({
-        ...userInfoValid,
-        driverNumberValid: true,
-      });
-      //  console.log(userInfoValid);
-    }
-  };
+  const [passowrdError, setPasswordError] = useState('');
+  const passwordValidation = (value: string): boolean => {
+    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/
 
-  const [officeAddressError, setOfficeAddressError] = useState('');
-  const officeAddressValidation = (value: string) => {
+    
     if (value.length == 0) {
-      setOfficeAddressError('Required!');
+      setPasswordError('Required!');
       setTimeout(() => {
-        setOfficeAddressError('');
+        setPasswordError('');
       }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        officeAddressValid: false,
+        passwordValid: false,
       });
-    } else if (value.length > 50) {
-      setOfficeAddressError('Invalid format');
-      setTimeout(() => {
-        setOfficeAddressError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        officeAddressValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
-      setOfficeAddressError('');
-      setUserInfoValid({
-        ...userInfoValid,
-        officeAddressValid: true,
-      });
-      //  console.log(userInfoValid);
-    }
-  };
-
-  const [companyEmailError, setCompanyEmailError] = useState('');
-  const companyEmailValidation = (value: string) => {
-    let regx = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-    if (value.length == 0) {
-      setCompanyEmailError('Required!');
-      setTimeout(() => {
-        setCompanyEmailError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        companyEmailValid: false,
-      });
-    } else if (regx.test(value) === false) {
-      setCompanyEmailError('Invalid format');
+    } else if (!value.trimEnd() || value.length <= 6) {
+      setPasswordError('Atleast 6 characters');
       // setTimeout(() => {
-      //   setCompanyEmailError('');
+      //   setPasswordError('');
       // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        companyEmailValid: false,
+        passwordValid: false,
       });
-      //  console.log(userInfoValid);
-    } else if (regx.test(value) === true) {
-      setCompanyEmailError('');
+    } else if (!value.trimEnd() || value.length > 30) {
+      setPasswordError('Max 30 characters');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
-        companyEmailValid: true,
+        passwordValid: false,
       });
-      //  console.log(userInfoValid);
+    } else if (reg.test(value) === false) {
+      setPasswordError('Use Aplhabets and numbers');
+      // setTimeout(() => {
+      //   setPasswordError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        passwordValid: false,
+      });
+    } else if (reg.test(value) === true) {
+      setPasswordError('');
+      setUserInfoValid({
+        ...userInfoValid,
+        passwordValid: true,
+      });
     }
+    return reg.test(value);
   };
+
+  // const [driverNumberError, setDriverNumberError] = useState('');
+  // const driverNumberValidation = (value: string) => {
+  //   if (value.length == 0) {
+  //     setDriverNumberError('Required!');
+  //     setTimeout(() => {
+  //       setDriverNumberError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       driverNumberValid: false,
+  //     });
+  //   } else if (value.length > 11) {
+  //     setDriverNumberError('Invalid format');
+  //     setTimeout(() => {
+  //       setDriverNumberError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       driverNumberValid: false,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   } else if (value.length < 11) {
+  //     setDriverNumberError('Invalid format');
+  //     setTimeout(() => {
+  //       setDriverNumberError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       driverNumberValid: false,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   } else {
+  //     setDriverNumberError('');
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       driverNumberValid: true,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   }
+  // };
+
+  // const [officeAddressError, setOfficeAddressError] = useState('');
+  // const officeAddressValidation = (value: string) => {
+  //   if (value.length == 0) {
+  //     setOfficeAddressError('Required!');
+  //     setTimeout(() => {
+  //       setOfficeAddressError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       officeAddressValid: false,
+  //     });
+  //   } else if (value.length > 50) {
+  //     setOfficeAddressError('Invalid format');
+  //     setTimeout(() => {
+  //       setOfficeAddressError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       officeAddressValid: false,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   } else {
+  //     setOfficeAddressError('');
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       officeAddressValid: true,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   }
+  // };
+
+  // const [companyEmailError, setCompanyEmailError] = useState('');
+  // const companyEmailValidation = (value: string) => {
+  //   let regx = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  //   if (value.length == 0) {
+  //     setCompanyEmailError('Required!');
+  //     setTimeout(() => {
+  //       setCompanyEmailError('');
+  //     }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       companyEmailValid: false,
+  //     });
+  //   } else if (regx.test(value) === false) {
+  //     setCompanyEmailError('Invalid format');
+  //     // setTimeout(() => {
+  //     //   setCompanyEmailError('');
+  //     // }, 2000);
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       companyEmailValid: false,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   } else if (regx.test(value) === true) {
+  //     setCompanyEmailError('');
+  //     setUserInfoValid({
+  //       ...userInfoValid,
+  //       companyEmailValid: true,
+  //     });
+  //     //  console.log(userInfoValid);
+  //   }
+  // };
 
   const handleOnChangeText = (getValue: string, fieldName: string) => {
     switch (fieldName) {
-      case 'companyName':
-        companyNameValidation(getValue);
-        break;
-      case 'vehicleNumber':
-        vehicleNumberValidation(getValue);
-        break;
+      // case 'companyName':
+      //   companyNameValidation(getValue);
+      //   break;
+      // case 'vehicleNumber':
+      //   vehicleNumberValidation(getValue);
+      //   break;
       case 'driverName':
         driverNameValidation(getValue);
         break;
-      case 'driverNumber':
-        driverNumberValidation(getValue);
-        break;
-      case 'officeAddress':
-        officeAddressValidation(getValue);
-        break;
-      case 'companyEmail':
-        companyEmailValidation(getValue);
-        break;
+        case 'password':
+          passwordValidation(getValue);
+          break;
+      // case 'driverNumber':
+      //   driverNumberValidation(getValue);
+      //   break;
+      // case 'officeAddress':
+      //   officeAddressValidation(getValue);
+      //   break;
+      // case 'companyEmail':
+      //   companyEmailValidation(getValue);
+      //   break;
 
       default:
       // code block
@@ -407,7 +448,7 @@ const SignInAsDriver = () => {
   return (
     <SafeAreaView style={styles.container}>
       <CustomHeader
-        title="Registeration Form"
+        title="Sign in as driver"
         marginTop={hp(3)}
         leftIcon={icons.BACK_ARROW}
         onPressLeftIcon={() => {
@@ -416,7 +457,7 @@ const SignInAsDriver = () => {
         marginBottom={hp(6)}
       />
       <ScrollView>
-        <Text
+        {/* <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -475,7 +516,7 @@ const SignInAsDriver = () => {
           multiline={false}
           maxLength={10}
           autoCapitalize="none"
-        />
+        /> */}
         <Text
           style={{
             // marginBottom: hp(1),
@@ -506,7 +547,60 @@ const SignInAsDriver = () => {
           maxLength={30}
           autoCapitalize="none"
         />
-        <Text
+              <Text
+          style={{
+            // marginBottom: hp(1),
+            marginHorizontal: hp(3),
+            fontWeight: '400',
+            fontSize: fontsizes.px_15,
+            fontFamily: fonts.REGULAR,
+            color: colors.RED,
+            textAlign: 'left',
+            // backgroundColor: 'red',
+          }}>
+          {passowrdError}
+        </Text>
+     <View style={styles.passwordInputView}>
+          <TextInput
+            value={password}
+            onChangeText={value => {
+              handleOnChangeText(value, 'password'), setPassword(value);
+            }}
+            style={{
+              ...styles.input,
+              borderColor: passowrdError ? colors.RED : colors.BLUE,
+              // marginBottom: hp(2),
+            }}
+            placeholder="Enter your password"
+            placeholderTextColor={colors.BLUE}
+            secureTextEntry={showPassword ? false : true}
+            numberOfLines={1}
+            multiline={false}
+            maxLength={30}
+            autoCapitalize="none"
+          />
+          <TouchableOpacity
+            style={{
+              position: 'absolute',
+              justifyContent:"center",
+              alignItems:"center",
+              right: wp(6),
+              // bottom: hp(2),
+              height: hp(4),
+              width: wp(8),
+              // backgroundColor:"red"
+            }}
+            onPress={() => {
+              setShowPassword(prevState => !prevState);
+            }}>
+            <Image
+              style={styles.eyeIcon}
+              resizeMode="contain"
+              source={showPassword ? icons.EYE_OFF : icons.EYE}
+            />
+          </TouchableOpacity>
+        </View>
+        {/* <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -595,7 +689,7 @@ const SignInAsDriver = () => {
           multiline={false}
           maxLength={30}
           autoCapitalize="none"
-        />
+        /> */}
 
         <View
           style={{
@@ -635,10 +729,24 @@ const SignInAsDriver = () => {
             }}>
             I agree to terms and conditions
           </Text>
+          <TouchableOpacity 
+          onPress={()=>{
+            navigation.navigate(TERMS_AND_CONDITIONS)
+          }}
+          >
+            <Text style={{
+              marginLeft: hp(0.5),
+              fontWeight: '400',
+              fontSize: fontsizes.px_15,
+              fontFamily: fonts.REGULAR,
+              color: colors.BLUE,
+              textDecorationLine:"underline"
+            }}>policies</Text>
+          </TouchableOpacity>
         </View>
 
         <CustomButton
-          title="Apply"
+          title="Sign in"
           textColor={colors.WHITE}
           backgroundColor={colors.BLUE}
           activityIndicator={signInIsLoaded}

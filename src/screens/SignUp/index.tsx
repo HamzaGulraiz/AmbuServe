@@ -185,7 +185,20 @@ const SignUp = () => {
         ...userInfoValid,
         fullNameValid: false,
       });
-    } else if (value.length >= 30) {
+    } 
+    else if (value.length < 3) {
+      setFullNameError('Atleast 3 characters');
+      // setTimeout(() => {
+      //   setFullNameError('');
+      // }, 2000);
+      setUserInfoValid({
+        ...userInfoValid,
+        fullNameValid: false,
+      });
+      //  console.log(userInfoValid);
+    }
+    
+    else if (value.length >= 30) {
       setFullNameError('Max 30 characters');
       // setTimeout(() => {
       //   setFullNameError('');
@@ -239,7 +252,7 @@ const SignUp = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/;
+    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{8,}$/
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -268,7 +281,7 @@ const SignUp = () => {
         passwordValid: false,
       });
     } else if (reg.test(value) === false) {
-      setPasswordError('user Aplhabets,numbers and special characters');
+      setPasswordError('Use Aplhabets Numbers');
       // setTimeout(() => {
       //   setPasswordError('');
       // }, 2000);
@@ -288,6 +301,7 @@ const SignUp = () => {
 
   const [contactError, setContactError] = useState('');
   const contactValidation = (value: string) => {
+    let reg = /^(?=.*?[0-9])[0-9]{11}$/i;
     if (value.length == 0) {
       setContactError('Required!');
       setTimeout(() => {
@@ -297,27 +311,29 @@ const SignUp = () => {
         ...userInfoValid,
         contactValid: false,
       });
-    } else if (value.length > 11) {
+    }
+    //  else if (value.length > 11) {
+    //   setContactError('Invalid format');
+    //   // setTimeout(() => {
+    //   //   setContactError('');
+    //   // }, 2000);
+    //   setUserInfoValid({
+    //     ...userInfoValid,
+    //     contactValid: false,
+    //   });
+    //   //  console.log(userInfoValid);
+    // } 
+    else if (reg.test(value) === false) {
       setContactError('Invalid format');
-      setTimeout(() => {
-        setContactError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setContactError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         contactValid: false,
       });
       //  console.log(userInfoValid);
-    } else if (value.length < 11) {
-      setContactError('Invalid format');
-      setTimeout(() => {
-        setContactError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        contactValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
+    } else if (reg.test(value) === true) {
       setContactError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -340,9 +356,9 @@ const SignUp = () => {
       });
     } else if (value.length > 40) {
       setAddressError('Invalid format');
-      setTimeout(() => {
-        setAddressError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setAddressError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         addressValid: false,
@@ -360,6 +376,7 @@ const SignUp = () => {
 
   const [emergencyContactError, setEmergencyContactError] = useState('');
   const emergencyContactValidation = (value: string) => {
+    let reg = /^(?=.*?[0-9])[0-9]{11}$/i;
     if (value.length == 0) {
       setEmergencyContactError('Required!');
       setTimeout(() => {
@@ -369,27 +386,29 @@ const SignUp = () => {
         ...userInfoValid,
         emergencyValid: false,
       });
-    } else if (value.length > 11) {
+    }  else if (reg.test(value) === false) {
       setEmergencyContactError('Invalid format');
-      setTimeout(() => {
-        setEmergencyContactError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setEmergencyContactError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         emergencyValid: false,
       });
       //  console.log(userInfoValid);
-    } else if (value.length < 11) {
-      setEmergencyContactError('Invalid format');
-      setTimeout(() => {
-        setEmergencyContactError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        emergencyValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
+    } 
+    // else if (value.length < 11) {
+    //   setEmergencyContactError('Invalid format');
+    //   setTimeout(() => {
+    //     setEmergencyContactError('');
+    //   }, 2000);
+    //   setUserInfoValid({
+    //     ...userInfoValid,
+    //     emergencyValid: false,
+    //   });
+    //   //  console.log(userInfoValid);
+    // } 
+     else if (reg.test(value) === true) {
       setEmergencyContactError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -401,6 +420,8 @@ const SignUp = () => {
 
   const [CNICError, setCNICError] = useState('');
   const CNICValidation = (value: string) => {
+    // let reg = /^(?=.*?[0-9])[0-9]{13}$/i;
+    let reg =/^[0-9]{5}-[0-9]{7}-[0-9]$/;
     if (value.length == 0) {
       setCNICError('Required!');
       setTimeout(() => {
@@ -410,8 +431,8 @@ const SignUp = () => {
         ...userInfoValid,
         CNICValid: false,
       });
-    } else if (value.length > 13) {
-      setCNICError('13 characters only');
+    }    else if (reg.test(value) === false) {
+      setCNICError('00000-0000000-0');
       // setTimeout(() => {
       //   setCNICError('');
       // }, 2000);
@@ -420,17 +441,19 @@ const SignUp = () => {
         CNICValid: false,
       });
       //  console.log(userInfoValid);
-    } else if (value.length < 13) {
-      setCNICError('13 characters');
-      setTimeout(() => {
-        setCNICError('');
-      }, 2000);
-      setUserInfoValid({
-        ...userInfoValid,
-        CNICValid: false,
-      });
-      //  console.log(userInfoValid);
-    } else {
+    }
+        // else if (reg.test(value) === true) {
+    //   setCNICError('13 characters');
+    //   setTimeout(() => {
+    //     setCNICError('');
+    //   }, 2000);
+    //   setUserInfoValid({
+    //     ...userInfoValid,
+    //     CNICValid: false,
+    //   });
+    //   //  console.log(userInfoValid);
+    // }    
+    else if (reg.test(value) === true) {
       setCNICError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -575,8 +598,13 @@ const SignUp = () => {
           <TouchableOpacity
             style={{
               position: 'absolute',
-              right: wp(8),
-              bottom: hp(2),
+              justifyContent:"center",
+              alignItems:"center",
+              right: wp(6),
+              // bottom: hp(2),
+              height: hp(4),
+              width: wp(8),
+              // backgroundColor:"red"
             }}
             onPress={() => {
               setShowPassword(prevState => !prevState);

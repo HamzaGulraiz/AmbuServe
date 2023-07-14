@@ -14,10 +14,17 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
   },
-  logOutButton: {
+  logOutButtonView:{
     marginHorizontal: wp(5),
     marginTop: hp(4),
     marginBottom: hp(2),
+    alignSelf: 'flex-end',
+    // backgroundColor:"blue"
+    position:"absolute",
+    right:wp(0.1)
+  },
+  logOutButton: {
+   
   },
   userImage: {
     height: hp(14),

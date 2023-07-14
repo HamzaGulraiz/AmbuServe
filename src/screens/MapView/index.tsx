@@ -22,6 +22,7 @@ import MapView, {Marker, Callout} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import colors from '../../../assets/colors/colors';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -135,6 +136,9 @@ const Maps = () => {
           <View style={styles.searchBarFrom}>
             <GooglePlacesAutocomplete
               placeholder="Current location"
+              textInputProps={{
+                placeholderTextColor:colors.BLACK
+              }}
               onPress={(data, details = null) => {
                 // 'details' is provided when fetchDetails = true
                 console.log(data, details);
@@ -149,6 +153,9 @@ const Maps = () => {
           <View style={styles.searchBarTo}>
             <GooglePlacesAutocomplete
               placeholder="Where to"
+              textInputProps={{
+                placeholderTextColor:colors.BLACK
+              }}
               onPress={(data, details = null) => {
                 // 'details' is provided when fetchDetails = true
                 console.log(data, details);
