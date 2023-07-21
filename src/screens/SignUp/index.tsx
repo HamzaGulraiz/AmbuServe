@@ -185,8 +185,7 @@ const SignUp = () => {
         ...userInfoValid,
         fullNameValid: false,
       });
-    } 
-    else if (value.length < 3) {
+    } else if (value.length < 3) {
       setFullNameError('Atleast 3 characters');
       // setTimeout(() => {
       //   setFullNameError('');
@@ -196,9 +195,7 @@ const SignUp = () => {
         fullNameValid: false,
       });
       //  console.log(userInfoValid);
-    }
-    
-    else if (value.length >= 30) {
+    } else if (value.length >= 30) {
       setFullNameError('Max 30 characters');
       // setTimeout(() => {
       //   setFullNameError('');
@@ -252,7 +249,8 @@ const SignUp = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{8,}$/
+    let reg =
+      /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/;
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -322,7 +320,7 @@ const SignUp = () => {
     //     contactValid: false,
     //   });
     //   //  console.log(userInfoValid);
-    // } 
+    // }
     else if (reg.test(value) === false) {
       setContactError('Invalid format');
       // setTimeout(() => {
@@ -386,7 +384,7 @@ const SignUp = () => {
         ...userInfoValid,
         emergencyValid: false,
       });
-    }  else if (reg.test(value) === false) {
+    } else if (reg.test(value) === false) {
       setEmergencyContactError('Invalid format');
       // setTimeout(() => {
       //   setEmergencyContactError('');
@@ -396,7 +394,7 @@ const SignUp = () => {
         emergencyValid: false,
       });
       //  console.log(userInfoValid);
-    } 
+    }
     // else if (value.length < 11) {
     //   setEmergencyContactError('Invalid format');
     //   setTimeout(() => {
@@ -407,8 +405,8 @@ const SignUp = () => {
     //     emergencyValid: false,
     //   });
     //   //  console.log(userInfoValid);
-    // } 
-     else if (reg.test(value) === true) {
+    // }
+    else if (reg.test(value) === true) {
       setEmergencyContactError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -421,7 +419,7 @@ const SignUp = () => {
   const [CNICError, setCNICError] = useState('');
   const CNICValidation = (value: string) => {
     // let reg = /^(?=.*?[0-9])[0-9]{13}$/i;
-    let reg =/^[0-9]{5}-[0-9]{7}-[0-9]$/;
+    let reg = /^[0-9]{5}-[0-9]{7}-[0-9]$/;
     if (value.length == 0) {
       setCNICError('Required!');
       setTimeout(() => {
@@ -431,7 +429,7 @@ const SignUp = () => {
         ...userInfoValid,
         CNICValid: false,
       });
-    }    else if (reg.test(value) === false) {
+    } else if (reg.test(value) === false) {
       setCNICError('00000-0000000-0');
       // setTimeout(() => {
       //   setCNICError('');
@@ -442,7 +440,7 @@ const SignUp = () => {
       });
       //  console.log(userInfoValid);
     }
-        // else if (reg.test(value) === true) {
+    // else if (reg.test(value) === true) {
     //   setCNICError('13 characters');
     //   setTimeout(() => {
     //     setCNICError('');
@@ -452,7 +450,7 @@ const SignUp = () => {
     //     CNICValid: false,
     //   });
     //   //  console.log(userInfoValid);
-    // }    
+    // }
     else if (reg.test(value) === true) {
       setCNICError('');
       setUserInfoValid({
@@ -598,8 +596,8 @@ const SignUp = () => {
           <TouchableOpacity
             style={{
               position: 'absolute',
-              justifyContent:"center",
-              alignItems:"center",
+              justifyContent: 'center',
+              alignItems: 'center',
               right: wp(6),
               // bottom: hp(2),
               height: hp(4),

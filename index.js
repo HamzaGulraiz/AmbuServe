@@ -17,6 +17,10 @@ import {
 import {getData} from './src/asyncStorage/AsyncStorage';
 import React, {useEffect, useState, useRef} from 'react';
 import {AppState, StyleSheet, Text, View} from 'react-native';
+import {Database, child, push, ref, set,remove} from 'firebase/database';
+import {db} from './src/components/firebase/config';
+
+
 
 const AppContainer = () => {
   const appState = useRef(AppState.currentState);
@@ -28,7 +32,7 @@ const AppContainer = () => {
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
-        console.log('App has come to the foreground!');
+        // console.log('App has come to the foreground!');
       }
 
       appState.current = nextAppState;
@@ -56,6 +60,7 @@ const AppContainer = () => {
               setRouteName(SPLASH_SCREEN);
               console.log('no result on index.js from storage');
             } else {
+  
               setRouteName(MY_BOTTOM_TABS);
               console.log('driver result on index.js from storage');
             }

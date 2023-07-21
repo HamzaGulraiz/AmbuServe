@@ -48,7 +48,7 @@ type NavigationProps = {
   jumpTo: any;
 };
 
-const SignInAsDriver = () => {
+const SignUpAsDriver = () => {
   const navigation = useNavigation<NavigationProps>();
   const dispatch = useDispatch();
 
@@ -80,17 +80,17 @@ const SignInAsDriver = () => {
       
       }, 2000);
     } else {
-      if (toogleCheck === true) {
+      // if (toogleCheck === true) {
         signUpUser(
           driverName,
           password,
         );
-      } else {
-        setToogleCheckError('    ');
-        setTimeout(() => {
-          setToogleCheckError('');
-        }, 2000);
-      }
+      // } else {
+      //   setToogleCheckError('    ');
+      //   setTimeout(() => {
+      //     setToogleCheckError('');
+      //   }, 2000);
+      // }
     }
   };
 
@@ -454,7 +454,7 @@ const SignInAsDriver = () => {
         onPressLeftIcon={() => {
           navigation.goBack();
         }}
-        marginBottom={hp(6)}
+        marginBottom={hp(10)}
       />
       <ScrollView>
         {/* <Text
@@ -691,7 +691,7 @@ const SignInAsDriver = () => {
           autoCapitalize="none"
         /> */}
 
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             marginHorizontal: wp(6),
@@ -743,7 +743,7 @@ const SignInAsDriver = () => {
               textDecorationLine:"underline"
             }}>policies</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <CustomButton
           title="Sign in"
@@ -754,7 +754,7 @@ const SignInAsDriver = () => {
           width={wp(90)}
           borderRadius={wp(2)}
           marginHorizontal={wp(5)}
-          marginTop={hp(2)}
+          // marginTop={hp(2)}
           marginBottom={hp(2)}
           onPress={signUpValidation}
         />
@@ -763,4 +763,4 @@ const SignInAsDriver = () => {
   );
 };
 
-export default SignInAsDriver;
+export default SignUpAsDriver;

@@ -12,6 +12,7 @@ const icons = {
   PROFILE: require('./profile.png'),
   CURRENT_LOCATION: require('./currentLocation.png'),
   PERSON:require('./person.png'),
+  CROSS:require('./cross.png'),
 };
 
 export default icons;

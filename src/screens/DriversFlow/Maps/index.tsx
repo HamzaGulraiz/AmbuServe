@@ -22,10 +22,13 @@ import MapView, {Marker, Callout} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {Database, child, push, ref, set} from 'firebase/database';
+import {Database, child, push, ref, set, update} from 'firebase/database';
 import {db} from '../../../components/firebase/config';
 import images from '../../../../assets/images/images';
 import icons from '../../../../assets/icons/icons';
+import { Double } from 'react-native/Libraries/Types/CodegenTypes';
+import {useTypedSelector} from '../../../redux/Store';
+import { getData } from '../../../asyncStorage/AsyncStorage';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -48,9 +51,10 @@ const predefinedPlaces = [
 
 const DriverMap = () => {
   const navigation = useNavigation<NavigationProps>();
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<any>();
+  // const appState = useTypedSelector(state => state.app.appState);
   const MY_KEY = 'AIzaSyDmAPrOnDwMg0-3lKuTWHOAfwylLwLj6Yk';
-
+  const [vehicleNumber, setVehicleNumber] = useState('');
   const [region, setRegion] = useState({
     latitude: 0,
     longitude: 0,
@@ -63,18 +67,42 @@ const DriverMap = () => {
     longitude: 0,
   });
 
+  // useEffect(()=>{
+  //     console.log("App state on drivers map ===>",appState);
+      
+  // },[appState])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getData({storageKey: 'DRIVER_INFO'});
+        if (result === null) {
+          console.log('no result on driver map  Screen from storage');
+        } else {
+          const responseObj = JSON.parse(result);
+    
+          setVehicleNumber(responseObj.vehicle_number);
+   
+          // console.log('Data on driverinfo screen ==>', responseObj);
+        }
+      } catch (error) {
+        console.log('Error occurred at userinfo screen from storage', error);
+      }
+    };
+    fetchData();
+  }, []);
+
   useEffect(() => {
     locationAccess();
   }, []);
 
-  const shareLiveLocation = () => {
-    const keyId = push(child(ref(db), 'location')).key;
-    set(ref(db, 'location/' + keyId), {
-      lat: region.latitude,
-      long: region.longitude,
+  const shareLiveLocation = (lat:Double,long:Double) => {
+    update(ref(db, 'location/' + vehicleNumber), {
+      lat: lat,
+      long: long,
     })
       .then(() => {
-        console.log('Live location sent to firebase');
+        console.log('updated live location from drivers map');
       })
       .catch(e => {
         console.log('error live location', e);
@@ -93,6 +121,7 @@ const DriverMap = () => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         });
+        shareLiveLocation(latitude,longitude);
       },
       error => {
         console.error(`Error getting location: ${error.message}`);
@@ -125,8 +154,8 @@ const DriverMap = () => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           });
-          shareLiveLocation();
-          console.log(position.coords.latitude);
+        
+          // console.log(position.coords.latitude);
         },
         error => {
           // See error code charts below.
@@ -180,7 +209,7 @@ const DriverMap = () => {
                 longitudeDelta: 0.0421,
               });
 
-              console.log(position.coords.latitude);
+              // console.log(position.coords.latitude);
             },
             error => {
               // See error code charts below.
@@ -324,8 +353,8 @@ const DriverMap = () => {
           onPress={handleShowUserLocation}
           style={{
             position:"absolute",
-            right:wp(4),
-            bottom:hp(2)
+            right:wp(5),
+            bottom:hp(3)
           }}>
             <Image source={icons.CURRENT_LOCATION} resizeMode="contain" style={{
               height:hp(4),

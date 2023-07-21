@@ -16,11 +16,11 @@ import colors from '../../../assets/colors/colors';
 import fonts from '../../../assets/fonts/fonts';
 
 type CustomButtonProps = {
-  onPress: () => void;
-  title: string;
-  height: number;
+  onPress?: () => void;
+  title?: string;
+  height?: number;
   width?: number;
-  backgroundColor: string;
+  backgroundColor?: string;
   activityIndicator?: boolean;
   leftIcon?: any;
   marginTop?: number;

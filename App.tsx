@@ -16,16 +16,16 @@ type Props = {
 };
 const App: React.FC<Props> = ({routeName, userInformation, appState}) => {
   const dispatch = useDispatch();
-  console.log('routname on app => ', routeName);
-  console.log('AppState & userInfo', userInformation, appState);
+  // console.log('routname on app => ', routeName);
+  // console.log('AppState & userInfo', userInformation, appState);
 
   useEffect(() => {
     const settingDataToRedux = () => {
       dispatch(setAppState(appState));
-      dispatch(setUserInfo(userInformation));
+      // dispatch(setUserInfo(userInformation));
     };
     settingDataToRedux();
-  }, []);
+  }, [appState]);
 
   return <StackNavigator routeName={routeName} />;
 };

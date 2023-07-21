@@ -29,6 +29,9 @@ import fonts from '../../../../assets/fonts/fonts';
 import fontsizes from '../../../../assets/fontsizes/fontsizes';
 import images from '../../../../assets/images/images';
 import icons from '../../../../assets/icons/icons';
+import axios from 'axios';
+import Toast from 'react-native-simple-toast';
+import { BASE_URL } from '../../../../config';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -47,6 +50,8 @@ const Profile = () => {
   const [driverNumber, setDriverNumber] = useState('');
   const [officeAddress, setOfficeAddress] = useState('');
   const [companyEmail, setCompanyEmail] = useState('');
+  const [driversToken,setDriversToken]=useState('')
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +67,7 @@ const Profile = () => {
           setDriverNumber(responseObj.driver_contact);
           setOfficeAddress(responseObj.office_address);
           setCompanyEmail(responseObj.company_email);
+          setDriversToken(responseObj.token)
           console.log('Data on driverinfo screen ==>', responseObj);
         }
       } catch (error) {
@@ -81,12 +87,33 @@ const Profile = () => {
       {
         text: 'OK',
         onPress: () => {
-          removeData({storageKey: 'DRIVER_INFO'});
-          navigation.navigate(SPLASH_SCREEN);
+         
         },
       },
     ]);
   };
+
+  
+  const removeDriverFromDb = ()=>{
+    
+    let config = {
+      method: 'delete',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/driver/delete/${driversToken}`, 
+    };
+    
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    removeData({storageKey: 'DRIVER_INFO'});
+    navigation.navigate(SPLASH_SCREEN);
+    })
+    .catch((error) => {
+      console.log(error);
+      removeData({storageKey: 'DRIVER_INFO'});
+      navigation.navigate(SPLASH_SCREEN);
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
