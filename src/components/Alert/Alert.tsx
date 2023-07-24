@@ -16,75 +16,115 @@ import colors from '../../../assets/colors/colors';
 import icons from '../../../assets/icons/icons';
 import fonts from '../../../assets/fonts/fonts';
 import images from '../../../assets/images/images';
-
+import fontsizes from '../../../assets/fontsizes/fontsizes';
+import CustomButton from '../Button/Button';
 
 type CustomAlertProps = {
-    visible?:boolean;
-    title?: string;
-    message?:string;
-    onPressClose?: () => void;
-    confirmButton?:boolean;
-    cancelButton?:boolean;
+  visible?: boolean;
+  name?: string;
+  number?: string;
+  pickup?: string;
+  dropoff?: string;
+  onPressClose?: () => void;
+  confirmButton?: () => void;
+  cancelButton?: () => void;
+};
 
-  };
-
-const CustomAlert : React.FC<CustomAlertProps> = ({
+const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
-  title,
-  message,
+  name,
+  number,
+  pickup,
+  dropoff,
   onPressClose,
   confirmButton,
   cancelButton,
 }) => {
   return (
-    <Modal visible={visible} transparent={true} animationType="fade">
+    <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.overlay}>
-        <View
-          style={{
-            ...styles.container,
-            backgroundColor:colors.WHITE,
-          }}>
+        <View style={styles.container}>
           <TouchableOpacity style={styles.closeButton} onPress={onPressClose}>
-            <Image style={styles.closeButtonIcon} source={icons.CROSS} resizeMode="contain" />
+            <Image
+              style={styles.closeButtonIcon}
+              source={icons.CROSS}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
           <View style={styles.content}>
-              <View style={styles.titleIconContainer}>
-                <Image style={styles.titleIcon} source={images.LOGO} resizeMode="contain" />
-              </View>
-         
-            {title ? <Text style={styles.title}>{title}</Text> : null}
-            {message ? <Text style={styles.message}>{message}</Text> : null}
-           
+            <View style={styles.titleIconContainer}>
+              <Image
+                style={styles.titleIcon}
+                source={images.LOGO}
+                resizeMode="contain"
+              />
+            </View>
 
-            {/* {dataUsed ? (
-              <View>
-                <View style={styles.dataUsedView}>
-                  <View style={styles.dataUsedImageContainer}>
-                    <Image style={styles.titleIcon} source={icons.logo} />
-                  </View>
-                  <View style={styles.dataIcon}>
-                    <Image style={styles.titleIcon} source={icons.data} />
-                  </View>
-                  <View style={styles.textView}>
-                    <Text style={styles.dataText}>
-                      Data used: {dataUsed} MB of {totalData} MB
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.progressBarContainer}>
-                  <View style={styles.greyProgressBar}>
-                    <View
-                      style={{
-                        ...styles.blueProgressBar,
-                        width: `${dataPercentage}%`,
-                      }}></View>
-                  </View>
-                </View>
-                <Divider marginBottom={hp(5)} dividerColor={colors.black} />
-              </View>
-            ) : null} */}
-
-
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>Name:</Text>
+              {name ? (
+                <Text numberOfLines={1} style={styles.message}>
+                  {name}
+                </Text>
+              ) : null}
+            </View>
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>Number: </Text>
+              {number ? (
+                <Text numberOfLines={1} style={styles.message}>
+                  {number}
+                </Text>
+              ) : null}
+            </View>
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>From:</Text>
+              {pickup ? (
+                <Text numberOfLines={1} style={styles.message}>
+                  {pickup}
+                </Text>
+              ) : null}
+            </View>
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>To:</Text>
+              {dropoff ? (
+                <Text numberOfLines={1} style={styles.message}>
+                  {dropoff}
+                </Text>
+              ) : null}
+            </View>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+            }}>
+            <CustomButton
+              title="Cancel"
+              textColor={colors.WHITE}
+              backgroundColor={colors.RED}
+              // activityIndicator={signInIsLoaded}
+              height={hp(6)}
+              width={wp(30)}
+              borderRadius={wp(2)}
+              marginHorizontal={wp(5)}
+              marginTop={hp(2)}
+              // marginBottom={hp(2)}
+              onPress={cancelButton}
+            />
+            <CustomButton
+              title="Confirm"
+              textColor={colors.WHITE}
+              backgroundColor={colors.BLUE}
+              // activityIndicator={signInIsLoaded}
+              height={hp(6)}
+              width={wp(30)}
+              borderRadius={wp(2)}
+              marginHorizontal={wp(5)}
+              marginTop={hp(2)}
+              // marginBottom={hp(2)}
+              onPress={confirmButton}
+            />
           </View>
         </View>
       </View>
@@ -101,7 +141,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '90%',
-    height:hp(40),
+    height: hp(40),
     backgroundColor: '#FFFFFF',
     borderRadius: wp(2),
     overflow: 'hidden',
@@ -109,52 +149,85 @@ const styles = StyleSheet.create({
   closeButton: {
     marginLeft: wp(2),
     marginTop: hp(1),
+    // marginBottom: hp(2),
     height: hp(3),
     width: wp(5),
-    // backgroundColor:"red"
   },
   closeButtonIcon: {
-    // resizeMode: 'contain',
     height: '100%',
     width: '100%',
   },
   content: {
     // marginTop: hp(1),
-    //marginBottom: hp(1),
+    // marginBottom: hp(1),
     // padding: 20,
     // backgroundColor: 'blue',
+    marginHorizontal: wp(6),
+  },
+  labelContaier: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   title: {
+    width: wp(30),
     fontFamily: fonts.REGULAR,
-    fontSize: hp(3.4),
+    fontSize: fontsizes.px_24,
     color: colors.BLACK,
-    fontWeight: '500',
+    fontWeight: '400',
     // marginBottom: hp(6),
-    textAlign: 'center',
+    textAlign: 'left',
+    // backgroundColor: 'red',
+  },
+  message: {
+    width: wp(40),
+    fontFamily: fonts.REGULAR,
+    fontSize: fontsizes.px_24,
+    color: colors.BLACK,
+    fontWeight: '400',
+    // marginBottom: hp(6),
+    textAlign: 'left',
+    // backgroundColor: 'green',
   },
   titleIconContainer: {
     // backgroundColor: 'red',
-    justifyContent:"center",
-    alignItems:"center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: hp(6),
   },
   titleIcon: {
     // resizeMode: 'contain',
     height: hp(5),
     width: wp(40),
-    
   },
-  message: {
-    fontFamily: fonts.REGULAR,
-    fontWeight: '400',
-    color: colors.BLACK,
-    marginLeft: wp(7),
-    marginRight: wp(4.4),
-    marginBottom: hp(4.3),
-    fontSize: wp(3.9),
-    textAlign: 'center',
-  },
- 
-
 });
 
 export default CustomAlert;
+
+// {dataUsed ? (
+//             <View>
+//               <View style={styles.dataUsedView}>
+//                 <View style={styles.dataUsedImageContainer}>
+//                   <Image style={styles.titleIcon} source={icons.logo} />
+//                 </View>
+//                 <View style={styles.dataIcon}>
+//                   <Image style={styles.titleIcon} source={icons.data} />
+//                 </View>
+//                 <View style={styles.textView}>
+//                   <Text style={styles.dataText}>
+//                     Data used: {dataUsed} MB of {totalData} MB
+//                   </Text>
+//                 </View>
+//               </View>
+//               <View style={styles.progressBarContainer}>
+//                 <View style={styles.greyProgressBar}>
+//                   <View
+//                     style={{
+//                       ...styles.blueProgressBar,
+//                       width: `${dataPercentage}%`,
+//                     }}></View>
+//                 </View>
+//               </View>
+//               <Divider marginBottom={hp(5)} dividerColor={colors.black} />
+//             </View>
+//           ) : null}

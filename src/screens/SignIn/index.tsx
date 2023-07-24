@@ -93,20 +93,6 @@ const SignIn = () => {
 
   const signInUser = (email?: string, password?: string) => {
     setSignUpIsLoaded(true);
-    // let data = JSON.stringify({
-    //   email: email,
-    //   password: password,
-    // });
-
-    // let config = {
-    //   method: 'get',
-    //   maxBodyLength: Infinity,
-    //   url: `${BASE_URL}/login`,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   data: data,
-    // };
 
     let config = {
       method: 'get',
@@ -191,9 +177,9 @@ const SignIn = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/
+    let reg =
+      /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/;
 
-    
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -329,8 +315,8 @@ const SignIn = () => {
           <TouchableOpacity
             style={{
               position: 'absolute',
-              justifyContent:"center",
-              alignItems:"center",
+              justifyContent: 'center',
+              alignItems: 'center',
               right: wp(6),
               // bottom: hp(2),
               height: hp(4),

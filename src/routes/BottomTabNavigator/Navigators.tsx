@@ -35,25 +35,102 @@ import Toast from 'react-native-simple-toast';
 import {BASE_URL} from '../../../config';
 // Import Socket.IO client library
 
+const socketDriver = new WebSocket(
+  'ws:https://ambu-serve.vercel.app',
+  'driver',
+);
+
+// const driverIdentifier = 'driver456'; // Unique identifier for the driver
+// const socketDriver = new WebSocket('ws://192.168.100.21:8080', 'driver', {
+//   headers: {
+//     'sec-websocket-protocol': driverIdentifier,
+//   },
+// });
+
 const Tab = createBottomTabNavigator();
 
 function MyBottomTabs() {
   const appState = useTypedSelector(state => state.app.appState);
-  const [alertVisible, setAlertVisible] = useState(false);
   const [driversToken, setDriversToken] = useState('');
   const [vehicleNumber, setVehicleNumber] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userContact, setUserContact] = useState('');
+  const [userPickUp, setUserPickUp] = useState('');
+  const [userDropOff, setUserDropOff] = useState('');
+  const [userToken, setUserToken] = useState('');
+  const [userInformation, setUserInformation] = useState('');
+
+  // useEffect(() => {
+  //   if (appState === 'active') {
+  //     fetchData();
+  //   } else if (appState === 'background') {
+  //     // removeDriverFromDb();
+  //   }
+  // }, [appState]);
+
+  // useEffect(() => {
+  // fetchData();
+  // }, []);
 
   useEffect(() => {
-    if (appState === 'active') {
-      fetchData();
-    } else if (appState === 'background') {
-      removeDriverFromDb();
-    }
-  }, [appState]);
+    socketDriver.onmessage = e => {
+      // a message was received
+      console.log('message from socket node js in drivers maps ===>', e);
 
-  useEffect(() => {
-    fetchData();
+      const receivedMessage = JSON.parse(e.data);
+
+      if (receivedMessage.type === 'user') {
+        // console.log('User name:', receivedMessage.full_name);
+        // You can also access other fields of the received message here if needed
+        // setUserInformation(receivedMessage);
+        setUserName(receivedMessage.full_name);
+        setUserContact(receivedMessage.contact);
+        setUserPickUp(receivedMessage.pickup_location);
+        setUserDropOff(receivedMessage.drop_location);
+        setUserToken(receivedMessage.token);
+        setAlertVisible(true);
+      }
+    };
   }, []);
+
+  const [userReqCancel, setUserReqCancel] = useState({
+    type: 'driver',
+    message: 'canceled',
+    driver_name: '',
+    contact: '',
+    currentLocation: '',
+    usertoken: userToken,
+    status: 'canceled',
+  });
+
+  const onConfirmRide = () => {
+    setAlertVisible(false);
+  };
+  const onCancelRide = () => {
+    setAlertVisible(false);
+    // setUserReqCancel(prevState => ({
+    //   ...prevState,
+    //   status: 'canceled', // Set the status to 'canceled' when the driver cancels the ride request
+    // }));
+    // console.log('canceled from driver');
+    const data = JSON.stringify(userReqCancel);
+    socketDriver.send(data);
+  };
+
+  const driveSockect = (responseObj: any) => {
+    // console.log('drivers data for sockct =====> ', responseObj);
+    // socketDriver.addEventListener('open', () => {
+    //   console.log('Connected to WebSocket server');
+    //   // Send a message to the server
+    //   const data = JSON.stringify(responseObj);
+    //   socketDriver.send(data);
+    // });
+    // socketDriver.onmessage = e => {
+    //   // a message was received
+    //   console.log('message from socket node js in user maps ===>', e.data);
+    // };
+  };
 
   const fetchData = async () => {
     try {
@@ -62,13 +139,14 @@ function MyBottomTabs() {
         console.log('no result on driver info  Screen from storage');
       } else {
         const responseObj = JSON.parse(result);
-        setVehicleNumber(responseObj.vehicle_number);
-        setDriversToken(responseObj.token);
+        // setVehicleNumber(responseObj.vehicle_number);
+        // setDriversToken(responseObj.token);
         if (driversToken === '') {
           fetchData();
         } else {
-          createDriverOnFirebase(responseObj.vehicle_number);
-          driverStateApi(responseObj);
+          // createDriverOnFirebase(responseObj.vehicle_number);
+          // driverStateApi(responseObj);
+          // driveSockect(responseObj);
         }
       }
     } catch (error) {
@@ -251,16 +329,20 @@ function MyBottomTabs() {
           }}
         />
       </Tab.Navigator>
-      {/* {alertVisible !== null && 
-     <CustomAlert 
-     title='Ambu serve' 
-     message='request' 
-     visible={alertVisible} 
-     onPressClose={()=>{
-      setAlertVisible(false);
-     }} 
-     />
-     } */}
+      {alertVisible !== null && (
+        <CustomAlert
+          name={userName}
+          number={userContact}
+          pickup={userPickUp}
+          dropoff={userDropOff}
+          visible={alertVisible}
+          onPressClose={() => {
+            setAlertVisible(false);
+          }}
+          confirmButton={onConfirmRide}
+          cancelButton={onCancelRide}
+        />
+      )}
     </>
   );
 }

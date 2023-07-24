@@ -8,9 +8,8 @@ const app = express();
 const jwt = require('jsonwebtoken');
 const secretKey = 'secretKey';
 
-// const server = require('http').Server(app);
-// const io = require('socket.io')(server);
-// Create separate arrays to store connected users and drivers
+////////////////////////////////Socket//////////////////////////////////////
+
 const connectedUsers = [];
 const connectedDrivers = [];
 
@@ -20,74 +19,79 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({port: 8080});
 
 wss.on('connection', (ws, request) => {
-  // Get the identifier sent by the client during the handshake
   const identifier = request.headers['sec-websocket-protocol'];
-  console.log(`A new client connected with identifier: ${identifier}`);
 
   if (identifier === 'user') {
     // connectedUsers.push(ws);
+    console.log(`A new USER connected with identifier: ${identifier}`);
   } else if (identifier === 'driver') {
+    // console.log('driverss ====>', ws, request);
+    console.log(`A new DRIVER connected with identifier: ${identifier}`);
     connectedDrivers.push(ws);
   }
 
-  //  // Remove the disconnected WebSocket connection from the corresponding array
-  // if (identifier === 'user') {
-  //   const index = connectedUsers.indexOf(ws);
-  //   if (index !== -1) {
-  //     connectedUsers.splice(index, 1);
-  //   }
-  // } else if (identifier === 'driver') {
-  //   const index = connectedDrivers.indexOf(ws);
-  //   if (index !== -1) {
-  //     connectedDrivers.splice(index, 1);
-  //   }
-  // }
-
   ws.on('message', message => {
-    const receivedMessage = Buffer.from(message);
-    const messageObject = JSON.parse(receivedMessage.toString());
-    // console.log(messageObject);
-    ////Check if the message has a "type" field
-    if (messageObject.type === 'user') {
+    const receivedMessage = JSON.parse(message);
+    console.log('Received message:', receivedMessage);
+    if (receivedMessage.type === 'user') {
+      // Store user connection in the array
+      connectedUsers.push({userId: receivedMessage.userId, ws});
+      // console.log(`User ${receivedMessage.userId} is connected.`);
       if (connectedDrivers.length < 1) {
         console.log(
-          `Received ${messageObject.type} message:`,
-          messageObject,
+          `Received ${receivedMessage.type} message:`,
+          receivedMessage,
           'no drivers',
         );
         setTimeout(() => {
           ws.send(`No drivers available`, 'error');
         }, 2000);
       } else {
-        sendRequestToAllDrivers(ws, messageObject);
+        sendRequestToAllDrivers(receivedMessage);
       }
-      // Echo the received message back to the client
-    } else if (messageObject.type === 'driver') {
-      console.log(
-        `Received ${messageObject.type} message:`,
-        messageObject.content,
-      );
+    } else if (receivedMessage.type === 'driver') {
+      console.log('Received response from driver:', receivedMessage);
+      // Find user connection based on user ID and send the response back to the user
+      if (receivedMessage.status === 'canceled') {
+        const userConnection = connectedUsers.find(
+          user => user.userId === receivedMessage.userId,
+        );
+        if (userConnection) {
+          userConnection.ws.send(JSON.stringify(receivedMessage));
+        } else {
+          console.log(
+            `User with ID ${receivedMessage.userId} not found or disconnected.`,
+          );
+        }
+      } else if (receivedMessage.status === 'active') {
+      }
     } else {
-      console.log('Invalid message format:', messageObject);
-      // Optionally, you can send an error response back to the client if the message format is invalid
-      // ws.send('Invalid message format');
+      console.log('Invalid message format:', receivedMessage);
     }
   });
 
-  // Event handler for closing connection
   ws.on('close', () => {
-    console.log('Client disconnected');
+    console.log(`${identifier} disconnected`);
+    // Remove user connection from the array
+    if (identifier === 'user') {
+      const index = connectedUsers.findIndex(user => user.ws === ws);
+      if (index !== -1) {
+        console.log(`User ${connectedUsers[index].userId} disconnected.`);
+        connectedUsers.splice(index, 1);
+      }
+    }
   });
 });
 
 // Function to send a request message to all connected drivers
 function sendRequestToAllDrivers(requestData) {
   const message = JSON.stringify(requestData);
-
   connectedDrivers.forEach(driverWs => {
     driverWs.send(message);
   });
 }
+
+////////////////////////////////////////////////////////////////////////////
 
 const PORT = 8000;
 
@@ -178,14 +182,14 @@ app.delete('/delete/:_id', async (req, resp) => {
 
 app.post('/driver/create', async (req, resp) => {
   let data = new driverRegister(req.body);
-  let email = data.email;
+  let email = data.company_email;
+
   let findEmail = await driverRegister.findOne({email});
   if (findEmail) {
-    console.log('Email already exists');
+    console.log('Email already exists ');
     return resp.send('Email already exists');
   }
   // console.log('posted', data.email);
-
   const token = jwt.sign({data}, secretKey, {expiresIn: '10000s'});
   data.token = token;
   console.log('jwt =>', data);
@@ -233,7 +237,7 @@ app.get('/driver/login', async (req, resp) => {
 app.post('/driver/online', async (req, resp) => {
   let data = new driverOnline(req.body);
   let company_email = data.company_email;
-  // console.log(email);
+  console.log(company_email);
   let findEmail = await driverOnline.findOne({company_email});
   if (findEmail) {
     console.log('Driver already Online');

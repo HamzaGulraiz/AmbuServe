@@ -55,7 +55,6 @@ const SignUpAsDriver = () => {
   const [toogleCheck, setToogleCheck] = useState(false);
   const [toogleCheckError, setToogleCheckError] = useState('');
 
-
   const [driverName, setDriverName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -70,21 +69,17 @@ const SignUpAsDriver = () => {
   const signUpValidation = () => {
     if (
       userInfoValid.driverNameValid === false ||
-      userInfoValid.passwordValid === false 
+      userInfoValid.passwordValid === false
     ) {
       setDriverNameError('    ');
-      setPasswordError("  ")
+      setPasswordError('  ');
       setTimeout(() => {
         setDriverNameError('');
         setPasswordError('');
-      
       }, 2000);
     } else {
       // if (toogleCheck === true) {
-        signUpUser(
-          driverName,
-          password,
-        );
+      signUpUser(driverName, password);
       // } else {
       //   setToogleCheckError('    ');
       //   setTimeout(() => {
@@ -94,30 +89,16 @@ const SignUpAsDriver = () => {
     }
   };
 
-  const signUpUser = (
-    driverName?: string,
-    password?: string,
-   
-  ) => {
+  const signUpUser = (driverName?: string, password?: string) => {
     setSignInIsLoaded(true);
-    // let data = JSON.stringify({
-    //   driver_name: driverName,
-    //   password: password,
-    // });
-
-
- 
-    // let params = new URLSearchParams(data);
-
 
     let config = {
       method: 'get',
       maxBodyLength: Infinity,
       url: `${BASE_URL}/driver/login`,
-      // url: 'http://192.168.100.21:8000/driver/login',
-      // url:`http://192.168.100.21:8000/driver/login?${params}`,
-      headers: { 
-        'Content-Type': 'application/json'
+
+      headers: {
+        'Content-Type': 'application/json',
       },
       params: {
         driver_name: driverName,
@@ -125,46 +106,40 @@ const SignUpAsDriver = () => {
       },
     };
 
-
     axios
-    .request(config)
-    .then(response => {
-      // console.log(JSON.stringify(response.data));
-      if (response.data === 'Email does not exist') {
-        Toast.showWithGravity(
-          'This user does not exist on our record',
-          Toast.SHORT,
-          Toast.BOTTOM,
-        );
+      .request(config)
+      .then(response => {
+        // console.log(JSON.stringify(response.data));
+        if (response.data === 'Email does not exist') {
+          Toast.showWithGravity(
+            'This user does not exist on our record',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignInIsLoaded(false);
+        } else if (response.data === 'Password does not match') {
+          Toast.showWithGravity(
+            'Password does not match',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignInIsLoaded(false);
+        } else {
+          console.log(
+            'data came from node response in sign in as driver =>',
+            response.data,
+          );
+          // dispatch(setUserInfo(response.data));
+          setData({value: response.data, storageKey: 'DRIVER_INFO'});
+          navigation.replace(MY_BOTTOM_TABS);
+          setSignInIsLoaded(false);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
         setSignInIsLoaded(false);
-      } else if (response.data === 'Password does not match') {
-        Toast.showWithGravity(
-          'Password does not match',
-          Toast.SHORT,
-          Toast.BOTTOM,
-        );
-        setSignInIsLoaded(false);
-      } else {
-        console.log(
-          'data came from node response in sign in as driver =>',
-          response.data,
-        );
-        // dispatch(setUserInfo(response.data));
-        setData({value: response.data, storageKey: 'DRIVER_INFO'});
-        navigation.replace(MY_BOTTOM_TABS);
-        setSignInIsLoaded(false);
-      }
-    })
-    .catch(error => {
-      console.log(error);
-      Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
-      setSignInIsLoaded(false);
-    });
-
-
-
-    
-   
+      });
   };
 
   // const [companyNameError, setCompanyNameError] = useState('');
@@ -231,7 +206,7 @@ const SignUpAsDriver = () => {
 
   const [driverNameError, setDriverNameError] = useState('');
   const driverNameValidation = (value: string) => {
-    let reg = /^[a-zA-Z ]{3,30}$/
+    let reg = /^[a-zA-Z ]{3,30}$/;
     if (value.length == 0) {
       setDriverNameError('Required!');
       setTimeout(() => {
@@ -263,9 +238,9 @@ const SignUpAsDriver = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/
+    let reg =
+      /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/;
 
-    
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -427,9 +402,9 @@ const SignUpAsDriver = () => {
       case 'driverName':
         driverNameValidation(getValue);
         break;
-        case 'password':
-          passwordValidation(getValue);
-          break;
+      case 'password':
+        passwordValidation(getValue);
+        break;
       // case 'driverNumber':
       //   driverNumberValidation(getValue);
       //   break;
@@ -547,7 +522,7 @@ const SignUpAsDriver = () => {
           maxLength={30}
           autoCapitalize="none"
         />
-              <Text
+        <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -560,7 +535,7 @@ const SignUpAsDriver = () => {
           }}>
           {passowrdError}
         </Text>
-     <View style={styles.passwordInputView}>
+        <View style={styles.passwordInputView}>
           <TextInput
             value={password}
             onChangeText={value => {
@@ -582,8 +557,8 @@ const SignUpAsDriver = () => {
           <TouchableOpacity
             style={{
               position: 'absolute',
-              justifyContent:"center",
-              alignItems:"center",
+              justifyContent: 'center',
+              alignItems: 'center',
               right: wp(6),
               // bottom: hp(2),
               height: hp(4),

@@ -29,20 +29,13 @@ import {BASE_URL} from '../../../config';
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import CustomButton from '../../components/Button/Button';
-// import io from 'socket.io-client';
-import SocketIOClient, {io} from 'socket.io-client';
 
-// const socket = io('http://192.168.100.21:8000');
+const socketUser = new WebSocket('ws:https://ambu-serve.vercel.app', 'user');
 
-// Listen for the 'connect' event
-// socket.on('connect', () => {
-//   console.log('Socket connected');
-// });
-
-// // Listen for the 'disconnect' event
-// socket.on('disconnect', () => {
-//   console.log('Socket disconnected');
-// });
+socketUser.addEventListener('open', () => {
+  console.log('Request send from user ');
+  // Send a message to the server
+});
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -70,6 +63,20 @@ const Maps = () => {
 
   const [findDriverIsLoaded, setfindDriverIsLoaded] = useState(false);
 
+  socketUser.onmessage = e => {
+    // a message was received
+    const receivedMessage = JSON.parse(e.data);
+    console.log(
+      'message from socket node js in user maps ===>',
+      receivedMessage.status,
+    );
+
+    if (receivedMessage.status === 'canceled') {
+      console.log('asdhakjshdjkashdjkashdjk');
+      Alert.alert('canceled');
+    }
+  };
+
   const [userInfoForRide, setUserInfoForRide] = useState({
     type: 'user',
     full_name: 'Hamza Gulraiz',
@@ -89,26 +96,8 @@ const Maps = () => {
   }, []);
 
   const sendRequestToAllDrivers = () => {
-    // console.log('driver requested ');
-    // For user
-    const socketUser = new WebSocket('ws://192.168.100.21:8080', 'user');
-
-    socketUser.addEventListener('open', () => {
-      console.log('Connected to WebSocket server');
-      // Send a message to the server
-      const data = JSON.stringify(userInfoForRide);
-      socketUser.send(data);
-    });
-
-    socketUser.onmessage = e => {
-      // a message was received
-      console.log('message from socket node js in user maps ===>', e.data);
-    };
-
-    // socket.onopen = () => {
-    //   // connection opened
-    //   socket.send('something');  // send a message
-    // };
+    const data = JSON.stringify(userInfoForRide);
+    socketUser.send(data);
   };
 
   const [region, setRegion] = useState({

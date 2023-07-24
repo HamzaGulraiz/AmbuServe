@@ -55,11 +55,11 @@ const SignUpAsDriver = () => {
   const [toogleCheck, setToogleCheck] = useState(false);
   const [toogleCheckError, setToogleCheckError] = useState('');
 
-  const [driverNumber,setDriverNumber] = useState('');
-  const [officeAddress,setOfficeAddress] = useState('');
-  const [companyEmail,setCompanyEmail] = useState('');
-  const [companyName,setCompanyName] = useState('');
-  const [vehicleNumber,setVehicleNumber] = useState('');
+  const [driverNumber, setDriverNumber] = useState('');
+  const [officeAddress, setOfficeAddress] = useState('');
+  const [companyEmail, setCompanyEmail] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [vehicleNumber, setVehicleNumber] = useState('');
   const [driverName, setDriverName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -67,13 +67,13 @@ const SignUpAsDriver = () => {
 
   //User Information After Validation
   const [userInfoValid, setUserInfoValid] = useState({
-    companyNameValid:false,
+    companyNameValid: false,
     driverNameValid: false,
     passwordValid: false,
-    vehicleNumberValid:false,
-    driverNumberValid:false,
-    officeAddressValid:false,
-    companyEmailValid:false,
+    vehicleNumberValid: false,
+    driverNumberValid: false,
+    officeAddressValid: false,
+    companyEmailValid: false,
   });
 
   const signUpValidation = () => {
@@ -84,30 +84,34 @@ const SignUpAsDriver = () => {
       userInfoValid.driverNumberValid === false ||
       userInfoValid.officeAddressValid === false ||
       userInfoValid.companyNameValid === false ||
-      userInfoValid.passwordValid === false 
+      userInfoValid.passwordValid === false
     ) {
       setDriverNameError('    ');
-      setPasswordError("  ")
-      setCompanyEmailError(' ')
-      setCompanyNameError('  ')
-      setDriverNumberError('   ')
-      setVehicleNumberError('  ')
-      setOfficeAddressError('  ')
+      setPasswordError('  ');
+      setCompanyEmailError(' ');
+      setCompanyNameError('  ');
+      setDriverNumberError('   ');
+      setVehicleNumberError('  ');
+      setOfficeAddressError('  ');
       setTimeout(() => {
         setDriverNameError('');
-        setPasswordError("")
-        setCompanyEmailError('')
-        setCompanyNameError('')
-        setDriverNumberError('')
-        setVehicleNumberError('')
-        setOfficeAddressError('')
-      
+        setPasswordError('');
+        setCompanyEmailError('');
+        setCompanyNameError('');
+        setDriverNumberError('');
+        setVehicleNumberError('');
+        setOfficeAddressError('');
       }, 2000);
     } else {
       if (toogleCheck === true) {
         signUpUser(
+          companyEmail,
+          companyName,
           driverName,
           password,
+          vehicleNumber,
+          driverNumber,
+          driverName,
         );
       } else {
         setToogleCheckError('    ');
@@ -119,76 +123,82 @@ const SignUpAsDriver = () => {
   };
 
   const signUpUser = (
+    companyEmail: string,
+    companyName?: string,
+    vehicleNumber?: string,
+    driverNumber?: string,
+    officeAddress?: string,
     driverName?: string,
     password?: string,
-   
   ) => {
     setSignInIsLoaded(true);
-    // let data = JSON.stringify({
-    //   driver_name: driverName,
-    //   password: password,
-    // });
-
-
- 
-    // let params = new URLSearchParams(data);
-
-
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: `${BASE_URL}/driver/create`,
-      // url: 'http://192.168.100.21:8000/driver/login',
-      // url:`http://192.168.100.21:8000/driver/login?${params}`,
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      params: {
-        driver_name: driverName,
-        password: password,
-      },
-    };
-
-
-    axios
-    .request(config)
-    .then(response => {
-      // console.log(JSON.stringify(response.data));
-      if (response.data === 'Email does not exist') {
-        Toast.showWithGravity(
-          'This user does not exist on our record',
-          Toast.SHORT,
-          Toast.BOTTOM,
-        );
-        setSignInIsLoaded(false);
-      } else if (response.data === 'Password does not match') {
-        Toast.showWithGravity(
-          'Password does not match',
-          Toast.SHORT,
-          Toast.BOTTOM,
-        );
-        setSignInIsLoaded(false);
-      } else {
-        console.log(
-          'data came from node response in sign in as driver =>',
-          response.data,
-        );
-        // dispatch(setUserInfo(response.data));
-        setData({value: response.data, storageKey: 'DRIVER_INFO'});
-        navigation.replace(MY_BOTTOM_TABS);
-        setSignInIsLoaded(false);
-      }
-    })
-    .catch(error => {
-      console.log(error);
-      Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
-      setSignInIsLoaded(false);
+    let data = JSON.stringify({
+      company_name: companyEmail,
+      vehicle_number: vehicleNumber,
+      driver_name: driverName,
+      password: password,
+      driver_contact: driverNumber,
+      office_address: officeAddress,
+      company_email: companyEmail,
     });
 
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/driver/create`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // params: {
+      //   driver_name: driverName,
+      //   password: password,
+      // },
+      data: data,
+    };
 
+    // console.log('====================>', data);
 
-    
-   
+    axios
+      .request(config)
+      .then(response => {
+        // console.log(JSON.stringify(response.data));
+        if (response.data === 'Email does not exist') {
+          Toast.showWithGravity(
+            'This user does not exist on our record',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignInIsLoaded(false);
+        } else if (response.data === 'Password does not match') {
+          Toast.showWithGravity(
+            'Password does not match',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignInIsLoaded(false);
+        } else if (response.data === 'Email already exists') {
+          Toast.showWithGravity(
+            'Email already exists',
+            Toast.SHORT,
+            Toast.BOTTOM,
+          );
+          setSignInIsLoaded(false);
+        } else {
+          console.log(
+            'data came from node response in sign in as driver =>',
+            response.data,
+          );
+          // dispatch(setUserInfo(response.data));
+          setData({value: response.data, storageKey: 'DRIVER_INFO'});
+          navigation.replace(MY_BOTTOM_TABS);
+          setSignInIsLoaded(false);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
+        setSignInIsLoaded(false);
+      });
   };
 
   const [companyNameError, setCompanyNameError] = useState('');
@@ -255,7 +265,7 @@ const SignUpAsDriver = () => {
 
   const [driverNameError, setDriverNameError] = useState('');
   const driverNameValidation = (value: string) => {
-    let reg = /^[a-zA-Z ]{3,30}$/
+    let reg = /^[a-zA-Z ]{3,30}$/;
     if (value.length == 0) {
       setDriverNameError('Required!');
       setTimeout(() => {
@@ -287,9 +297,9 @@ const SignUpAsDriver = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/
+    let reg =
+      /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{6,}$/;
 
-    
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -349,9 +359,9 @@ const SignUpAsDriver = () => {
       });
     } else if (value.length > 11) {
       setDriverNumberError('Invalid format');
-      setTimeout(() => {
-        setDriverNumberError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setDriverNumberError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         driverNumberValid: false,
@@ -359,9 +369,9 @@ const SignUpAsDriver = () => {
       //  console.log(userInfoValid);
     } else if (value.length < 11) {
       setDriverNumberError('Invalid format');
-      setTimeout(() => {
-        setDriverNumberError('');
-      }, 2000);
+      // setTimeout(() => {
+      //   setDriverNumberError('');
+      // }, 2000);
       setUserInfoValid({
         ...userInfoValid,
         driverNumberValid: false,
@@ -451,9 +461,9 @@ const SignUpAsDriver = () => {
       case 'driverName':
         driverNameValidation(getValue);
         break;
-        case 'password':
-          passwordValidation(getValue);
-          break;
+      case 'password':
+        passwordValidation(getValue);
+        break;
       case 'driverNumber':
         driverNumberValidation(getValue);
         break;
@@ -511,7 +521,7 @@ const SignUpAsDriver = () => {
           maxLength={30}
           autoCapitalize="none"
         />
-                <Text
+        <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -542,7 +552,7 @@ const SignUpAsDriver = () => {
           autoCapitalize="none"
         />
 
-<Text
+        <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -573,7 +583,7 @@ const SignUpAsDriver = () => {
           autoCapitalize="none"
         />
 
-           <Text
+        <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -602,9 +612,9 @@ const SignUpAsDriver = () => {
           multiline={false}
           maxLength={30}
           autoCapitalize="none"
-                    />
-    
-          <Text
+        />
+
+        <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -665,8 +675,8 @@ const SignUpAsDriver = () => {
           maxLength={10}
           autoCapitalize="none"
         />
-     
-              <Text
+
+        <Text
           style={{
             // marginBottom: hp(1),
             marginHorizontal: hp(3),
@@ -679,7 +689,7 @@ const SignUpAsDriver = () => {
           }}>
           {passowrdError}
         </Text>
-     <View style={styles.passwordInputView}>
+        <View style={styles.passwordInputView}>
           <TextInput
             value={password}
             onChangeText={value => {
@@ -701,8 +711,8 @@ const SignUpAsDriver = () => {
           <TouchableOpacity
             style={{
               position: 'absolute',
-              justifyContent:"center",
-              alignItems:"center",
+              justifyContent: 'center',
+              alignItems: 'center',
               right: wp(6),
               // bottom: hp(2),
               height: hp(4),
@@ -719,9 +729,6 @@ const SignUpAsDriver = () => {
             />
           </TouchableOpacity>
         </View>
-
-     
-
 
         <View
           style={{
@@ -761,19 +768,21 @@ const SignUpAsDriver = () => {
             }}>
             I agree to terms and conditions
           </Text>
-          <TouchableOpacity 
-          onPress={()=>{
-            navigation.navigate(TERMS_AND_CONDITIONS)
-          }}
-          >
-            <Text style={{
-              marginLeft: hp(0.5),
-              fontWeight: '400',
-              fontSize: fontsizes.px_15,
-              fontFamily: fonts.REGULAR,
-              color: colors.BLUE,
-              textDecorationLine:"underline"
-            }}>policies</Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(TERMS_AND_CONDITIONS);
+            }}>
+            <Text
+              style={{
+                marginLeft: hp(0.5),
+                fontWeight: '400',
+                fontSize: fontsizes.px_15,
+                fontFamily: fonts.REGULAR,
+                color: colors.BLUE,
+                textDecorationLine: 'underline',
+              }}>
+              policies
+            </Text>
           </TouchableOpacity>
         </View>
 
