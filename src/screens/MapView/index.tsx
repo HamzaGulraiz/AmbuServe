@@ -66,7 +66,7 @@ const Maps = () => {
   const [findDriverIsLoaded, setfindDriverIsLoaded] = useState(false);
 
   const socketUser = new WebSocket(
-    'ws://earnest-medovik-e59290.netlify.app/',
+    'ws://ambu-serv-8e4fba44a667.herokuapp.com/',
     'user',
   );
   // socketUser.addEventListener('open', () => {

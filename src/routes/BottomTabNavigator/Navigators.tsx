@@ -44,7 +44,7 @@ import {BASE_URL} from '../../../config';
 
 const Tab = createBottomTabNavigator();
 const socketDriver = new WebSocket(
-  'ws://earnest-medovik-e59290.netlify.app/',
+  'ws://ambu-serv-8e4fba44a667.herokuapp.com/',
   'driver',
 );
 
