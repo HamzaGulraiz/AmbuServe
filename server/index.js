@@ -95,7 +95,7 @@ function sendRequestToAllDrivers(requestData) {
 
 ////////////////////////////////////////////////////////////////////////////
 
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 
 DB();
 
@@ -269,6 +269,6 @@ app.get('/driver/list', async (req, resp) => {
 
 //////////////////////////////////////////////////////////////////////////////////
 
-app.listen(PORT, () => {
-  console.log('Server is running on live port ' + PORT);
+app.listen(port, () => {
+  console.log('Server is running on live port ' + port);
 });
