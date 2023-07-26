@@ -31,6 +31,7 @@ import {
   MY_BOTTOM_TABS,
   SIGN_IN,
   SIGN_UP,
+  SIGN_UP_AS_DRIVER,
   TERMS_AND_CONDITIONS,
 } from '../../constants/Navigator';
 import axios from 'axios';
@@ -733,6 +734,66 @@ const SignUpAsDriver = () => {
           marginBottom={hp(2)}
           onPress={signUpValidation}
         />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            marginHorizontal: wp(5),
+            marginBottom: hp(2),
+          }}>
+          <Divider
+            height={hp(0.1)}
+            dividerColor={colors.BLACK}
+            width={wp(36)}
+            marginRight={wp(1.6)}
+          />
+          <Text
+            style={{
+              fontWeight: '400',
+              fontSize: fontsizes.px_12,
+              fontFamily: fonts.REGULAR,
+              color: colors.GREY,
+            }}>
+            OR
+          </Text>
+          <Divider
+            height={hp(0.1)}
+            dividerColor={colors.BLACK}
+            width={wp(36)}
+            marginLeft={wp(1.6)}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            // marginBottom: hp(5),
+          }}>
+          <Text
+            style={{
+              fontWeight: '400',
+              fontSize: fontsizes.px_15,
+              fontFamily: fonts.REGULAR,
+              color: colors.BLACK,
+            }}>
+            Don't have an account?
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(SIGN_UP_AS_DRIVER);
+            }}>
+            <Text
+              style={{
+                fontWeight: '400',
+                fontSize: fontsizes.px_15,
+                fontFamily: fonts.REGULAR,
+                color: colors.BLUE,
+              }}>
+              {' '}
+              Sign up
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

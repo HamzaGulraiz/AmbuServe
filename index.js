@@ -17,10 +17,8 @@ import {
 import {getData} from './src/asyncStorage/AsyncStorage';
 import React, {useEffect, useState, useRef} from 'react';
 import {AppState, StyleSheet, Text, View} from 'react-native';
-import {Database, child, push, ref, set,remove} from 'firebase/database';
+import {Database, child, push, ref, set, remove} from 'firebase/database';
 import {db} from './src/components/firebase/config';
-
-
 
 const AppContainer = () => {
   const appState = useRef(AppState.currentState);
@@ -60,7 +58,6 @@ const AppContainer = () => {
               setRouteName(SPLASH_SCREEN);
               console.log('no result on index.js from storage');
             } else {
-  
               setRouteName(MY_BOTTOM_TABS);
               console.log('driver result on index.js from storage');
             }
@@ -69,7 +66,7 @@ const AppContainer = () => {
           }
         } else {
           const responseObj = JSON.parse(result);
-          setUserInfornation(responseObj);
+          setUserInfornation(result);
           setRouteName(DASHBOARD);
           console.log('Data token on index.js ==>', responseObj);
         }

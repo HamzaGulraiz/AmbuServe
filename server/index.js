@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const DB = require('./config');
 const userRegister = require('./userRegister');
@@ -58,6 +59,7 @@ wss.on('connection', (ws, request) => {
         );
         if (userConnection) {
           userConnection.ws.send(JSON.stringify(receivedMessage));
+          console.log('sent response from driver: canceled');
         } else {
           console.log(
             `User with ID ${receivedMessage.userId} not found or disconnected.`,
@@ -93,7 +95,7 @@ function sendRequestToAllDrivers(requestData) {
 
 ////////////////////////////////////////////////////////////////////////////
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 DB();
 

@@ -29,13 +29,8 @@ import {BASE_URL} from '../../../config';
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import CustomButton from '../../components/Button/Button';
-
-const socketUser = new WebSocket('ws:https://ambu-serve.vercel.app', 'user');
-
-socketUser.addEventListener('open', () => {
-  console.log('Request send from user ');
-  // Send a message to the server
-});
+import CustomAlert from '../../components/Alert/Alert';
+import {useTypedSelector} from '../../redux/Store';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -58,11 +53,23 @@ const predefinedPlaces = [
 
 const Maps = () => {
   const navigation = useNavigation<NavigationProps>();
+  const userInfoFromRedux = useTypedSelector(state => state.app.userInfo);
+  console.log('from redux ========> ', userInfoFromRedux);
+  const userDataToSend = JSON.parse(userInfoFromRedux);
+  const {full_name, email, contact, emergency_contact, token, ...otherProps} =
+    userDataToSend;
+
   const mapRef = useRef<any>(null);
   const MY_KEY = 'AIzaSyDmAPrOnDwMg0-3lKuTWHOAfwylLwLj6Yk';
+  const [alertVisible, setAlertVisible] = useState(false);
 
   const [findDriverIsLoaded, setfindDriverIsLoaded] = useState(false);
 
+  const socketUser = new WebSocket('ws://192.168.100.21:8080', 'user');
+  // socketUser.addEventListener('open', () => {
+  //   // console.log('Request send from user ');
+  //   // Send a message to the server
+  // });
   socketUser.onmessage = e => {
     // a message was received
     const receivedMessage = JSON.parse(e.data);
@@ -70,11 +77,12 @@ const Maps = () => {
       'message from socket node js in user maps ===>',
       receivedMessage.status,
     );
-
     if (receivedMessage.status === 'canceled') {
-      console.log('asdhakjshdjkashdjkashdjk');
-      Alert.alert('canceled');
+      // console.log('status hweraa sdkljlk');
+      // setfindDriverIsLoaded(false);
+      setAlertVisible(true);
     }
+    // setfindDriverIsLoaded(false);
   };
 
   const [userInfoForRide, setUserInfoForRide] = useState({
@@ -96,7 +104,22 @@ const Maps = () => {
   }, []);
 
   const sendRequestToAllDrivers = () => {
-    const data = JSON.stringify(userInfoForRide);
+    // setfindDriverIsLoaded(true);
+    // console.log('asdajkhdajkhdajkdhajkshdjkahsdjk', userDataInformations);
+    const sendingObject = {
+      type: 'user',
+      full_name: full_name,
+      email: email,
+      contact: contact,
+      emergency_contact: emergency_contact,
+      pickup_location: 'here',
+      drop_location: 'to',
+      pickup_date: '12-03-23',
+      drop_date: '12-03-23',
+      token: token,
+    };
+
+    const data = JSON.stringify(sendingObject);
     socketUser.send(data);
   };
 
@@ -252,153 +275,164 @@ const Maps = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {region.latitude != null ? (
-        <>
-          <View style={styles.searchBarFrom}>
-            <GooglePlacesAutocomplete
-              placeholder="Current location"
-              textInputProps={{
-                placeholderTextColor: colors.BLACK,
-              }}
-              styles={{
-                textInput: {
-                  color: colors.BLACK,
-                },
-                container: {
-                  // marginTop:30
-                },
-                listView: {
-                  marginTop: hp(6),
-                },
-              }}
-              onPress={(data, details = null) => {
-                // 'details' is provided when fetchDetails = true
-                console.log(data, details);
-              }}
-              query={{
-                key: MY_KEY,
-                language: 'en',
-              }}
-              // predefinedPlaces={predefinedPlaces}
-            />
-          </View>
-          <View style={styles.searchBarTo}>
-            <GooglePlacesAutocomplete
-              placeholder="Where to"
-              textInputProps={{
-                placeholderTextColor: colors.BLACK,
-              }}
-              styles={{
-                textInput: {
-                  color: colors.BLACK,
-                },
-              }}
-              onPress={(data, details = null) => {
-                // 'details' is provided when fetchDetails = true
-                console.log(data, details);
-              }}
-              query={{
-                key: MY_KEY,
-                language: 'en',
-              }}
-              // predefinedPlaces={predefinedPlaces}
-            />
-          </View>
-          <MapView
-            style={styles.map}
-            // showsUserLocation={true}
-            provider="google"
-            ref={mapRef}
-            minZoomLevel={13}
-            maxZoomLevel={16}
-            onPress={event =>
-              SetMarkerPosition({
-                latitude: event.nativeEvent.coordinate.latitude,
-                longitude: event.nativeEvent.coordinate.longitude,
-              })
-            }
-            region={region}
-            // onRegionChangeComplete={region => setRegion(region)}
-            //onRegionChange={region}
-          >
-            <Marker
-              coordinate={{
-                latitude: region.latitude,
-                longitude: region.longitude,
-              }}
-              //title="Home"
-              //description="press button to save"
-              //image={require('../../assets/home.png')}
-              // onPress={() => {
-              //   sendCoords({markerposition});
-              // }}
+    <>
+      <SafeAreaView style={styles.container}>
+        {region.latitude != null ? (
+          <>
+            <View style={styles.searchBarFrom}>
+              <GooglePlacesAutocomplete
+                placeholder="Current location"
+                textInputProps={{
+                  placeholderTextColor: colors.BLACK,
+                }}
+                styles={{
+                  textInput: {
+                    color: colors.BLACK,
+                  },
+                  container: {
+                    // marginTop:30
+                  },
+                  listView: {
+                    marginTop: hp(6),
+                  },
+                }}
+                onPress={(data, details = null) => {
+                  // 'details' is provided when fetchDetails = true
+                  console.log(data, details);
+                }}
+                query={{
+                  key: MY_KEY,
+                  language: 'en',
+                }}
+                // predefinedPlaces={predefinedPlaces}
+              />
+            </View>
+            <View style={styles.searchBarTo}>
+              <GooglePlacesAutocomplete
+                placeholder="Where to"
+                textInputProps={{
+                  placeholderTextColor: colors.BLACK,
+                }}
+                styles={{
+                  textInput: {
+                    color: colors.BLACK,
+                  },
+                }}
+                onPress={(data, details = null) => {
+                  // 'details' is provided when fetchDetails = true
+                  console.log(data, details);
+                }}
+                query={{
+                  key: MY_KEY,
+                  language: 'en',
+                }}
+                // predefinedPlaces={predefinedPlaces}
+              />
+            </View>
+            <MapView
+              style={styles.map}
+              // showsUserLocation={true}
+              provider="google"
+              ref={mapRef}
+              minZoomLevel={13}
+              maxZoomLevel={16}
+              onPress={event =>
+                SetMarkerPosition({
+                  latitude: event.nativeEvent.coordinate.latitude,
+                  longitude: event.nativeEvent.coordinate.longitude,
+                })
+              }
+              region={region}
+              // onRegionChangeComplete={region => setRegion(region)}
+              //onRegionChange={region}
             >
+              <Marker
+                coordinate={{
+                  latitude: region.latitude,
+                  longitude: region.longitude,
+                }}
+                //title="Home"
+                //description="press button to save"
+                //image={require('../../assets/home.png')}
+                // onPress={() => {
+                //   sendCoords({markerposition});
+                // }}
+              >
+                <Image
+                  source={icons.PERSON}
+                  resizeMode="center"
+                  style={{
+                    height: hp(2.5),
+                    width: wp(5),
+                    // backgroundColor:"red"
+                  }}
+                />
+              </Marker>
+            </MapView>
+            <TouchableOpacity
+              onPress={handleShowUserLocation}
+              style={{
+                position: 'absolute',
+                right: wp(4),
+                bottom: hp(10),
+              }}>
               <Image
-                source={icons.PERSON}
-                resizeMode="center"
+                source={icons.CURRENT_LOCATION}
+                resizeMode="contain"
                 style={{
-                  height: hp(2.5),
-                  width: wp(5),
-                  // backgroundColor:"red"
+                  height: hp(4),
+                  width: wp(8),
                 }}
               />
-            </Marker>
-          </MapView>
-          <TouchableOpacity
-            onPress={handleShowUserLocation}
-            style={{
-              position: 'absolute',
-              right: wp(4),
-              bottom: hp(10),
-            }}>
-            <Image
-              source={icons.CURRENT_LOCATION}
-              resizeMode="contain"
+            </TouchableOpacity>
+            <View
               style={{
-                height: hp(4),
-                width: wp(8),
-              }}
-            />
-          </TouchableOpacity>
-          <View
-            style={{
-              position: 'absolute',
-              // right:wp(4),
-              bottom: hp(0.5),
-            }}>
-            <CustomButton
-              title="Request Ambulance"
-              textColor={colors.WHITE}
-              backgroundColor={colors.BLUE}
-              activityIndicator={findDriverIsLoaded}
-              height={hp(6)}
-              width={wp(90)}
-              borderRadius={wp(2)}
-              marginHorizontal={wp(5)}
-              // marginTop={hp(2)}
-              marginBottom={hp(2)}
-              onPress={() => {
-                sendRequestToAllDrivers();
-              }}
-            />
-          </View>
-        </>
-      ) : (
-        <MapView
-          style={styles.map}
-          showsUserLocation={true}
-          provider="google"
-          maxZoomLevel={12}
-          initialRegion={{
-            latitude: 31.5204,
-            longitude: 74.3587,
-            latitudeDelta: 0.001,
-            longitudeDelta: 0.001,
+                position: 'absolute',
+                // right:wp(4),
+                bottom: hp(0.5),
+              }}>
+              <CustomButton
+                title="Request Ambulance"
+                textColor={colors.WHITE}
+                backgroundColor={colors.BLUE}
+                activityIndicator={findDriverIsLoaded}
+                height={hp(6)}
+                width={wp(90)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                // marginTop={hp(2)}
+                marginBottom={hp(2)}
+                onPress={() => {
+                  sendRequestToAllDrivers();
+                }}
+              />
+            </View>
+          </>
+        ) : (
+          <MapView
+            style={styles.map}
+            showsUserLocation={true}
+            provider="google"
+            maxZoomLevel={12}
+            initialRegion={{
+              latitude: 31.5204,
+              longitude: 74.3587,
+              latitudeDelta: 0.001,
+              longitudeDelta: 0.001,
+            }}
+          />
+        )}
+      </SafeAreaView>
+      {alertVisible !== null && (
+        <CustomAlert
+          message="Could not find driver"
+          visible={alertVisible}
+          onPressClose={() => {
+            setAlertVisible(false);
           }}
         />
       )}
-    </SafeAreaView>
+    </>
   );
 };
 

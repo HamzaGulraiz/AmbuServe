@@ -25,6 +25,7 @@ type CustomAlertProps = {
   number?: string;
   pickup?: string;
   dropoff?: string;
+  message?: string;
   onPressClose?: () => void;
   confirmButton?: () => void;
   cancelButton?: () => void;
@@ -36,6 +37,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   number,
   pickup,
   dropoff,
+  message,
   onPressClose,
   confirmButton,
   cancelButton,
@@ -60,72 +62,81 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               />
             </View>
 
-            <View style={styles.labelContaier}>
-              <Text style={styles.title}>Name:</Text>
-              {name ? (
+            {message ? (
+              <View style={styles.messageContaier}>
                 <Text numberOfLines={1} style={styles.message}>
+                  {message}
+                </Text>
+              </View>
+            ) : null}
+            {name ? (
+              <View style={styles.labelContaier}>
+                <Text style={styles.title}>Name:</Text>
+                <Text numberOfLines={1} style={styles.text}>
                   {name}
                 </Text>
-              ) : null}
-            </View>
-            <View style={styles.labelContaier}>
-              <Text style={styles.title}>Number: </Text>
-              {number ? (
-                <Text numberOfLines={1} style={styles.message}>
+              </View>
+            ) : null}
+            {number ? (
+              <View style={styles.labelContaier}>
+                <Text style={styles.title}>Number: </Text>
+                <Text numberOfLines={1} style={styles.text}>
                   {number}
                 </Text>
-              ) : null}
-            </View>
-            <View style={styles.labelContaier}>
-              <Text style={styles.title}>From:</Text>
-              {pickup ? (
-                <Text numberOfLines={1} style={styles.message}>
+              </View>
+            ) : null}
+            {pickup ? (
+              <View style={styles.labelContaier}>
+                <Text style={styles.title}>From:</Text>
+                <Text numberOfLines={1} style={styles.text}>
                   {pickup}
                 </Text>
-              ) : null}
-            </View>
-            <View style={styles.labelContaier}>
-              <Text style={styles.title}>To:</Text>
-              {dropoff ? (
-                <Text numberOfLines={1} style={styles.message}>
+              </View>
+            ) : null}
+            {dropoff ? (
+              <View style={styles.labelContaier}>
+                <Text style={styles.title}>To:</Text>
+                <Text numberOfLines={1} style={styles.text}>
                   {dropoff}
                 </Text>
-              ) : null}
+              </View>
+            ) : null}
+          </View>
+          {confirmButton ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-around',
+              }}>
+              <CustomButton
+                title="Cancel"
+                textColor={colors.WHITE}
+                backgroundColor={colors.RED}
+                // activityIndicator={signInIsLoaded}
+                height={hp(6)}
+                width={wp(30)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                marginTop={hp(2)}
+                // marginBottom={hp(2)}
+                onPress={cancelButton}
+              />
+              <CustomButton
+                title="Confirm"
+                textColor={colors.WHITE}
+                backgroundColor={colors.BLUE}
+                // activityIndicator={signInIsLoaded}
+                height={hp(6)}
+                width={wp(30)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                marginTop={hp(2)}
+                // marginBottom={hp(2)}
+                onPress={confirmButton}
+              />
             </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-around',
-            }}>
-            <CustomButton
-              title="Cancel"
-              textColor={colors.WHITE}
-              backgroundColor={colors.RED}
-              // activityIndicator={signInIsLoaded}
-              height={hp(6)}
-              width={wp(30)}
-              borderRadius={wp(2)}
-              marginHorizontal={wp(5)}
-              marginTop={hp(2)}
-              // marginBottom={hp(2)}
-              onPress={cancelButton}
-            />
-            <CustomButton
-              title="Confirm"
-              textColor={colors.WHITE}
-              backgroundColor={colors.BLUE}
-              // activityIndicator={signInIsLoaded}
-              height={hp(6)}
-              width={wp(30)}
-              borderRadius={wp(2)}
-              marginHorizontal={wp(5)}
-              marginTop={hp(2)}
-              // marginBottom={hp(2)}
-              onPress={confirmButton}
-            />
-          </View>
+          ) : null}
         </View>
       </View>
     </Modal>
@@ -169,6 +180,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
   },
+  messageContaier: {
+    // flexDirection: 'row',
+    // justifyContent: 'space-around',
+    // alignItems: 'center',
+  },
   title: {
     width: wp(30),
     fontFamily: fonts.REGULAR,
@@ -180,6 +196,17 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
   },
   message: {
+    // width: wp(80),
+    fontFamily: fonts.REGULAR,
+    fontSize: fontsizes.px_24,
+    color: colors.BLACK,
+    fontWeight: '400',
+    marginTop: hp(4),
+    // marginBottom: hp(6),
+    textAlign: 'center',
+    // backgroundColor: 'green',
+  },
+  text: {
     width: wp(40),
     fontFamily: fonts.REGULAR,
     fontSize: fontsizes.px_24,

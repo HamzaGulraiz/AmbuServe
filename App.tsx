@@ -5,7 +5,11 @@ import StackNavigator from './src/routes/StackNavigator/Navigators';
 import {getData} from './src/asyncStorage/AsyncStorage';
 import {useDispatch} from 'react-redux';
 
-import {DASHBOARD, SPLASH_SCREEN} from './src/constants/Navigator';
+import {
+  DASHBOARD,
+  MY_BOTTOM_TABS,
+  SPLASH_SCREEN,
+} from './src/constants/Navigator';
 import {setAppState, setUserInfo} from './src/redux/Action';
 import UserInformation from './src/screens/UserInformation';
 
@@ -16,17 +20,20 @@ type Props = {
 };
 const App: React.FC<Props> = ({routeName, userInformation, appState}) => {
   const dispatch = useDispatch();
-  // console.log('routname on app => ', routeName);
+  console.log('routname on app => ', routeName);
   // console.log('AppState & userInfo', userInformation, appState);
 
   useEffect(() => {
     const settingDataToRedux = () => {
       dispatch(setAppState(appState));
-      // dispatch(setUserInfo(userInformation));
+      dispatch(setUserInfo(userInformation));
     };
     settingDataToRedux();
-  }, [appState]);
+  }, [userInformation]);
+
+  // return <StackNavigator routeName={routeName} />;
 
   return <StackNavigator routeName={routeName} />;
 };
+
 export default App;

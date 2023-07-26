@@ -22,12 +22,17 @@ import images from '../../../assets/images/images';
 import colors from '../../../assets/colors/colors';
 
 import CustomButton from '../../components/Button/Button';
-import {MAPS, SPLASH_SCREEN} from '../../constants/Navigator';
+import {
+  MAPS,
+  SIGN_IN,
+  SPLASH_SCREEN,
+  USER_STACK,
+} from '../../constants/Navigator';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import fonts from '../../../assets/fonts/fonts';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {PermissionsAndroid} from 'react-native';
-import {getData, removeData,setData} from '../../asyncStorage/AsyncStorage';
+import {getData, removeData, setData} from '../../asyncStorage/AsyncStorage';
 import icons from '../../../assets/icons/icons';
 import {useTypedSelector} from '../../redux/Store';
 import {set} from 'mongoose';
@@ -36,7 +41,7 @@ import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import {useDispatch} from 'react-redux';
 import {setUserInfo} from '../../redux/Action';
-import { BASE_URL } from '../../../config';
+import {BASE_URL} from '../../../config';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -58,8 +63,6 @@ interface UserInfo {
   token: string;
 }
 
-
-
 const UserInformation = () => {
   const navigation = useNavigation<NavigationProps>();
   const dispatch = useDispatch();
@@ -77,7 +80,6 @@ const UserInformation = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [signInIsLoaded, setSignInIsLoaded] = useState(false);
 
- 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -184,17 +186,13 @@ const UserInformation = () => {
     };
 
     // console.log("data sent on user info edit ===> " , data);
-    
+
     axios
       .request(config)
       .then(response => {
         //setErrorMessage(response.data.message);
         // console.log('axios then', response);
-        Toast.showWithGravity(
-          "Updated",
-          Toast.SHORT,
-          Toast.BOTTOM,
-        );
+        Toast.showWithGravity('Updated', Toast.SHORT, Toast.BOTTOM);
         dispatch(setUserInfo(response.data));
         setData({value: response.data, storageKey: 'USER_INFO'});
         setEditButton(false);
@@ -204,7 +202,7 @@ const UserInformation = () => {
         //     Toast.SHORT,
         //     Toast.BOTTOM,
         //   );
-          setSignInIsLoaded(false);
+        setSignInIsLoaded(false);
         // } else {
         //   setData({value: response.data, storageKey: 'USER_INFO'});
         //   navigation.replace(DASHBOARD);
@@ -213,7 +211,7 @@ const UserInformation = () => {
       })
       .catch((error: any) => {
         // console.log(error);
-        
+
         console.log('user info update Catch', error);
         setSignInIsLoaded(false);
         Toast.showWithGravity(
@@ -236,8 +234,7 @@ const UserInformation = () => {
         ...userInfoValid,
         fullNameValid: false,
       });
-    } 
-    else if (value.length < 3) {
+    } else if (value.length < 3) {
       setFullNameError('Atleast 3 characters');
       // setTimeout(() => {
       //   setFullNameError('');
@@ -247,9 +244,7 @@ const UserInformation = () => {
         fullNameValid: false,
       });
       //  console.log(userInfoValid);
-    }
-    
-    else if (value.length >= 30) {
+    } else if (value.length >= 30) {
       setFullNameError('Max 30 characters');
       // setTimeout(() => {
       //   setFullNameError('');
@@ -303,7 +298,8 @@ const UserInformation = () => {
 
   const [passowrdError, setPasswordError] = useState('');
   const passwordValidation = (value: string): boolean => {
-    let reg = /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{8,}$/
+    let reg =
+      /^(?=.*?[a-zA-Z])(?=.*?[0-9])[a-zA-Z0-9!@#$%^&*()-_=+[\]{};:'",.<>/?`~|\\]{8,}$/;
     if (value.length == 0) {
       setPasswordError('Required!');
       setTimeout(() => {
@@ -373,7 +369,7 @@ const UserInformation = () => {
     //     contactValid: false,
     //   });
     //   //  console.log(userInfoValid);
-    // } 
+    // }
     else if (reg.test(value) === false) {
       setContactError('Invalid format');
       // setTimeout(() => {
@@ -437,7 +433,7 @@ const UserInformation = () => {
         ...userInfoValid,
         emergencyValid: false,
       });
-    }  else if (reg.test(value) === false) {
+    } else if (reg.test(value) === false) {
       setEmergencyContactError('Invalid format');
       // setTimeout(() => {
       //   setEmergencyContactError('');
@@ -447,7 +443,7 @@ const UserInformation = () => {
         emergencyValid: false,
       });
       //  console.log(userInfoValid);
-    } 
+    }
     // else if (value.length < 11) {
     //   setEmergencyContactError('Invalid format');
     //   setTimeout(() => {
@@ -458,8 +454,8 @@ const UserInformation = () => {
     //     emergencyValid: false,
     //   });
     //   //  console.log(userInfoValid);
-    // } 
-     else if (reg.test(value) === true) {
+    // }
+    else if (reg.test(value) === true) {
       setEmergencyContactError('');
       setUserInfoValid({
         ...userInfoValid,
@@ -472,7 +468,7 @@ const UserInformation = () => {
   const [CNICError, setCNICError] = useState('');
   const CNICValidation = (value: string) => {
     // let reg = /^(?=.*?[0-9])[0-9]{13}$/i;
-    let reg =/^[0-9]{5}-[0-9]{7}-[0-9]$/;
+    let reg = /^[0-9]{5}-[0-9]{7}-[0-9]$/;
     if (value.length == 0) {
       setCNICError('Required!');
       setTimeout(() => {
@@ -482,7 +478,7 @@ const UserInformation = () => {
         ...userInfoValid,
         CNICValid: false,
       });
-    }    else if (reg.test(value) === false) {
+    } else if (reg.test(value) === false) {
       setCNICError('00000-0000000-0');
       // setTimeout(() => {
       //   setCNICError('');
@@ -493,7 +489,7 @@ const UserInformation = () => {
       });
       //  console.log(userInfoValid);
     }
-        // else if (reg.test(value) === true) {
+    // else if (reg.test(value) === true) {
     //   setCNICError('13 characters');
     //   setTimeout(() => {
     //     setCNICError('');
@@ -503,7 +499,7 @@ const UserInformation = () => {
     //     CNICValid: false,
     //   });
     //   //  console.log(userInfoValid);
-    // }    
+    // }
     else if (reg.test(value) === true) {
       setCNICError('');
       setUserInfoValid({
@@ -561,7 +557,7 @@ const UserInformation = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <CustomHeader
+      <CustomHeader
         // title="Sign up"
         marginTop={hp(3)}
         leftIcon={icons.BACK_ARROW}
@@ -571,20 +567,19 @@ const UserInformation = () => {
         marginBottom={hp(6)}
       />
       <View style={styles.logOutButtonView}>
-
-      <TouchableOpacity onPress={handleLogOut} style={styles.logOutButton}>
-        <Text
-          style={{
-            textAlign: 'right',
-            color: colors.RED,
-            fontWeight: '300',
-            fontFamily: fonts.BOLD,
-            fontSize: fontsizes.px_16,
-          }}>
-          Log out
-        </Text>
-      </TouchableOpacity>
-            </View>
+        <TouchableOpacity onPress={handleLogOut} style={styles.logOutButton}>
+          <Text
+            style={{
+              textAlign: 'right',
+              color: colors.RED,
+              fontWeight: '300',
+              fontFamily: fonts.BOLD,
+              fontSize: fontsizes.px_16,
+            }}>
+            Log out
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
         style={styles.imageButton}
@@ -680,7 +675,6 @@ const UserInformation = () => {
             multiline={false}
             maxLength={30}
             editable={editButton}
-
           />
           {/* <TouchableOpacity
             style={{
@@ -777,7 +771,7 @@ const UserInformation = () => {
         <CustomButton
           title="Update"
           textColor={colors.WHITE}
-          backgroundColor={editButton? colors.BLUE : colors.GREY}
+          backgroundColor={editButton ? colors.BLUE : colors.GREY}
           activityIndicator={signInIsLoaded}
           height={hp(6)}
           width={wp(90)}

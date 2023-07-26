@@ -35,11 +35,6 @@ import Toast from 'react-native-simple-toast';
 import {BASE_URL} from '../../../config';
 // Import Socket.IO client library
 
-const socketDriver = new WebSocket(
-  'ws:https://ambu-serve.vercel.app',
-  'driver',
-);
-
 // const driverIdentifier = 'driver456'; // Unique identifier for the driver
 // const socketDriver = new WebSocket('ws://192.168.100.21:8080', 'driver', {
 //   headers: {
@@ -48,6 +43,7 @@ const socketDriver = new WebSocket(
 // });
 
 const Tab = createBottomTabNavigator();
+const socketDriver = new WebSocket('ws://192.168.100.21:8080', 'driver');
 
 function MyBottomTabs() {
   const appState = useTypedSelector(state => state.app.appState);

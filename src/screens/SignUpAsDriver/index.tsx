@@ -30,6 +30,7 @@ import {
   DRIVER_MAP,
   MY_BOTTOM_TABS,
   SIGN_IN,
+  SIGN_IN_AS_DRIVER,
   SIGN_UP,
   TERMS_AND_CONDITIONS,
 } from '../../constants/Navigator';
@@ -799,6 +800,37 @@ const SignUpAsDriver = () => {
           marginBottom={hp(2)}
           onPress={signUpValidation}
         />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            // marginBottom: hp(5),
+          }}>
+          <Text
+            style={{
+              fontWeight: '400',
+              fontSize: fontsizes.px_15,
+              fontFamily: fonts.REGULAR,
+              color: colors.BLACK,
+            }}>
+            Already have an account?
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(SIGN_IN_AS_DRIVER);
+            }}>
+            <Text
+              style={{
+                fontWeight: '400',
+                fontSize: fontsizes.px_15,
+                fontFamily: fonts.REGULAR,
+                color: colors.BLUE,
+              }}>
+              {' '}
+              Sign in
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

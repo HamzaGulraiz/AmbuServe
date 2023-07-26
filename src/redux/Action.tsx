@@ -1,6 +1,6 @@
 // actions.ts
-export const SET_THEME = 'SET_THEME';
 export const SET_USER_INFO = 'SET_USER_INFO';
+export const SET_DRIVER_INFO = 'SET_DRIVER_INFO';
 export const SET_APP_STATE = 'SET_APP_STATE';
 
 interface SetAppStateAction {
@@ -17,12 +17,24 @@ export const setAppState = (appState: string): SetAppStateAction => ({
 
 interface SetUserInfoAction {
   type: typeof SET_USER_INFO;
-  payload: object;
+  payload: string;
 }
 
 export type InfoActionTypes = SetUserInfoAction;
 
-export const setUserInfo = (userInfo: object): SetUserInfoAction => ({
+export const setUserInfo = (userInfo: string): SetUserInfoAction => ({
   type: SET_USER_INFO,
   payload: userInfo,
+});
+
+interface SetDriverInfoAction {
+  type: typeof SET_DRIVER_INFO;
+  payload: object;
+}
+
+export type DriverInfoActionTypes = SetDriverInfoAction;
+
+export const setDriverInfo = (driverInfo: object): SetDriverInfoAction => ({
+  type: SET_DRIVER_INFO,
+  payload: driverInfo,
 });

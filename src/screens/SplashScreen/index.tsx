@@ -18,7 +18,14 @@ import images from '../../../assets/images/images';
 import colors from '../../../assets/colors/colors';
 
 import CustomButton from '../../components/Button/Button';
-import {SIGN_IN, SIGN_IN_AS_DRIVER, SIGN_UP, SIGN_UP_AS_DRIVER} from '../../constants/Navigator';
+import {
+  DRIVER_STACK,
+  SIGN_IN,
+  SIGN_IN_AS_DRIVER,
+  SIGN_UP,
+  SIGN_UP_AS_DRIVER,
+  USER_STACK,
+} from '../../constants/Navigator';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -38,26 +45,29 @@ const SplashScreen = () => {
   // }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{
-        flexDirection:"row",
-        marginBottom:hp(35),
-        // backgroundColor:"red"
-      }}>
+      {/* <View
+        style={{
+          flexDirection: 'row',
+          marginBottom: hp(35),
+          // backgroundColor:"red"
+        }}> */}
       <CustomButton
-        title="Sign in as Driver"
+        title="Continue as driver"
         textColor={colors.BLUE}
         backgroundColor={colors.TRANSPARENT}
         height={hp(6)}
-        width={wp(40)}
+        width={wp(90)}
         marginHorizontal={wp(5)}
         borderRadius={wp(2)}
-        marginTop={hp(2)}
-        // marginBottom={hp(35)}
+        borderWidth={hp(0.1)}
+        borderColor={colors.BLUE}
+        marginTop={hp(4)}
+        marginBottom={hp(35)}
         onPress={() => {
           navigation.navigate(SIGN_IN_AS_DRIVER);
         }}
-        />
-        <CustomButton
+      />
+      {/* <CustomButton
         title="Sign up as Driver"
         textColor={colors.BLUE}
         backgroundColor={colors.TRANSPARENT}
@@ -70,24 +80,24 @@ const SplashScreen = () => {
         onPress={() => {
           navigation.navigate(SIGN_UP_AS_DRIVER);
         }}
-        />
-        </View>
+        /> */}
+      {/* </View> */}
       <Image resizeMode="contain" source={images.LOGO} style={styles.image} />
       <CustomButton
-        title="Create and account"
+        title="Continue as user"
         textColor={colors.WHITE}
         backgroundColor={colors.BLUE}
         height={hp(6)}
         width={wp(90)}
         borderRadius={wp(2)}
         marginHorizontal={wp(5)}
-        // marginTop={hp(2)}
+        marginTop={hp(4)}
         marginBottom={hp(2)}
         onPress={() => {
-          navigation.navigate(SIGN_UP);
+          navigation.navigate(SIGN_IN);
         }}
       />
-      <CustomButton
+      {/* <CustomButton
         title="Sign in"
         textColor={colors.BLUE}
         backgroundColor={colors.TRANSPARENT}
@@ -102,7 +112,7 @@ const SplashScreen = () => {
         onPress={() => {
           navigation.navigate(SIGN_IN);
         }}
-      />
+      /> */}
     </SafeAreaView>
   );
 };

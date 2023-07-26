@@ -5,6 +5,7 @@ import {
   DRIVER_Activity,
   DRIVER_MAP,
   DRIVER_Profile,
+  DRIVER_STACK,
   MAPS,
   MY_BOTTOM_TABS,
   SIGN_IN,
@@ -14,6 +15,7 @@ import {
   SPLASH_SCREEN,
   TERMS_AND_CONDITIONS,
   USER_INFORMATION,
+  USER_STACK,
 } from '../../constants/Navigator';
 import SplashScreen from '../../screens/SplashScreen';
 import SignIn from '../../screens/SignIn';
@@ -28,36 +30,11 @@ import UserInformation from '../../screens/UserInformation';
 import {useTypedSelector} from '../../redux/Store';
 import MyBottomTabs from '../BottomTabNavigator/Navigators';
 import TermsAndConditions from '../../screens/TermsandConditions';
+import {useNavigation} from '@react-navigation/native';
 
-// import { RootStackParams } from './types';
-
-export type RootStackParams = {
-  SplashScreen: ComponentType;
-  SignIn: ComponentType;
-  SignUp: ComponentType;
-  SignInAsDriver: ComponentType;
-  SignUpAsDriver:ComponentType;
-  TermsAndConditions:ComponentType,
-  DashBoard: ComponentType;
-  Maps: ComponentType;
-  UserInformation: ComponentType;
-  MyBottomTabs: ComponentType;
-};
-
-// type RouteName = {
-//   routeName?: any;
-// };
-
-type RouteName = {
-  routeName?: keyof RootStackParams | undefined;
-};
-
-const Stack = createStackNavigator<RootStackParams>();
-const StackNavigator: React.FC<RouteName> = ({routeName}) => {
-  // console.log('routeName on stack nav =>', routeName);
-  const [initialRouteName, setInitialRouteName] = useState<
-    keyof RootStackParams | undefined
-  >(undefined);
+const Stack = createStackNavigator();
+const StackNavigator = ({routeName}) => {
+  const [initialRouteName, setInitialRouteName] = useState();
 
   useEffect(() => {
     if (routeName) {
@@ -74,15 +51,19 @@ const StackNavigator: React.FC<RouteName> = ({routeName}) => {
       screenOptions={{headerShown: false}}
       initialRouteName={initialRouteName}>
       <Stack.Screen name={SPLASH_SCREEN} component={SplashScreen} />
+
       <Stack.Screen name={SIGN_IN} component={SignIn} />
       <Stack.Screen name={SIGN_UP} component={SignUp} />
-      <Stack.Screen name={SIGN_IN_AS_DRIVER} component={SignInAsDriver} />
-      <Stack.Screen name={SIGN_UP_AS_DRIVER} component={SignUpAsDriver} />
-      <Stack.Screen name={TERMS_AND_CONDITIONS} component={TermsAndConditions} />
-
       <Stack.Screen name={DASHBOARD} component={DashBoard} />
       <Stack.Screen name={MAPS} component={Maps} />
       <Stack.Screen name={USER_INFORMATION} component={UserInformation} />
+
+      <Stack.Screen name={SIGN_IN_AS_DRIVER} component={SignInAsDriver} />
+      <Stack.Screen name={SIGN_UP_AS_DRIVER} component={SignUpAsDriver} />
+      <Stack.Screen
+        name={TERMS_AND_CONDITIONS}
+        component={TermsAndConditions}
+      />
       <Stack.Screen name={MY_BOTTOM_TABS} component={MyBottomTabs} />
     </Stack.Navigator>
   );

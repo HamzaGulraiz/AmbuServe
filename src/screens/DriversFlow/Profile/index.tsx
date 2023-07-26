@@ -23,7 +23,11 @@ import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {getData, removeData} from '../../../asyncStorage/AsyncStorage';
-import {SPLASH_SCREEN} from '../../../constants/Navigator';
+import {
+  SIGN_IN_AS_DRIVER,
+  SPLASH_SCREEN,
+  USER_STACK,
+} from '../../../constants/Navigator';
 import colors from '../../../../assets/colors/colors';
 import fonts from '../../../../assets/fonts/fonts';
 import fontsizes from '../../../../assets/fontsizes/fontsizes';
@@ -32,6 +36,7 @@ import icons from '../../../../assets/icons/icons';
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import {BASE_URL} from '../../../../config';
+import SplashScreen from '../../SplashScreen';
 
 type NavigationProps = {
   navigate(APPEREANCE: string): unknown;
@@ -100,18 +105,18 @@ const Profile = () => {
       url: `${BASE_URL}/driver/delete/${driversToken}`,
     };
 
-    axios
-      .request(config)
-      .then(response => {
-        console.log(JSON.stringify(response.data));
-        removeData({storageKey: 'DRIVER_INFO'});
-        navigation.navigate(SPLASH_SCREEN);
-      })
-      .catch(error => {
-        console.log(error);
-        removeData({storageKey: 'DRIVER_INFO'});
-        navigation.navigate(SPLASH_SCREEN);
-      });
+    // axios
+    //   .request(config)
+    //   .then(response => {
+    //     console.log(JSON.stringify(response.data));
+    //     removeData({storageKey: 'DRIVER_INFO'});
+    //     navigation.navigate(SPLASH_SCREEN);
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //     removeData({storageKey: 'DRIVER_INFO'});
+    //     navigation.navigate(SPLASH_SCREEN);
+    //   });
   };
 
   return (
