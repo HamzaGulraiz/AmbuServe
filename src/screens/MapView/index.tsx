@@ -65,7 +65,10 @@ const Maps = () => {
 
   const [findDriverIsLoaded, setfindDriverIsLoaded] = useState(false);
 
-  const socketUser = new WebSocket('ws://192.168.100.21:8080', 'user');
+  const socketUser = new WebSocket(
+    'ws://earnest-medovik-e59290.netlify.app/',
+    'user',
+  );
   // socketUser.addEventListener('open', () => {
   //   // console.log('Request send from user ');
   //   // Send a message to the server

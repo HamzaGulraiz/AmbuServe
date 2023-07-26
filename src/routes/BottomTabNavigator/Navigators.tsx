@@ -43,7 +43,10 @@ import {BASE_URL} from '../../../config';
 // });
 
 const Tab = createBottomTabNavigator();
-const socketDriver = new WebSocket('ws://192.168.100.21:8080', 'driver');
+const socketDriver = new WebSocket(
+  'ws://earnest-medovik-e59290.netlify.app/',
+  'driver',
+);
 
 function MyBottomTabs() {
   const appState = useTypedSelector(state => state.app.appState);
