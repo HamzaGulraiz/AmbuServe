@@ -16,74 +16,49 @@ import {
 } from './src/constants/Navigator';
 import {getData} from './src/asyncStorage/AsyncStorage';
 import React, {useEffect, useState, useRef} from 'react';
-import {AppState, StyleSheet, Text, View} from 'react-native';
-import {Database, child, push, ref, set, remove} from 'firebase/database';
-import {db} from './src/components/firebase/config';
 
 const AppContainer = () => {
-  const appState = useRef(AppState.currentState);
-  const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  // const [routeName, setRouteName] = useState('');
+  // const [userInfo, setUserInfo] = useState();
+  // const [driverInfo, setDriverInfo] = useState();
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        // console.log('App has come to the foreground!');
-      }
-
-      appState.current = nextAppState;
-      setAppStateVisible(appState.current);
-      // dispatch(setAppState(appState.current));
-      // console.log('AppState', appState.current);
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
-  const [routeName, setRouteName] = useState();
-  const [userInfornation, setUserInfornation] = useState('');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await getData({storageKey: 'USER_INFO'});
-        if (result === null) {
-          try {
-            const driverInfo = await getData({storageKey: 'DRIVER_INFO'});
-            if (driverInfo === null) {
-              setRouteName(SPLASH_SCREEN);
-              console.log('no result on index.js from storage');
-            } else {
-              setRouteName(MY_BOTTOM_TABS);
-              console.log('driver result on index.js from storage');
-            }
-          } catch (e) {
-            console.log('drivers catch index', e);
-          }
-        } else {
-          const responseObj = JSON.parse(result);
-          setUserInfornation(result);
-          setRouteName(DASHBOARD);
-          console.log('Data token on index.js ==>', responseObj);
-        }
-      } catch (error) {
-        console.log('Error occurred at index.js from storage', error);
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const userInformation = await getData({storageKey: 'USER_INFO'});
+  //       if (userInformation === null) {
+  //         try {
+  //           const driverInfo = await getData({storageKey: 'DRIVER_INFO'});
+  //           if (driverInfo === null) {
+  //             setRouteName(SPLASH_SCREEN);
+  //             console.log('Index.js: routing to splash screen');
+  //           } else {
+  //             setRouteName(MY_BOTTOM_TABS);
+  //             setDriverInfo(driverInfo);
+  //             console.log('Index.js: routing to Bottom tabs');
+  //           }
+  //         } catch (e) {
+  //           console.log('Index.js: drivers async catch', e);
+  //         }
+  //       } else {
+  //         console.log('Index.js: routing to Dashboard');
+  //         setUserInfo(userInformation);
+  //         setRouteName(DASHBOARD);
+  //       }
+  //     } catch (error) {
+  //       console.log('Index.js: user async catch', error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   return (
     <Provider store={store}>
       <NavigationContainer>
         <App
-          routeName={routeName}
-          appState={appState.current}
-          userInformation={userInfornation}
+        // routeName={routeName}
+        // userInformation={userInfo}
+        // driverInformation={driverInfo}
         />
       </NavigationContainer>
     </Provider>

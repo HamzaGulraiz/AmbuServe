@@ -2,10 +2,6 @@ import React, {useState, useEffect, ComponentType} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   DASHBOARD,
-  DRIVER_Activity,
-  DRIVER_MAP,
-  DRIVER_Profile,
-  DRIVER_STACK,
   MAPS,
   MY_BOTTOM_TABS,
   SIGN_IN,
@@ -15,22 +11,18 @@ import {
   SPLASH_SCREEN,
   TERMS_AND_CONDITIONS,
   USER_INFORMATION,
-  USER_STACK,
 } from '../../constants/Navigator';
 import SplashScreen from '../../screens/SplashScreen';
 import SignIn from '../../screens/SignIn';
 import SignUp from '../../screens/SignUp';
 import SignInAsDriver from '../../screens/SignInAsDriver';
 import SignUpAsDriver from '../../screens/SignUpAsDriver';
-
 import DashBoard from '../../screens/DashBoard';
 import Maps from '../../screens/MapView';
-import {getData} from '../../asyncStorage/AsyncStorage';
 import UserInformation from '../../screens/UserInformation';
-import {useTypedSelector} from '../../redux/Store';
+
 import MyBottomTabs from '../BottomTabNavigator/Navigators';
 import TermsAndConditions from '../../screens/TermsandConditions';
-import {useNavigation} from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 const StackNavigator = ({routeName}) => {
