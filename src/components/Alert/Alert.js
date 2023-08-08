@@ -42,100 +42,136 @@ const CustomAlert = ({
   confirmButton,
   cancelButton,
 }) => {
+  // console.log('alert', pickup?.distance, dropoff?.distance);
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <TouchableOpacity style={styles.closeButton} onPress={onPressClose}>
-            <Image
-              style={styles.closeButtonIcon}
-              source={icons.CROSS}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-          <View style={styles.content}>
-            <View style={styles.titleIconContainer}>
+          {onPressClose ? (
+            <TouchableOpacity style={styles.closeButton} onPress={onPressClose}>
               <Image
-                style={styles.titleIcon}
-                source={images.LOGO}
+                style={styles.closeButtonIcon}
+                source={icons.CROSS}
                 resizeMode="contain"
               />
+            </TouchableOpacity>
+          ) : null}
+          {message ? (
+            <View style={styles.messageContaier}>
+              <Text numberOfLines={2} style={styles.message}>
+                {message}
+              </Text>
             </View>
-
-            {message ? (
-              <View style={styles.messageContaier}>
-                <Text numberOfLines={2} style={styles.message}>
-                  {message}
-                </Text>
-              </View>
-            ) : null}
-            {name ? (
-              <View style={styles.labelContaier}>
-                <Text style={styles.title}>Name:</Text>
-                <Text numberOfLines={1} style={styles.text}>
-                  {name}
-                </Text>
-              </View>
-            ) : null}
-            {number ? (
-              <View style={styles.labelContaier}>
-                <Text style={styles.title}>Number: </Text>
-                <Text numberOfLines={1} style={styles.text}>
-                  {number}
-                </Text>
-              </View>
-            ) : null}
-            {pickup ? (
-              <View style={styles.labelContaier}>
-                <Text style={styles.title}>From:</Text>
-                <Text numberOfLines={1} style={styles.text}>
-                  {pickup}
-                </Text>
-              </View>
-            ) : null}
-            {dropoff ? (
-              <View style={styles.labelContaier}>
-                <Text style={styles.title}>To:</Text>
-                <Text numberOfLines={1} style={styles.text}>
-                  {dropoff}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-          {confirmButton ? (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-around',
-              }}>
-              <CustomButton
-                title="Cancel"
-                textColor={colors.WHITE}
-                backgroundColor={colors.RED}
-                // activityIndicator={signInIsLoaded}
-                height={hp(6)}
-                width={wp(30)}
-                borderRadius={wp(2)}
-                marginHorizontal={wp(5)}
-                marginTop={hp(2)}
-                onPress={cancelButton}
-              />
-              <CustomButton
-                title="Confirm"
-                textColor={colors.WHITE}
-                backgroundColor={colors.BLUE}
-                // activityIndicator={signInIsLoaded}
-                height={hp(6)}
-                width={wp(30)}
-                borderRadius={wp(2)}
-                marginHorizontal={wp(5)}
-                marginTop={hp(2)}
-                onPress={confirmButton}
-              />
+          ) : null}
+          {name ? (
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>Rider name:</Text>
+              <Text numberOfLines={1} style={styles.text}>
+                {name}
+              </Text>
+            </View>
+          ) : null}
+          {number ? (
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>Number: </Text>
+              <Text numberOfLines={1} style={styles.text}>
+                {number}
+              </Text>
+            </View>
+          ) : null}
+          {pickup ? (
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>Pickup Distance:</Text>
+              <Text numberOfLines={1} style={styles.text}>
+                {pickup}
+              </Text>
+            </View>
+          ) : null}
+          {dropoff ? (
+            <View style={styles.labelContaier}>
+              <Text style={styles.title}>Drop Distance:</Text>
+              <Text numberOfLines={1} style={styles.text}>
+                {dropoff}
+              </Text>
             </View>
           ) : null}
         </View>
+        {confirmButton ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+              marginTop: hp(1),
+            }}>
+            <TouchableOpacity
+              onPress={cancelButton}
+              style={{
+                height: hp(6),
+                width: wp(35),
+                backgroundColor: colors.RED,
+                borderRadius: wp(2),
+                marginHorizontal: wp(5),
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  fontWeight: '400',
+                  fontSize: fontsizes.px_18,
+                  fontFamily: fonts.REGULAR,
+                  color: colors.WHITE,
+                  textAlign: 'center',
+                }}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={confirmButton}
+              style={{
+                height: hp(6),
+                width: wp(35),
+                backgroundColor: colors.BLUE,
+                borderRadius: wp(2),
+                marginHorizontal: wp(5),
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  fontWeight: '400',
+                  fontSize: fontsizes.px_18,
+                  fontFamily: fonts.REGULAR,
+                  color: colors.WHITE,
+                  textAlign: 'center',
+                }}>
+                Confirm
+              </Text>
+            </TouchableOpacity>
+            {/* <CustomButton
+              title="Cancel"
+              textColor={colors.WHITE}
+              backgroundColor={colors.RED}
+              // activityIndicator={signInIsLoaded}
+              height={hp(6)}
+              width={wp(35)}
+              borderRadius={wp(2)}
+              marginHorizontal={wp(5)}
+              // marginTop={hp(2)}
+              onPress={cancelButton}
+            />
+            <CustomButton
+              title="Confirm"
+              textColor={colors.WHITE}
+              backgroundColor={colors.BLUE}
+              // activityIndicator={signInIsLoaded}
+              height={hp(6)}
+              width={wp(35)}
+              borderRadius={wp(2)}
+              marginHorizontal={wp(5)}
+              // marginTop={hp(1)}
+              onPress={confirmButton}
+            /> */}
+          </View>
+        ) : null}
       </View>
     </Modal>
   );
@@ -146,14 +182,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
   },
   container: {
     width: '90%',
-    height: hp(40),
+    // height: hp(40),
     backgroundColor: '#FFFFFF',
     borderRadius: wp(2),
     overflow: 'hidden',
+    marginTop: hp(2),
+    borderRadius: wp(5),
+    borderWidth: wp(0.2),
+    // marginHorizontal: wp(5),
+    borderColor: colors.BLACK,
+    zIndex: 1,
   },
   closeButton: {
     marginLeft: wp(2),
@@ -169,34 +211,41 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(6),
   },
   labelContaier: {
+    marginHorizontal: wp(2),
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+    // backgroundColor: 'red',
   },
-  messageContaier: {},
+  messageContaier: {
+    // marginHorizontal: wp(2),
+  },
   title: {
-    width: wp(30),
+    width: wp(35),
     fontFamily: fonts.REGULAR,
-    fontSize: fontsizes.px_24,
+    fontSize: fontsizes.px_18,
     color: colors.BLACK,
     fontWeight: '400',
     textAlign: 'left',
+    // backgroundColor: 'green',
   },
   message: {
     fontFamily: fonts.REGULAR,
     fontSize: fontsizes.px_24,
     color: colors.BLACK,
     fontWeight: '400',
-    marginTop: hp(4),
+    // marginTop: hp(4),
+    marginBottom: hp(3),
     textAlign: 'center',
   },
   text: {
     width: wp(40),
     fontFamily: fonts.REGULAR,
-    fontSize: fontsizes.px_24,
+    fontSize: fontsizes.px_22,
     color: colors.BLACK,
     fontWeight: '400',
     textAlign: 'left',
+    // backgroundColor: 'blue',
   },
   titleIconContainer: {
     justifyContent: 'center',

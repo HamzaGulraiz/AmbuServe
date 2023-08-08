@@ -3,6 +3,9 @@ import {
   DriverInfoActionTypes,
   SET_USER_INFO,
   SET_DRIVER_INFO,
+  SET_DRIVER_RIDE_CONNECT_STATE,
+  SET_DRIVER_RIDE_PHASE_ONE,
+  SET_DRIVER_RIDE_PHASE_TWO,
 } from './Action';
 
 // export interface State {
@@ -13,6 +16,9 @@ import {
 const initialState = {
   userInfo: '',
   driverInfo: '',
+  driverRideConnectState: false,
+  driverRidePhaseOne: false,
+  driverRidePhaseTwo: false,
 };
 
 const reducer = (state = initialState, action) => {
@@ -34,6 +40,33 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         driverInfo: action.payload,
+      };
+    case SET_DRIVER_RIDE_CONNECT_STATE:
+      console.log(
+        'Redux reducer: saving Drivers ride Connect State ===>',
+        action.payload,
+      );
+      return {
+        ...state,
+        driverRideConnectState: action.payload,
+      };
+    case SET_DRIVER_RIDE_PHASE_ONE:
+      console.log(
+        'Redux reducer: saving Drivers ride Phase one ===>',
+        action.payload,
+      );
+      return {
+        ...state,
+        driverRidePhaseOne: action.payload,
+      };
+    case SET_DRIVER_RIDE_PHASE_TWO:
+      console.log(
+        'Redux reducer: saving Drivers ride Phase two ===>',
+        action.payload,
+      );
+      return {
+        ...state,
+        driverRidePhaseTwo: action.payload,
       };
     default:
       return state;

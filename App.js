@@ -94,7 +94,7 @@ const App = (
       // IOS
       // Geolocation.requestAuthorization();
     }
-  }, []);
+  }, [isFocused]);
 
   // React.useEffect(() => {
   //   dispatch(setUserInfo(userInformation));

@@ -13,7 +13,8 @@ const icons = {
   CURRENT_LOCATION: require('./currentLocation.png'),
   PERSON: require('./person.png'),
   CROSS: require('./cross.png'),
-  CHECK_POINT: require('./checkPoint.png'),
+  START_POINT: require('./checkPoint.png'),
+  END_POINT: require('./endPoint.png'),
 };
 
 export default icons;
