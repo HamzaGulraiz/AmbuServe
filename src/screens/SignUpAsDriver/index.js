@@ -101,10 +101,10 @@ const SignUpAsDriver = () => {
           companyEmail,
           companyName,
           driverName,
-          password,
-          vehicleNumber,
           driverNumber,
-          driverName,
+          vehicleNumber,
+          officeAddress,
+          password,
         );
       } else {
         setToogleCheckError('    ');
@@ -118,21 +118,21 @@ const SignUpAsDriver = () => {
   const signUpUser = (
     companyEmail,
     companyName,
-    vehicleNumber,
-    driverNumber,
-    officeAddress,
     driverName,
+    driverNumber,
+    vehicleNumber,
+    officeAddress,
     password,
   ) => {
     setSignInIsLoaded(true);
     let data = JSON.stringify({
-      company_name: companyEmail,
-      vehicle_number: vehicleNumber,
-      driver_name: driverName,
-      password: password,
-      driver_contact: driverNumber,
-      office_address: officeAddress,
       company_email: companyEmail,
+      company_name: companyName,
+      driver_name: driverName,
+      driver_contact: driverNumber,
+      vehicle_number: vehicleNumber,
+      office_address: officeAddress,
+      password: password,
     });
 
     let config = {

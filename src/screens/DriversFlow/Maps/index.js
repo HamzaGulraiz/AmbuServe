@@ -1,20 +1,9 @@
+///////////////////////////////////////driversmap/////////////////////////////////////////////////
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {
-  Image,
-  Text,
-  ImageBackground,
-  SafeAreaView,
-  StatusBar,
-  Dimensions,
-  ToastAndroid,
-  View,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-} from 'react-native';
+import {Image, Text, SafeAreaView, View, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import styles from './styles';
 import {useNavigation} from '@react-navigation/native';
@@ -26,53 +15,28 @@ import fontsizes from '../../../../assets/fontsizes/fontsizes';
 import colors from '../../../../assets/colors/colors';
 import CustomAlert from '../../../components/Alert/Alert';
 import {GOOGLE_API_KEY, WEB_SOCKET} from '../../../../config';
-
-import {useTypedSelector} from '../../../redux/Store';
 import MapViewDirections from 'react-native-maps-directions';
 import io from 'socket.io-client';
 import getDistanceMatrix from '../../../DistanceMatrix/DistanceMatrix';
 import CustomScreenLoading from '../../../components/ScreenLoading/ScreenLoading';
-import Geolocation, {watchPosition} from 'react-native-geolocation-service';
+import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
-
 import {useIsFocused} from '@react-navigation/native';
 import getInitialMatrix from '../../../DistanceMatrix/initialMatrix';
-import {useSelector, useDispatch} from 'react-redux';
+import {useTypedSelector} from '../../../redux/Store';
+import {useDispatch} from 'react-redux';
 import {
-  setDriverRideConnectedState,
-  setDriverRidePhaseOne,
-} from '../../../redux/Action';
+  getCurrentLocation,
+  watchPosition,
+} from '../../../components/Location/GeoLocation';
+import useSocket from '../../../components/Socket/Socket';
+import {setData, getData, removeData} from '../../../asyncStorage/AsyncStorage';
 
 const DriverMap = () => {
   const isFocused = useIsFocused();
-  const rideConnect = useSelector(
-    state => state.reducer.driverRideConnectState,
-  ); // Access state from Redux
-  const ridePhaseOne = useSelector(state => state.reducer.driverRidePhaseOne);
-
-  useEffect(() => {
-    if (ridePhaseOne) {
-      // Update location based on rideConnect value
-      // ...
-      setStartPhaseOne(ridePhaseOne);
-      // console.log(ridePhaseOne);
-    }
-  }, [rideConnect]);
-
-  useEffect(() => {
-    if (rideConnect) {
-      // Update location based on rideConnect value
-      // ...
-      setRideConnected(rideConnect);
-      // console.log(rideConnect);
-    }
-  }, [rideConnect]);
-
   const dispatch = useDispatch();
   const GOOGLE_MAPS_APIKEY = GOOGLE_API_KEY;
-  // const socketDriver = new WebSocket(WEB_SOCKET, 'driver');
   const navigation = useNavigation();
-  // const [liveLocation, isLoading] = useLiveLocation();
   const mapRef = useRef(null);
   const driverInfoString = useTypedSelector(state => state.reducer.driverInfo);
   const driverInfo = JSON.parse(driverInfoString);
@@ -84,7 +48,39 @@ const DriverMap = () => {
     driver_contact,
     office_address,
   } = driverInfo;
-  const destination = {latitude: 37.771707, longitude: -122.4053769};
+
+  // const [companyName, setCompanyName] = useState('');
+  // const [vehicleNumber, setVehicleNumber] = useState('');
+  // const [driverName, setDriverName] = useState('');
+  // const [companyEmail, setCompanyEmail] = useState('');
+  // const [driverContact, setDriverContact] = useState('');
+  // const [officeAddress, setOfficeAddress] = useState('');
+
+  // useEffect(() => {
+  //   console.log('1');
+  //   const fetchData = async () => {
+  //     try {
+  //       const driverInfo = await getData({storageKey: 'DRIVER_INFO'});
+  //       if (driverInfo === null) {
+  //         console.log('Drivers Map: No driver info');
+  //       } else {
+  //         const driverData = JSON.parse(driverInfo);
+  //         console.log(driverData);
+  //         console.log(typeof driverData);
+  //         // setCompanyName(driverData.company_name);
+  //         // setVehicleNumber(driverData.vehicle_number);
+  //         // setDriverContact(driverData.driver_contact);
+  //         // setDriverName(driverData.driver_name);
+  //         // console.log('Drivers Map: saving results');
+  //         // requestLocationPermission();
+  //       }
+  //     } catch (e) {
+  //       console.log('Index.js: drivers async catch', e);
+  //     }
+  //     fetchData();
+  //   };
+  // }, [isFocused]);
+
   const [region, setRegion] = useState({
     latitude: 31.5204,
     longitude: 74.3587,
@@ -100,231 +96,159 @@ const DriverMap = () => {
   const [ridePhase1, setRidePhase1] = useState({latitude: 0, longitude: 0});
   const [ridePhase2, setRidePhase2] = useState({latitude: 0, longitude: 0});
   const [userDetailCard, setUserDetailCard] = useState(false);
-
+  const [manualLocation, setManualLocation] = useState(false);
   const [userToken, setUserToken] = useState('');
-  const [userInformation, setUserInformation] = useState('');
-
-  const [socket, setSocket] = useState(null);
-  const [userSocket, setUserSocket] = useState(null);
-
+  // const [socket, setSocket] = useState(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [ambulanceMessage, setAmbulanceMessage] = useState(
-    'You ambulance is on the way',
-  );
   const [startRideButton, setStartRideButton] = useState(false);
+
   const [startPhaseOne, setStartPhaseOne] = useState(false);
   const [startPhaseTwo, setStartPhaseTwo] = useState(false);
   const [rideConnected, setRideConnected] = useState(false);
-  console.log('redndered screen', rideConnected);
-  console.log('redndered screen 1', startPhaseOne);
+
+  // console.log('render', rideConnected, startPhaseOne);
+  // useEffect(() => {
+  //   console.log('rideConnected:', rideConnected);
+  //   console.log('startPhaseOne:', startPhaseOne);
+  //   console.log('startPhaseTwo:', startPhaseTwo);
+  // }, [rideConnected, startPhaseOne, startPhaseTwo]);
+
+  const socket = useSocket(WEB_SOCKET);
+
+  // useEffect(() => {
+  //   // Connect to the server as a driver
+  //   const driverSocket = io(WEB_SOCKET, {transports: ['websocket']});
+  //   driverSocket.emit('identify', {type: 'driver', driverId: driverSocket.id});
+  //   setSocket(driverSocket);
+  //   // Clean up on unmount
+  //   return () => {
+  //     if (driverSocket) {
+  //       driverSocket.disconnect();
+  //     }
+  //   };
+  // }, []);
 
   useEffect(() => {
-    // Connect to the server as a driver
-    const driverSocket = io(WEB_SOCKET, {transports: ['websocket']});
-    driverSocket.emit('identify', {type: 'driver', driverId: driverSocket.id});
-    setSocket(driverSocket);
+    // When the driver receives a new request
 
-    // Clean up on unmount
+    if (socket) {
+      socket?.on('new_request', request => {
+        const receivedMessage = JSON.parse(request);
+        const {pickUp_location, dropOff_location} = receivedMessage;
+        if (pickUp_location && dropOff_location) {
+          setRidePhase1(pickUp_location);
+          setRidePhase2(dropOff_location);
+          getInitialMatrix(region, pickUp_location).then(distanceMatrix => {
+            setDestinationDistance(distanceMatrix.distance);
+            getInitialMatrix(pickUp_location, dropOff_location).then(
+              distanceMatrix => {
+                setUserDropOff(distanceMatrix.distance);
+                setUserName(receivedMessage.full_name);
+                setUserContact(receivedMessage.contact);
+                setUserToken(receivedMessage.token);
+                setAlertVisible(true);
+              },
+            );
+          });
+        }
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (isFocused) {
+      // console.log(rideConnected, 'isFocused');
+      getCurrentLocation().then(currentLocation => {
+        setRegion(prevRegion => ({
+          ...prevRegion,
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude,
+        }));
+        console.log('set user on bind ', currentLocation);
+      });
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    const watchId = watchPosition(position => {
+      // Handle position updates
+      setRegion(prevRegion => ({
+        ...prevRegion,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      }));
+      setIsLoadingLocation(true);
+      // handleLocationChange(position);
+    });
+
     return () => {
-      if (userSocket) {
-        driverSocket.disconnect();
-      }
+      Geolocation.clearWatch(watchId);
     };
   }, []);
 
   useEffect(() => {
-    // When the driver receives a new request
-    socket?.on('new_request', request => {
-      // Handle the new request here
-      // console.log('Received new request:', request);
-      const receivedMessage = JSON.parse(request);
-      const {pickUp_location, dropOff_location} = receivedMessage;
-      // console.log(' geting location====>', {pickUp_location, dropOff_location});
-      if (pickUp_location && dropOff_location) {
-        setRidePhase1(pickUp_location);
-        setRidePhase2(dropOff_location);
-        getInitialMatrix(region, pickUp_location).then(distanceMatrix => {
-          setDestinationDistance(distanceMatrix.distance);
-          // console.log('--------------->', distanceMatrix);
-          getInitialMatrix(pickUp_location, dropOff_location).then(
-            distanceMatrix => {
-              setUserDropOff(distanceMatrix.distance);
-              setUserName(receivedMessage.full_name);
-              setUserContact(receivedMessage.contact);
-              setUserToken(receivedMessage.token);
-              setAlertVisible(true);
-            },
-          );
-        });
+    console.log('1');
+    const watchId = watchPosition(position => {
+      // Handle position updates
+      if (startPhaseOne) {
+        handleLocationChangePhaseOne(position);
       }
     });
-  }, [socket]);
+
+    return () => {
+      Geolocation.clearWatch(watchId);
+    };
+  }, [startPhaseOne]);
 
   useEffect(() => {
-    requestLocationPermission();
-  }, []);
-
-  const requestLocationPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Ambuserve Camera Permission',
-          message:
-            'Ambuserve needs access to your location ' +
-            'so you can take awesome rides.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        updateMapLocation();
-      } else {
-        return null;
+    console.log('3');
+    const watchId = watchPosition(position => {
+      // Handle position updates
+      if (startPhaseTwo) {
+        handleLocationChangePhaseTwo(position);
       }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
+    });
 
-  const updateMapLocation = async () => {
-    console.log('1');
-    try {
-      Geolocation.watchPosition(
-        position => {
-          const {latitude, longitude} = position.coords;
-          // console.log(rideConnected, startPhaseOne, startPhaseTwo);
-          setRegion(prevRegion => ({
-            ...prevRegion,
-            latitude: latitude,
-            longitude: longitude,
-          }));
-          setIsLoadingLocation(true);
-        },
-        error => {
-          console.error(`Error getting current location: ${error.message}`);
-          setIsLoadingLocation(true);
-        },
-        {
-          enableHighAccuracy: true,
-          interval: 2000,
-          distanceFilter: 1,
-          forceRequestLocation: true,
-        },
-      );
-    } catch (error) {
-      console.error('Error fetching current location:', error);
-      setIsLoadingLocation(true);
-    }
-  };
+    return () => {
+      Geolocation.clearWatch(watchId);
+    };
+  }, [startPhaseTwo]);
 
-  ///////////////////////on ride connection/////////////////////////
-  const handleLocationChange = position => {
-    const {latitude, longitude} = position.coords;
-    if (startPhaseOne) {
-      getDistanceMatrix(position.coords, ridePhase1, 'phaseOne').then(
-        distanceMatrix => {
-          console.log('--------------------------------');
-          setDestinationDistance(distanceMatrix.distance);
-          setDestinationTime(distanceMatrix.duration);
-          shareLiveLocation(
-            latitude,
-            longitude,
-            distanceMatrix.distance,
-            distanceMatrix.duration,
-            distanceMatrix.message,
-          );
-          setStartRideButton(distanceMatrix.phaseTwo);
-        },
-      );
-    } else if (startPhaseTwo) {
-      getDistanceMatrix(position.coords, ridePhase2, 'phaseTwo').then(
-        distanceMatrix => {
-          setDestinationDistance(distanceMatrix.distance);
-          setDestinationTime(distanceMatrix.duration);
-          shareLiveLocation(
-            latitude,
-            longitude,
-            distanceMatrix.distance,
-            distanceMatrix.duration,
-            distanceMatrix.message,
-          );
-        },
-      );
-    }
-  };
-
-  useEffect(() => {
-    // console.log(rideConnected, startPhaseOne, startPhaseTwo);
-    console.log('2');
-    try {
-      const watchId = Geolocation.watchPosition(
-        position => {
-          console.log('3');
-          if (rideConnected) {
-            console.log('ride conect==========>', rideConnected);
-            handleLocationChange(position);
-          }
-        },
-        error => {
-          console.error(`Error getting current location: ${error.message}`);
-          setIsLoadingLocation(true);
-        },
-        {
-          enableHighAccuracy: true,
-          interval: 2000,
-          distanceFilter: 2,
-          forceRequestLocation: true,
-        },
-      );
-
-      return () => {
-        Geolocation.clearWatch(watchId);
-      };
-    } catch (error) {
-      console.error('Error fetching current location:', error);
-      setIsLoadingLocation(true);
-    }
-  }, [rideConnected]);
-
-  // useEffect(() => {
-  //   console.log(rideConnected, startPhaseOne, startPhaseTwo);
-
+  // const requestLocationPermission = async () => {
   //   try {
-  //     Geolocation.watchPosition(
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //       {
+  //         title: 'Ambuserve Camera Permission',
+  //         message:
+  //           'Ambuserve needs access to your location ' +
+  //           'so you can take awesome rides.',
+  //         buttonNeutral: 'Ask Me Later',
+  //         buttonNegative: 'Cancel',
+  //         buttonPositive: 'OK',
+  //       },
+  //     );
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       setLocationOnMapOnFocus();
+  //     } else {
+  //       setManualLocation(true);
+  //     }
+  //   } catch (err) {
+  //     console.warn(err);
+  //   }
+  // };
+
+  // const setLocationOnMapOnFocus = async () => {
+  //   try {
+  //     Geolocation.getCurrentPosition(
   //       position => {
   //         const {latitude, longitude} = position.coords;
-  //         if (startPhaseOne) {
-  //           getDistanceMatrix(position.coords, ridePhase1, 'phaseOne').then(
-  //             distanceMatrix => {
-  //               setDestinationDistance(distanceMatrix.distance);
-  //               setDestinationTime(distanceMatrix.duration);
-  //               shareLiveLocation(
-  //                 latitude,
-  //                 longitude,
-  //                 distanceMatrix.distance,
-  //                 distanceMatrix.duration,
-  //                 distanceMatrix.message,
-  //               );
-  //               setStartRideButton(distanceMatrix.phaseTwo);
-  //             },
-  //           );
-  //         } else if (startPhaseTwo) {
-  //           getDistanceMatrix(position.coords, ridePhase2, 'phaseTwo').then(
-  //             distanceMatrix => {
-  //               setDestinationDistance(distanceMatrix.distance);
-  //               setDestinationTime(distanceMatrix.duration);
-  //               shareLiveLocation(
-  //                 latitude,
-  //                 longitude,
-  //                 distanceMatrix.distance,
-  //                 distanceMatrix.duration,
-  //                 distanceMatrix.message,
-  //               );
-  //             },
-  //           );
-  //         }
+  //         setRegion(prevRegion => ({
+  //           ...prevRegion,
+  //           latitude: latitude,
+  //           longitude: longitude,
+  //         }));
+  //         setIsLoadingLocation(true);
   //       },
   //       error => {
   //         console.error(`Error getting current location: ${error.message}`);
@@ -332,61 +256,151 @@ const DriverMap = () => {
   //       },
   //       {
   //         enableHighAccuracy: true,
-  //         interval: 2000,
-  //         distanceFilter: 2,
-  //         forceRequestLocation: true,
+  //         timeout: 10000,
+  //         maximumAge: 1000,
   //       },
   //     );
   //   } catch (error) {
-  //     console.error('Error fetching current location:', error);
   //     setIsLoadingLocation(true);
+  //     console.error('Error fetching current location:', error);
   //   }
+  // };
+
+  // useEffect(() => {
+  //   const watchId = Geolocation.watchPosition(
+  //     position => {
+  //       const {latitude, longitude} = position.coords;
+  //       setRegion(prevRegion => ({
+  //         ...prevRegion,
+  //         latitude: latitude,
+  //         longitude: longitude,
+  //       }));
+  //       setIsLoadingLocation(true);
+  //       // console.log(rideConnected, '========>??');
+  //       // if (rideConnected === true) {
+  //       // handleLocationChange(position);
+  //       // }
+  //     },
+  //     error => {
+  //       console.error(`Error getting current location: ${error.message}`);
+  //       setIsLoadingLocation(true);
+  //     },
+  //     {
+  //       enableHighAccuracy: true,
+  //       interval: 4000,
+  //       distanceFilter: 2,
+  //       forceRequestLocation: true,
+  //     },
+  //   );
+  //   return () => {
+  //     Geolocation.clearWatch(watchId);
+  //   };
   // }, []);
-
-  const onConfirmRide = () => {
-    setAlertVisible(false);
-    // setStartPhaseOne(true);
-    dispatch(setDriverRidePhaseOne(true));
-    dispatch(setDriverRideConnectedState(true));
-    // setRideConnected(true);
-    setUserDetailCard(true);
-
-    // Call the fetchCurrentLocation function here to immediately send the socket data
-    sendLocationOnRideConnected();
-  };
-
-  const sendLocationOnRideConnected = async () => {
-    try {
-      Geolocation.getCurrentPosition(
-        position => {
-          const {latitude, longitude} = position.coords;
-          getDistanceMatrix(region, ridePhase1, 'phaseOne').then(
-            distanceMatrix => {
-              setDestinationDistance(distanceMatrix.distance);
-              setDestinationTime(distanceMatrix.duration);
-              shareLiveLocation(
-                latitude,
-                longitude,
-                distanceMatrix.distance,
-                distanceMatrix.duration,
-                distanceMatrix.message,
-              );
-            },
-          );
-        },
-        error => {
-          console.error(`Error getting current location: ${error.message}`);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 1000,
-        },
+  ///////////////////////on ride connection/////////////////////////
+  const handleLocationChangePhaseOne = async position => {
+    const {latitude, longitude} = position;
+    console.log(
+      'handle loation sharing ====.',
+      latitude,
+      longitude,
+      rideConnected,
+      startPhaseOne,
+    );
+    getDistanceMatrix(position, ridePhase1, 'phaseOne').then(distanceMatrix => {
+      console.log('--------------------------------');
+      setDestinationDistance(distanceMatrix.distance);
+      setDestinationTime(distanceMatrix.duration);
+      shareLiveLocation(
+        latitude,
+        longitude,
+        distanceMatrix.distance,
+        distanceMatrix.duration,
+        distanceMatrix.message,
       );
-    } catch (error) {
-      console.error('Error fetching current location:', error);
-    }
+      // setStartRideButton(distanceMatrix.phaseTwo);
+    });
   };
+
+  const handleLocationChangePhaseTwo = async position => {
+    const {latitude, longitude} = position;
+    console.log(
+      'handle loation sharing ====.',
+      latitude,
+      longitude,
+      rideConnected,
+      startPhaseTwo,
+    );
+
+    getDistanceMatrix(position, ridePhase2, 'phaseTwo').then(distanceMatrix => {
+      setDestinationDistance(distanceMatrix.distance);
+      setDestinationTime(distanceMatrix.duration);
+      shareLiveLocation(
+        latitude,
+        longitude,
+        distanceMatrix.distance,
+        distanceMatrix.duration,
+        distanceMatrix.message,
+      );
+    });
+  };
+  const onConfirmRide = () => {
+    // Set the necessary states first
+    setRideConnected(true);
+    setStartPhaseOne(true);
+    setUserDetailCard(true);
+    setStartRideButton(true);
+
+    // Now, send the location and hide the alert
+    sendLocationOnRideConnected();
+    setAlertVisible(false);
+  };
+
+  const sendLocationOnRideConnected = () => {
+    getCurrentLocation().then(currentLocation => {
+      const {latitude, longitude} = currentLocation;
+      getDistanceMatrix(region, ridePhase1, 'phaseOne').then(distanceMatrix => {
+        setDestinationDistance(distanceMatrix.distance);
+        setDestinationTime(distanceMatrix.duration);
+        shareLiveLocation(
+          latitude,
+          longitude,
+          distanceMatrix.distance,
+          distanceMatrix.duration,
+          distanceMatrix.message,
+        );
+      });
+      console.log('send on connect', currentLocation);
+    });
+  };
+  // const sendLocationOnRideConnected = async () => {
+  //   try {
+  //     Geolocation.getCurrentPosition(
+  //       position => {
+  //         const {latitude, longitude} = position.coords;
+
+  //         getDistanceMatrix(region, ridePhase1, 'phaseOne').then(
+  //           distanceMatrix => {
+  //             setDestinationDistance(distanceMatrix.distance);
+  //             setDestinationTime(distanceMatrix.duration);
+  //             shareLiveLocation(
+  //               latitude,
+  //               longitude,
+  //               distanceMatrix.distance,
+  //               distanceMatrix.duration,
+  //               distanceMatrix.message,
+  //             );
+  //           },
+  //         );
+  //       },
+  //       error => {
+  //         console.error(`Error getting current location: ${error.message}`);
+  //       },
+  //       {enableHighAccuracy: true, timeout: 10000, maximumAge: 1000},
+  //     );
+  //   } catch (error) {
+  //     console.error('Error fetching current location:', error);
+  //   }
+  // };
 
   const onCancelRide = () => {
     setAlertVisible(false);
@@ -397,20 +411,18 @@ const DriverMap = () => {
     // console.log('Phase 2');
     setStartPhaseOne(false);
     setStartPhaseTwo(true);
-    // setRideConnected(true);
+    setRideConnected(true);
     setStartRideButton(false);
   };
 
   const shareLiveLocation = (lat, long, distance, duration, message) => {
     console.log('message:', message);
+
     const userReqConnect = {
       type: 'driver',
       driver_name: driver_name,
       contact: driver_contact,
-      currentLocation: {
-        latitude: lat,
-        longitude: long,
-      },
+      currentLocation: {latitude: lat, longitude: long},
       distance: distance,
       duration: duration,
       company_name: company_name,
@@ -428,7 +440,6 @@ const DriverMap = () => {
     mapRef.current.animateToRegion(region, 1000);
   };
 
-  const [manualLocation, setManualLocation] = useState(false);
   const handleLocationPermission = () => {
     setManualLocation(true);
   };
@@ -519,8 +530,8 @@ const DriverMap = () => {
             style={styles.map}
             provider="google"
             ref={mapRef}
-            minZoomLevel={13}
-            maxZoomLevel={20}
+            // minZoomLevel={13}
+            // maxZoomLevel={20}
             // onPress={event => {
             //   setRegion({
             //     latitude: event.nativeEvent.coordinate.latitude,
@@ -560,7 +571,7 @@ const DriverMap = () => {
                 }}
               />
             </Marker>
-            {rideConnected ? (
+            {rideConnected === true ? (
               <>
                 <MapViewDirections
                   origin={{
@@ -568,12 +579,8 @@ const DriverMap = () => {
                     longitude: region?.longitude,
                   }}
                   destination={{
-                    latitude: startPhaseTwo
-                      ? ridePhase2.latitude
-                      : ridePhase1.latitude,
-                    longitude: startPhaseTwo
-                      ? ridePhase2.longitude
-                      : ridePhase1.longitude,
+                    latitude: ridePhase1.latitude,
+                    longitude: ridePhase1.longitude,
                   }}
                   apikey={GOOGLE_MAPS_APIKEY}
                   strokeWidth={3}
@@ -581,12 +588,8 @@ const DriverMap = () => {
                 />
                 <Marker
                   coordinate={{
-                    latitude: startPhaseTwo
-                      ? ridePhase2.latitude
-                      : ridePhase1?.latitude,
-                    longitude: startPhaseTwo
-                      ? ridePhase2.longitude
-                      : ridePhase1?.longitude,
+                    latitude: ridePhase1?.latitude,
+                    longitude: ridePhase1?.longitude,
                   }}>
                   <Image
                     source={icons.END_POINT}
@@ -600,7 +603,7 @@ const DriverMap = () => {
               </>
             ) : null}
           </MapView>
-          {startRideButton ? (
+          {startRideButton === true ? (
             <TouchableOpacity
               onPress={handleRidePhase2}
               style={{
@@ -678,7 +681,7 @@ const DriverMap = () => {
               longitudeDelta: 0.001,
             }}
           />
-          {/* 
+
           <TouchableOpacity
             onPress={handleLocationPermission}
             style={{
@@ -694,7 +697,7 @@ const DriverMap = () => {
                 width: wp(8),
               }}
             />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </>
       )}
     </SafeAreaView>

@@ -2,81 +2,33 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {
-  Image,
-  Text,
-  ImageBackground,
-  SafeAreaView,
-  StatusBar,
-  Dimensions,
-  ToastAndroid,
-  View,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-} from 'react-native';
+import {Image, Text, SafeAreaView, View, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import styles from './styles';
 import {useNavigation} from '@react-navigation/native';
 import MapView, {Marker, Callout} from 'react-native-maps';
-
-import {
-  // GooglePlaceData,
-  GooglePlacesAutocomplete,
-} from 'react-native-google-places-autocomplete';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import colors from '../../../assets/colors/colors';
 import images from '../../../assets/images/images';
 import icons from '../../../assets/icons/icons';
 import {BASE_URL, GOOGLE_API_KEY, WEB_SOCKET} from '../../../config';
-import axios from 'axios';
-import Toast from 'react-native-simple-toast';
 import CustomButton from '../../components/Button/Button';
 import CustomAlert from '../../components/Alert/Alert';
-// import {useTypedSelector} from '../../redux/Store';
-import {getData} from '../../asyncStorage/AsyncStorage';
-import {useTypedSelector} from '../../redux/Store';
 
 import CustomScreenLoading from '../../components/ScreenLoading/ScreenLoading';
 import MapViewDirections from 'react-native-maps-directions';
-import {useFocusEffect} from '@react-navigation/native';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import fonts from '../../../assets/fonts/fonts';
-import getDistanceMatrix from '../../DistanceMatrix/DistanceMatrix';
 import io from 'socket.io-client';
-import Geolocation from 'react-native-geolocation-service';
+import Geolocation, {clearWatch} from 'react-native-geolocation-service';
 import {PermissionsAndroid} from 'react-native';
-
 import {useIsFocused} from '@react-navigation/native';
-// interface Geometry {
-//   latitude: number;
-//   longitude: number;
-// }
+import {useTypedSelector} from '../../redux/Store';
 
-// interface GooglePlaceData {
-//   location: Geometry;
-// }
-
-// interface Region {
-//   latitude: number;
-//   longitude: number;
-//   latitudeDelta: number;
-//   longitudeDelta: number;
-// }
-
-// type NavigationProps = {
-//   navigate(APPEREANCE: string): unknown;
-//   navigation: string;
-//   goBack: () => void;
-//   replace: any;
-//   jumpTo: any;
-// };
-
-// Geolocation.setRNConfiguration(config);
-// navigator.geolocation = require('@react-native-community/geolocation');
+navigator.geolocation = require('react-native-geolocation-service');
 
 const Maps = () => {
   const navigation = useNavigation();
-
   const isFocused = useIsFocused();
   const mapRef = useRef(null);
   const originRef = useRef(null);
@@ -106,16 +58,16 @@ const Maps = () => {
     longitudeDelta: 0.01,
   });
   const [userInfoForRide, setUserInfoForRide] = useState({});
+
   const [route, setRoute] = useState(null);
   const [driverRoute, setDriverRoute] = useState(false);
   const [requestPhase, setRequestPhase] = useState(true);
   const [driverAcceptPhase, setDriverAcceptPhase] = useState(false);
 
   const [screenLoading, setScreenLoading] = useState(false);
-  const [socket, setSocket] = useState(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [ambulanceMessage, setAmbulanceMessage] = useState('......');
 
+  const [socket, setSocket] = useState(null);
   useEffect(() => {
     // Connect to the server as a user
     const userSocket = io(WEB_SOCKET, {
@@ -160,9 +112,6 @@ const Maps = () => {
     socket?.on('driver_response', response => {
       console.log('Received driver response:', response);
       const driverData = JSON.parse(response);
-      // const distanceValue = parseFloat(driverData.distance_Matrix.distance); // Parse float
-      // const distanceInKm = distanceValue;
-
       setDriversInformation(prevDriversInfo => ({
         ...prevDriversInfo,
         ...driverData,
@@ -173,28 +122,14 @@ const Maps = () => {
         setRequestPhase(false);
         setDriverRoute(true);
         setDriverAcceptPhase(true);
-        // notification(distanceInKm);
       }
     });
   }, [socket]);
-
-  // const notification = distance => {
-  //   console.log('Distance in integer:', distance);
-  //   if (distance > 1) {
-  //     setAmbulanceMessage('You ambulance is on the way ');
-  //   } else if (distance < 1 && distance > 0.5) {
-  //     setAmbulanceMessage('Get Ready..');
-  //   } else if (distance < 0.5) {
-  //     setAmbulanceMessage('Ambulance is here');
-  //   }
-  // };
 
   const sendRequest = request => {
     console.log('data sending ======>>>>', request);
     socket?.emit('user_request', request);
   };
-
-  const [distanceData, setDistanceData] = useState(null);
 
   const sendRequestToAllDrivers = () => {
     if (originPlace && destinationPlace) {
@@ -269,7 +204,7 @@ const Maps = () => {
 
   const fetchCurrentLocation = async () => {
     try {
-      Geolocation.watchPosition(
+      Geolocation.getCurrentPosition(
         position => {
           const {latitude, longitude} = position.coords;
           setRegion(prevRegion => ({
@@ -277,6 +212,7 @@ const Maps = () => {
             latitude: latitude,
             longitude: longitude,
           }));
+
           setIsLoadingLocation(true);
         },
         error => {
@@ -285,7 +221,8 @@ const Maps = () => {
         },
         {
           enableHighAccuracy: true,
-          interval: 2000,
+          timeout: 10000,
+          maximumAge: 10000,
           distanceFilter: 2,
           forceRequestLocation: true,
         },
@@ -297,44 +234,33 @@ const Maps = () => {
   };
   useEffect(() => {
     requestLocationPermission();
-  }, []);
-
-  const getCurrentPositionOnFocus = async () => {
-    try {
-      Geolocation.getCurrentPosition(
-        position => {
-          const {latitude, longitude} = position.coords;
-          setRegion(prevRegion => ({
-            ...prevRegion,
-            latitude: latitude,
-            longitude: longitude,
-          }));
-          setIsLoadingLocation(true);
-        },
-        error => {
-          console.error(`Error getting current location: ${error.message}`);
-          setIsLoadingLocation(true);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 1000,
-          // interval: 3000,
-          // distanceFilter: 3,
-          // forceRequestLocation: true,
-        },
-      );
-    } catch (error) {
-      console.error('Error fetching current location:', error);
-      setIsLoadingLocation(true);
-    }
-  };
+  }, [isFocused]);
 
   useEffect(() => {
-    if (isFocused) {
-      getCurrentPositionOnFocus();
-    }
-  }, [isFocused]);
+    const watchId = Geolocation.watchPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        setRegion(prevRegion => ({
+          ...prevRegion,
+          latitude: latitude,
+          longitude: longitude,
+        }));
+      },
+      error => {
+        console.error(`Error getting current location: ${error.message}`);
+      },
+      {
+        enableHighAccuracy: true,
+        interval: 4000,
+        distanceFilter: 2,
+        forceRequestLocation: true,
+      },
+    );
+
+    return () => {
+      Geolocation.clearWatch(watchId);
+    };
+  }, []);
 
   const handleShowUserLocation = () => {
     mapRef.current.animateToRegion(region, 1000);
@@ -350,11 +276,9 @@ const Maps = () => {
   const cancelRideHandle = () => {};
 
   const handleOriginPlaceChange = location => {
-    // console.log('Setting origin place:', location);
     setOriginPlace(location);
   };
   const handleDestinationPlaceChange = location => {
-    // console.log('Setting origin place:', location);
     setDestinationPlace(location);
   };
 
@@ -448,6 +372,8 @@ const Maps = () => {
               <>
                 <View style={styles.searchBarFrom}>
                   <GooglePlacesAutocomplete
+                    // currentLocation={true}
+                    // currentLocationLabel="Current Location"
                     ref={originRef}
                     placeholder={originPlaceholder}
                     minLength={2}
@@ -564,8 +490,8 @@ const Maps = () => {
               style={styles.map}
               provider="google"
               ref={mapRef}
-              minZoomLevel={14}
-              maxZoomLevel={18}
+              // minZoomLevel={14}
+              // maxZoomLevel={18}
               region={region}>
               <Marker
                 coordinate={{
@@ -647,135 +573,152 @@ const Maps = () => {
               ) : null}
             </MapView>
             {driverAcceptPhase ? (
-              <View
-                style={{
-                  // marginTop: hp(2),
-                  marginHorizontal: wp(5),
-                  position: 'absolute',
-                  height: hp(25),
-                  width: wp(90),
-                  borderRadius: wp(5),
-                  borderWidth: wp(0.2),
-                  borderColor: colors.BLACK,
-                  zIndex: 1,
-                  bottom: hp(2),
-                  backgroundColor: colors.WHITE,
-                  // justifyContent: 'center',
-                }}>
-                <View
+              <>
+                <TouchableOpacity
+                  onPress={handleShowUserLocation}
                   style={{
-                    marginTop: hp(2),
-                    marginBottom: hp(2),
-                    height: hp(4),
-                    marginHorizontal: wp(2),
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    // backgroundColor: 'pink',
-                  }}>
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      fontFamily: fonts.REGULAR,
-                      fontSize: fontsizes.px_22,
-                      color: colors.BLACK,
-                      fontWeight: '700',
-                      // textAlign: 'left',
-                    }}>
-                    {driversInformation?.message}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginHorizontal: wp(2),
-                    height: hp(11),
-                    borderRadius: wp(2),
-                    backgroundColor: '#f2f2f2',
-                    // justifyContent: 'center',
-                    alignItems: 'center',
-
-                    // justifyContent:'space-between',
-                    // alignItems: 'center',
+                    position: 'absolute',
+                    right: wp(5),
+                    bottom: hp(28),
                   }}>
                   <Image
-                    source={images.DEFAULT_USER}
+                    source={icons.CURRENT_LOCATION}
                     resizeMode="contain"
                     style={{
-                      // backgroundColor: 'green',
-                      marginLeft: wp(1),
-                      height: hp(8),
-                      width: wp(15),
-                      // borderRadius: wp(10),
-                      // marginRight: wp(5),
+                      height: hp(4),
+                      width: wp(8),
                     }}
                   />
-                  <View>
+                </TouchableOpacity>
+                <View
+                  style={{
+                    // marginTop: hp(2),
+                    marginHorizontal: wp(5),
+                    position: 'absolute',
+                    height: hp(25),
+                    width: wp(90),
+                    borderRadius: wp(5),
+                    borderWidth: wp(0.2),
+                    borderColor: colors.BLACK,
+                    zIndex: 1,
+                    bottom: hp(2),
+                    backgroundColor: colors.WHITE,
+                    // justifyContent: 'center',
+                  }}>
+                  <View
+                    style={{
+                      marginTop: hp(2),
+                      marginBottom: hp(2),
+                      height: hp(4),
+                      marginHorizontal: wp(2),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      // backgroundColor: 'pink',
+                    }}>
                     <Text
                       numberOfLines={1}
                       style={{
-                        marginLeft: wp(2),
-                        // marg/inTop: hp(1),
                         fontFamily: fonts.REGULAR,
                         fontSize: fontsizes.px_22,
                         color: colors.BLACK,
-                        fontWeight: '400',
-                        width: wp(32),
-                        // backgroundColor: 'pink',
+                        fontWeight: '700',
                         // textAlign: 'left',
                       }}>
-                      {driversInformation?.driver_name}
-                    </Text>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        marginLeft: wp(2),
-                        // marginTop: hp(1),
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_22,
-                        color: colors.BLACK,
-                        fontWeight: '400',
-                        width: wp(32),
-                        // backgroundColor: 'pink',
-                        // textAlign: 'left',
-                      }}>
-                      {driversInformation?.vehicle_number}
+                      {driversInformation?.message}
                     </Text>
                   </View>
-                  <View>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        width: wp(32),
-                        // backgroundColor: 'pink',
-                        marginLeft: wp(2),
-                        // marginTop: hp(1),
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_22,
-                        color: colors.BLACK,
-                        fontWeight: '400',
-                        // textAlign: 'left',
-                      }}>
-                      {driversInformation?.contact}
-                    </Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginHorizontal: wp(2),
+                      height: hp(11),
+                      borderRadius: wp(2),
+                      backgroundColor: '#f2f2f2',
+                      // justifyContent: 'center',
+                      alignItems: 'center',
 
-                    <Text
-                      numberOfLines={1}
+                      // justifyContent:'space-between',
+                      // alignItems: 'center',
+                    }}>
+                    <Image
+                      source={images.DEFAULT_USER}
+                      resizeMode="contain"
                       style={{
-                        width: wp(32),
-                        // backgroundColor: 'pink',
-                        marginLeft: wp(2),
-                        // marginTop: hp(1),
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_22,
-                        color: colors.BLACK,
-                        fontWeight: '400',
-                        // textAlign: 'left',
-                      }}>
-                      4.5
-                    </Text>
+                        // backgroundColor: 'green',
+                        marginLeft: wp(1),
+                        height: hp(8),
+                        width: wp(15),
+                        // borderRadius: wp(10),
+                        // marginRight: wp(5),
+                      }}
+                    />
+                    <View>
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          marginLeft: wp(2),
+                          // marg/inTop: hp(1),
+                          fontFamily: fonts.REGULAR,
+                          fontSize: fontsizes.px_22,
+                          color: colors.BLACK,
+                          fontWeight: '400',
+                          width: wp(32),
+                          // backgroundColor: 'pink',
+                          // textAlign: 'left',
+                        }}>
+                        {driversInformation?.driver_name}
+                      </Text>
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          marginLeft: wp(2),
+                          // marginTop: hp(1),
+                          fontFamily: fonts.REGULAR,
+                          fontSize: fontsizes.px_22,
+                          color: colors.BLACK,
+                          fontWeight: '400',
+                          width: wp(32),
+                          // backgroundColor: 'pink',
+                          // textAlign: 'left',
+                        }}>
+                        {driversInformation?.vehicle_number}
+                      </Text>
+                    </View>
+                    <View>
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          width: wp(32),
+                          // backgroundColor: 'pink',
+                          marginLeft: wp(2),
+                          // marginTop: hp(1),
+                          fontFamily: fonts.REGULAR,
+                          fontSize: fontsizes.px_22,
+                          color: colors.BLACK,
+                          fontWeight: '400',
+                          // textAlign: 'left',
+                        }}>
+                        {driversInformation?.contact}
+                      </Text>
+
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          width: wp(32),
+                          // backgroundColor: 'pink',
+                          marginLeft: wp(2),
+                          // marginTop: hp(1),
+                          fontFamily: fonts.REGULAR,
+                          fontSize: fontsizes.px_22,
+                          color: colors.BLACK,
+                          fontWeight: '400',
+                          // textAlign: 'left',
+                        }}>
+                        4.5
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                {/* <TouchableOpacity
+                  {/* <TouchableOpacity
                   onPress={cancelRideHandle}
                   style={{
                     width: wp(80),
@@ -803,7 +746,8 @@ const Maps = () => {
                     Cancel ride
                   </Text>
                 </TouchableOpacity> */}
-              </View>
+                </View>
+              </>
             ) : null}
             {requestPhase ? (
               <View

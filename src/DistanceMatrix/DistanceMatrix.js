@@ -4,11 +4,12 @@ import {GOOGLE_API_KEY} from '../../config';
 const GOOGLE_MAPS_APIKEY = GOOGLE_API_KEY;
 
 const getDistanceMatrix = async (origin, destination, phase) => {
+  console.log('distance matrix component');
   try {
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&key=${GOOGLE_MAPS_APIKEY}`,
     );
-
+    // console.log('worked distance matrix');
     if (response.data && response.data.rows[0]?.elements[0]?.status === 'OK') {
       if (phase === 'phaseOne') {
         const distanceValue = parseFloat(

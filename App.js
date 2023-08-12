@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import StackNavigator from './src/routes/StackNavigator/Navigators';
 import {useDispatch} from 'react-redux';
 import {setUserInfo, setDriverInfo} from './src/redux/Action';
-import {getData} from './src/asyncStorage/AsyncStorage';
+import {getData, setData} from './src/asyncStorage/AsyncStorage';
 import {
   DASHBOARD,
   MY_BOTTOM_TABS,
