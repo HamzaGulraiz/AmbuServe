@@ -37,7 +37,7 @@ import {
 import axios from 'axios';
 import Toast from 'react-native-simple-toast';
 import {setData} from '../../asyncStorage/AsyncStorage';
-import {setDriverInfo} from '../../redux/Action';
+import {setDriverInfo, setDriverActivity} from '../../redux/Action';
 import {useDispatch} from 'react-redux';
 import {BASE_URL} from '../../../config';
 
@@ -181,12 +181,32 @@ const SignUpAsDriver = () => {
           setData({value: response.data, storageKey: 'DRIVER_INFO'});
           navigation.replace(MY_BOTTOM_TABS);
           setSignInIsLoaded(false);
+          reCallDriverActivityApi(driverNumber);
         }
       })
       .catch(error => {
         console.log(error);
         Toast.showWithGravity('Try again', Toast.SHORT, Toast.BOTTOM);
         setSignInIsLoaded(false);
+      });
+  };
+
+  const reCallDriverActivityApi = driver_contact => {
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/driver/rides/${driver_contact}`,
+      // url: `http://192.168.100.21:8080/driver/rides/03244421921`,
+      headers: {},
+    };
+
+    axios
+      .request(config)
+      .then(response => {
+        dispatch(setDriverActivity(response.data));
+      })
+      .catch(error => {
+        console.log(error);
       });
   };
 

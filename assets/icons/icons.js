@@ -15,6 +15,13 @@ const icons = {
   CROSS: require('./cross.png'),
   START_POINT: require('./checkPoint.png'),
   END_POINT: require('./endPoint.png'),
+  PHONE_ICON: require('./phoneIcon.png'),
+  CASH_ICON: require('./cash.png'),
+  CREDIT_CARD_ICON: require('./credit-card.png'),
+  BANK_TRANSFER_ICON: require('./bank-transfer.png'),
+  HALF_STAR: require('./halfStar.png'),
+  EMPTY_STAR: require('./emptyStar.png'),
+  FULL_STAR: require('./fullStar.png'),
 };
 
 export default icons;

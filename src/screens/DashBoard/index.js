@@ -106,7 +106,7 @@ const DashBoard = () => {
         borderRadius={wp(2)}
         marginHorizontal={wp(5)}
         // marginTop={hp(2)}
-        // marginBottom={hp(2)}
+        marginBottom={hp(2)}
         onPress={handleChoseHospital}
       />
     </SafeAreaView>

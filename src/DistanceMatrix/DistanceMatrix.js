@@ -20,29 +20,45 @@ const getDistanceMatrix = async (origin, destination, phase) => {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'Ambulance is on the way',
+            title: 'Ambulance is on the way',
+            message:
+              'Since September 2000, AmbuServe has been providing exceptional ambulance service to Los Angeles County.',
             phaseTwo: false,
+            route: 'pickup',
+            rideCompleted: false,
           };
         } else if (distanceInKm > 0.5) {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'Get Ready',
+            title: 'Get Ready',
+            message:
+              'We provide emergency and non-emergency ambulance service and event medical coverage.',
             phaseTwo: false,
+            route: 'pickup',
+            rideCompleted: false,
           };
         } else if (distanceInKm > 0.2) {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'Around the corner',
+            title: 'Around the corner',
+            message:
+              ' We offer basic life support (EMT) ambulance service, advanced life support (paramedic) ambulance service',
             phaseTwo: false,
+            route: 'pickup',
+            rideCompleted: false,
           };
         } else {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'Ambulance is here',
+            title: 'Ambulance is here',
+            message:
+              'AmbuServe is the right choice to serve as your ambulance service and event medical services provider.',
             phaseTwo: true,
+            route: 'pickup',
+            rideCompleted: false,
           };
         }
       } else if (phase === 'phaseTwo') {
@@ -55,123 +71,56 @@ const getDistanceMatrix = async (origin, destination, phase) => {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'To your destination',
+            title: 'To your destination',
+            message:
+              'We provide emergency and non-emergency ambulance service and event medical coverage.',
             phaseTwo: false,
+            route: 'dropoff',
+            rideCompleted: false,
           };
         } else if (distanceInKm > 0.5) {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'Near the hospital',
+            title: 'Near the hospital',
+            message:
+              ' We offer basic life support (EMT) ambulance service, advanced life support (paramedic) ambulance service',
             phaseTwo: false,
+            route: 'dropoff',
+            rideCompleted: false,
           };
         } else if (distanceInKm > 0.2) {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'Will arrive in a few minutes',
+            title: 'Will arrive in a few minutes',
+            message:
+              ' AmbuServe is the right choice to serve as your ambulance service and event medical services provider.',
             phaseTwo: false,
+            route: 'dropoff',
+            rideCompleted: false,
           };
-        } else {
+        } else if (distanceInKm < 0.1) {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            message: 'You have arrived',
+            title: 'Arrived',
+            message:
+              'Since September 2000, AmbuServe has been providing exceptional ambulance service to Los Angeles County.',
             phaseTwo: false,
+            route: 'dropoff',
+            rideCompleted: true,
+          };
+        } else {
+          return {
+            // distance: response.data.rows[0].elements[0].distance.text,
+            // duration: response.data.rows[0].elements[0].duration.text,
+            // title: 'You have arrived',
+            // phaseTwo: false,
+            // route:'dropoff',
           };
         }
       }
-
-      // if (phase === 'phaseOne') {
-      //   const distanceValue = parseFloat(
-      //     response.data.rows[0].elements[0].distance.text,
-      //   ); // Parse float
-      //   console.log('value', distanceValue);
-      //   const distanceInKm = distanceValue;
-      //   switch (distanceInKm) {
-      //     case distanceInKm > 1:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'Ambulance is on the way',
-      //         phaseTwo: false,
-      //       };
-      //     case distanceInKm > 0.5:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'Get Ready',
-      //         phaseTwo: false,
-      //       };
-
-      //     case distanceInKm > 0.2:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'Arround the corner',
-      //         phaseTwo: false,
-      //       };
-
-      //     case distanceInKm < 0.2:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'Ambulance is here',
-      //         phaseTwo: true,
-      //       };
-      //     default:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: '.....',
-      //         phaseTwo: false,
-      //       };
-      //   }
-      // } else if (phase === 'phaseTwo') {
-      //   const distanceValue = parseFloat(
-      //     response.data.rows[0].elements[0].distance.text,
-      //   ); // Parse float
-      //   const distanceInKm = distanceValue;
-      //   switch (distanceInKm) {
-      //     case distanceInKm > 1:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'To your destination',
-      //         phaseTwo: false,
-      //       };
-      //     case distanceInKm > 0.5:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'Near the hospital',
-      //         phaseTwo: false,
-      //       };
-
-      //     case distanceInKm > 0.2:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'Will arrive in few minutes',
-      //         phaseTwo: false,
-      //       };
-
-      //     case distanceInKm < 0.2:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: 'You have arrived',
-      //         phaseTwo: false,
-      //       };
-      //     default:
-      //       return {
-      //         distance: response.data.rows[0].elements[0].distance.text,
-      //         duration: response.data.rows[0].elements[0].duration.text,
-      //         message: '.....',
-      //         phaseTwo: true,
-      //       };
-      //   }
-      // }
     } else {
       throw new Error('Failed to fetch distance matrix data');
     }

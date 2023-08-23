@@ -11,46 +11,32 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
   },
-  searchBarFrom: {
-    marginTop: hp(2),
-    paddingHorizontal: wp(5),
-    position: 'absolute',
-    // height: hp(6),
-    width: '100%',
-    zIndex: 1,
-  },
-  searchBarTo: {
-    marginTop: hp(8),
-    paddingHorizontal: wp(5),
-    position: 'absolute',
-    // height: hp(6),
-    width: '100%',
-    zIndex: 1,
-  },
-  map: {
-    flex: 1,
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: '#DDDDDD',
-    padding: 10,
-  },
+
   tripCardView: {
     paddingHorizontal: wp(5),
   },
 
   card: {
     backgroundColor: '#FFFFFA',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: hp(12),
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    height: hp(26),
     // width: wp(86.6),
     paddingLeft: wp(6),
     marginBottom: hp(1.125),
     borderRadius: wp(2),
     elevation: hp(0.5),
+    // backgroundColor: 'pink',
   },
-  cardInfoView: {},
+  cardInfoView: {
+    flexDirection: 'row',
+    // height: hp(2),
+    marginTop: hp(0.5),
+    // marginBottom: hp(1),
+    // alignItems: 'center',
+    // justifyContent: 'space-between',
+    // width: wp(80),
+  },
 });
 
 export default styles;

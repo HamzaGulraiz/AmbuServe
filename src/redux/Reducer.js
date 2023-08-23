@@ -3,6 +3,7 @@ import {
   DriverInfoActionTypes,
   SET_USER_INFO,
   SET_DRIVER_INFO,
+  SET_DRIVER_ACTIVITY,
   SET_DRIVER_RIDE_CONNECT_STATE,
   SET_DRIVER_RIDE_PHASE_ONE,
   SET_DRIVER_RIDE_PHASE_TWO,
@@ -16,6 +17,7 @@ import {
 const initialState = {
   userInfo: '',
   driverInfo: '',
+  driverActivity: '',
   driverRideConnectState: false,
   driverRidePhaseOne: false,
   driverRidePhaseTwo: false,
@@ -40,6 +42,15 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         driverInfo: action.payload,
+      };
+    case SET_DRIVER_ACTIVITY:
+      console.log(
+        'Redux reducer: saving Drivers activity ===>',
+        action.payload,
+      );
+      return {
+        ...state,
+        driverActivity: action.payload,
       };
     case SET_DRIVER_RIDE_CONNECT_STATE:
       console.log(

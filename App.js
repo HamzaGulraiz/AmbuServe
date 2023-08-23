@@ -1,7 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import StackNavigator from './src/routes/StackNavigator/Navigators';
 import {useDispatch} from 'react-redux';
-import {setUserInfo, setDriverInfo} from './src/redux/Action';
+import {
+  setUserInfo,
+  setDriverInfo,
+  setDriverActivity,
+} from './src/redux/Action';
 import {getData, setData} from './src/asyncStorage/AsyncStorage';
 import {
   DASHBOARD,
@@ -11,6 +15,8 @@ import {
 import {useIsFocused} from '@react-navigation/native';
 import Geolocation from 'react-native-geolocation-service';
 import {PermissionsAndroid, Platform} from 'react-native';
+import axios from 'axios';
+import {BASE_URL} from './config';
 
 // type Props = {
 //   routeName: string;
@@ -42,9 +48,8 @@ const App = (
               setRouteName(SPLASH_SCREEN);
               console.log('Index.js: routing to splash screen');
             } else {
-              setRouteName(MY_BOTTOM_TABS);
-              // setDriverInfo(driverInfo);
-              dispatch(setDriverInfo(driverInfo));
+              driversActivityCallback(driverInfo);
+
               console.log('Index.js: routing to Bottom tabs');
             }
           } catch (e) {
@@ -62,6 +67,33 @@ const App = (
     };
     fetchData();
   }, [isFocused]);
+
+  const driversActivityCallback = driverInfo => {
+    const {driver_contact} = JSON.parse(driverInfo);
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `${BASE_URL}/driver/rides/${driver_contact}`,
+      // url: `http://192.168.100.21:8080/driver/rides/03244421921`,
+      headers: {},
+    };
+
+    axios
+      .request(config)
+      .then(response => {
+        if (response.data !== null) {
+          setRouteName(MY_BOTTOM_TABS);
+          dispatch(setDriverInfo(driverInfo));
+          dispatch(setDriverActivity(response.data));
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        setRouteName(MY_BOTTOM_TABS);
+        dispatch(setDriverInfo(driverInfo));
+        dispatch(setDriverActivity([]));
+      });
+  };
 
   const androidPermission = async () => {
     try {

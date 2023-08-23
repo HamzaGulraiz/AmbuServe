@@ -38,6 +38,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDDDDD',
     padding: 10,
   },
+  rideConnectedCardView: {
+    height: hp(45),
+    width: '100%',
+    borderColor: colors.BLACK,
+    zIndex: 1,
+    bottom: hp(0),
+    backgroundColor: colors.WHITE,
+  },
 });
 
 export default styles;

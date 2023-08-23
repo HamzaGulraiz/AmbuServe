@@ -29,8 +29,8 @@ export const watchPosition = callback => {
     },
     {
       enableHighAccuracy: true,
-      interval: 5000,
-      distanceFilter: 5,
+      interval: 3000,
+      distanceFilter: 1,
       forceRequestLocation: true,
     },
   );

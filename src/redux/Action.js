@@ -1,6 +1,7 @@
 // actions.ts
 export const SET_USER_INFO = 'SET_USER_INFO';
 export const SET_DRIVER_INFO = 'SET_DRIVER_INFO';
+export const SET_DRIVER_ACTIVITY = 'SET_DRIVER_ACTIVITY';
 export const SET_DRIVER_RIDE_CONNECT_STATE = 'SET_DRIVER_RIDE_CONNECT_STATE';
 export const SET_DRIVER_RIDE_PHASE_ONE = 'SET_DRIVER_RIDE_PHASE_ONE';
 export const SET_DRIVER_RIDE_PHASE_TWO = 'SET_DRIVER_RIDE_PHASE_TWO';
@@ -27,6 +28,11 @@ export const setUserInfo = userInfo => ({
 export const setDriverInfo = driverInfo => ({
   type: SET_DRIVER_INFO,
   payload: driverInfo,
+});
+
+export const setDriverActivity = driverActivity => ({
+  type: SET_DRIVER_ACTIVITY,
+  payload: driverActivity,
 });
 
 export const setDriverRideConnectedState = state => ({
