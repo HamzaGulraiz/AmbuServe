@@ -72,15 +72,15 @@ const Maps = () => {
   const [originPlace, setOriginPlace] = useState(null);
   const [destinationPlace, setDestinationPlace] = useState(null);
   const [region, setRegion] = useState({
-    latitude: 31.5204,
-    longitude: 74.3587,
+    latitude: 24.8607,
+    longitude: 67.0011,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
 
   const [regionForZoom, setRegionForZoom] = useState({
-    latitude: 31.5204,
-    longitude: 74.3587,
+    latitude: 24.8607,
+    longitude: 67.0011,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
@@ -163,9 +163,10 @@ const Maps = () => {
 
   useEffect(() => {
     socket?.on('ride_completed', response => {
-      socket?.on('disconnect', () => {
-        console.log('user disconnect after ride compelete', socket.id); // undefined
-      });
+      socket?.disconnect();
+      // socket?.on('disconnect', () => {
+      //   console.log('user disconnect after ride compelete', socket.id); // undefined
+      // });
       setRequestPhase(true);
       setDriverAcceptPhase(false);
       setDriverRoute(false);
@@ -175,8 +176,34 @@ const Maps = () => {
   }, [socket]);
 
   const [defaultRouteForMarker, setDefaultRouteForMarker] = useState('pickup');
+  // useEffect(() => {
+  //   socket?.on('driver_response', response => {
+  //     console.log('Received driver response:', response);
+  //     const driverData = JSON.parse(response);
+  //     setDriversInformation(prevDriversInfo => ({
+  //       ...prevDriversInfo,
+  //       ...driverData,
+  //     }));
+  //     setPhoneNumber(driverData?.contact);
+  //     setDefaultRouteForMarker(driverData?.route);
+  //     if (driverData.currentLocation) {
+  //       ////////////////////////// check this
+  //       setScreenLoading(false);
+  //       setRequestPhase(false);
+  //       setDriverRoute(true);
+  //       setDriverAcceptPhase(true);
+  //       handleMapZoomOnRideConnection(driverData);
+  //     }
+  //     setRoute(false);
+  //     setUserCurrentPosition(false);
+
+  //     // console.log('setUserCurrentPosition false');
+  //   });
+  // }, [socket]);
+
   useEffect(() => {
-    socket?.on('driver_response', response => {
+    const eventHandler = response => {
+      // Your code here
       console.log('Received driver response:', response);
       const driverData = JSON.parse(response);
       setDriversInformation(prevDriversInfo => ({
@@ -191,44 +218,50 @@ const Maps = () => {
         setRequestPhase(false);
         setDriverRoute(true);
         setDriverAcceptPhase(true);
-        handleMapZoomOnRideConnection(driverData);
       }
+      handleMapZoomOnRideConnection(driverData);
       setRoute(false);
       setUserCurrentPosition(false);
+    };
 
-      // console.log('setUserCurrentPosition false');
-    });
+    socket?.on('driver_response', eventHandler);
+
+    return () => {
+      socket?.off('driver_response', eventHandler);
+    };
   }, [socket]);
 
   const handleMapZoomOnRideConnection = driverData => {
-    console.log('handleMapZoomOnRideConnection', driverData);
-    if (originPlace) {
-      if (driverData.route === 'route') {
-        const distance = haversine(
-          originPlace?.location,
-          driverData?.currentLocation,
-        );
+    console.log('handleMapZoomOnRideConnection ===>>>>>>>>>>.', driverData);
+    if (driverData.route === 'pickup') {
+      console.log(
+        'handleMapZoomOnRideConnection ========================== pickup',
+      );
 
-        const centerLatitude =
-          (originPlace?.location.latitude +
-            driverData?.currentLocation.latitude) /
-          2;
-        const centerLongitude =
-          (originPlace?.location.longitude +
-            driverData?.currentLocation.longitude) /
-          2;
+      const distance = haversine(driverData?.zoom, driverData?.currentLocation);
 
-        const mapDelta = distance * 0.5; // Adjust this factor for better coverage
-        const zoom = calculateZoom(mapDelta);
+      const centerLatitude =
+        (driverData?.zoom.latitude + driverData?.currentLocation.latitude) / 2;
+      const centerLongitude =
+        (driverData?.zoom.longitude + driverData?.currentLocation.longitude) /
+        2;
 
-        setMapZoom(zoom);
-        setRegionForZoom({
-          latitude: centerLatitude,
-          longitude: centerLongitude,
-          latitudeDelta: mapDelta,
-          longitudeDelta: mapDelta,
-        });
-      }
+      const mapDelta = distance * 0.02; // Adjust this factor for better coverage
+      // const zoom = calculateZoom(mapDelta);
+
+      // setMapZoom(zoom);
+      setRegionForZoom({
+        latitude: centerLatitude,
+        longitude: centerLongitude,
+        latitudeDelta: mapDelta,
+        longitudeDelta: mapDelta,
+      });
+      console.log(
+        'updated location for zoom ',
+        centerLatitude,
+        centerLongitude,
+      );
+
       // const distance = haversine(
       //   originPlace.location,
       //   driverData?.currentLocation,
@@ -250,32 +283,28 @@ const Maps = () => {
       //     2,
       // }));
     } else if (driverData.route === 'dropoff') {
-      if (destinationPlace) {
-        const distance = haversine(
-          destinationPlace?.location,
-          driverData?.currentLocation,
-        );
+      console.log(
+        'handleMapZoomOnRideConnection ========================================= Dropoff',
+      );
+      const distance = haversine(driverData?.zoom, driverData?.currentLocation);
 
-        const centerLatitude =
-          (destinationPlace?.location.latitude +
-            driverData?.currentLocation.latitude) /
-          2;
-        const centerLongitude =
-          (destinationPlace?.location.longitude +
-            driverData?.currentLocation.longitude) /
-          2;
+      const centerLatitude =
+        (driverData?.zoom.latitude + driverData?.currentLocation.latitude) / 2;
+      const centerLongitude =
+        (driverData?.zoom.longitude + driverData?.currentLocation.longitude) /
+        2;
 
-        const mapDelta = distance * 0.5; // Adjust this factor for better coverage
-        const zoom = calculateZoom(mapDelta);
+      const mapDelta = distance * 0.02; // Adjust this factor for better coverage
+      // const zoom = calculateZoom(mapDelta);
 
-        setMapZoom(zoom);
-        setRegionForZoom({
-          latitude: centerLatitude,
-          longitude: centerLongitude,
-          latitudeDelta: mapDelta,
-          longitudeDelta: mapDelta,
-        });
-      }
+      // setMapZoom(zoom);
+      setRegionForZoom({
+        latitude: centerLatitude,
+        longitude: centerLongitude,
+        latitudeDelta: mapDelta,
+        longitudeDelta: mapDelta,
+      });
+
       // const distance = haversine(
       //   destinationPlace?.location,
       //   driverData?.currentLocation,
@@ -302,6 +331,10 @@ const Maps = () => {
   const sendRequest = request => {
     console.log('data sending ======>>>>', request);
     socket?.emit('user_request', request);
+    setTimeout(() => {
+      setScreenLoading(false);
+      setRequestPhase(true);
+    }, 10000);
   };
 
   const sendRequestToAllDrivers = () => {
@@ -396,8 +429,8 @@ const Maps = () => {
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 10000,
-          distanceFilter: 2,
-          forceRequestLocation: true,
+          distanceFilter: 6,
+          // forceRequestLocation: true,
         },
       );
     } catch (error) {
@@ -409,45 +442,50 @@ const Maps = () => {
     requestLocationPermission();
   }, [isFocused]);
 
-  useEffect(() => {
-    let watchId; // Define watchId outside the if block
+  // useEffect(() => {
+  //   let watchId; // Define watchId outside the if block
 
-    watchId = Geolocation.watchPosition(
-      position => {
-        const {latitude, longitude} = position.coords;
-        setRegion(prevRegion => ({
-          ...prevRegion,
-          latitude: latitude,
-          longitude: longitude,
-        }));
-        // console.log('Watching position current location');
-      },
-      error => {
-        console.error(`Error getting current location: ${error.message}`);
-      },
-      {
-        enableHighAccuracy: true,
-        interval: 4000,
-        distanceFilter: 1,
-        forceRequestLocation: true,
-      },
-    );
+  //   watchId = Geolocation.watchPosition(
+  //     position => {
+  //       const {latitude, longitude} = position.coords;
+  //       setRegion(prevRegion => ({
+  //         ...prevRegion,
+  //         latitude: latitude,
+  //         longitude: longitude,
+  //       }));
+  //       // console.log('Watching position current location');
+  //     },
+  //     error => {
+  //       console.error(`Error getting current location: ${error.message}`);
+  //     },
+  //     {
+  //       enableHighAccuracy: true,
+  //       interval: 5000,
+  //       distanceFilter: 5,
+  //       // forceRequestLocation: true,
+  //     },
+  //   );
 
-    return () => {
-      Geolocation.clearWatch(watchId); // Clear the watch only if watchId is defined
-    };
-  }, []);
+  //   return () => {
+  //     Geolocation.clearWatch(watchId); // Clear the watch only if watchId is defined
+  //   };
+  // }, []);
 
   const handleShowUserLocation = () => {
-    mapRef.current.animateToRegion(region, 1000);
+    if (userCurrentPosition === true) {
+      console.log('userCurrentPosition is true');
+      mapRef.current.animateToRegion(region, 1000);
+    } else {
+      console.log('userCurrentPosition is false', regionForZoom);
+      mapRef.current.animateToRegion(regionForZoom, 1000);
+    }
   };
 
-  const [mapZoom, setMapZoom] = useState(12);
+  const [mapZoom, setMapZoom] = useState(10);
 
   useEffect(() => {
     // Check if both originPlace and destinationPlace are not null
     if (originPlace && destinationPlace) {
-      setUserCurrentPosition(false);
       const distance = haversine(
         originPlace.location,
         destinationPlace.location,
@@ -460,16 +498,18 @@ const Maps = () => {
         (originPlace.location.longitude + destinationPlace.location.longitude) /
         2;
 
-      const mapDelta = distance * 0.5; // Adjust this factor for better coverage
-      const zoom = calculateZoom(mapDelta);
+      const mapDelta = distance * 0.02; // Adjust this factor for better coverage
+      // console.log(mapDelta);
+      // const zoom = calculateZoom(mapDelta);
 
-      setMapZoom(zoom);
+      // setMapZoom(zoom);
       setRegionForZoom({
         latitude: centerLatitude,
         longitude: centerLongitude,
         latitudeDelta: mapDelta,
         longitudeDelta: mapDelta,
       });
+      setUserCurrentPosition(false);
       setRoute(true);
     }
     // if (originPlace && destinationPlace) {
@@ -513,6 +553,7 @@ const Maps = () => {
   const setRideDefault = () => {
     setUserCurrentPosition(true);
     setPaymentPhase(false);
+    setDriverAcceptPhase(false);
     setRequestPhase(true);
     setRideSuccessfulAlert(false);
   };
@@ -729,36 +770,38 @@ const Maps = () => {
               style={styles.map}
               provider="google"
               ref={mapRef}
+              showsUserLocation={userCurrentPosition ? true : false}
               // minZoomLevel={14}
               // maxZoomLevel={18}
               zoomEnabled={true}
-              minZoomLevel={mapZoom}
+              // minZoomLevel={mapZoom}
               region={userCurrentPosition ? region : regionForZoom}>
               {userCurrentPosition ? (
-                <Marker
-                  style={{
-                    // backgroundColor: 'green',
-                    height: hp(4),
-                    width: wp(7),
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                  flat
-                  anchor={{x: 0.5, y: 0.5}}
-                  coordinate={{
-                    latitude: region?.latitude,
-                    longitude: region?.longitude,
-                  }}>
-                  <Image
-                    source={icons.PERSON}
-                    resizeMode="contain"
-                    style={{
-                      height: '100%',
-                      width: '100%',
-                      // backgroundColor: 'red',
-                    }}
-                  />
-                </Marker>
+                // <Marker
+                //   style={{
+                //     // backgroundColor: 'green',
+                //     height: hp(4),
+                //     width: wp(7),
+                //     justifyContent: 'center',
+                //     alignItems: 'center',
+                //   }}
+                //   flat
+                //   anchor={{x: 0.5, y: 0.5}}
+                //   coordinate={{
+                //     latitude: region?.latitude,
+                //     longitude: region?.longitude,
+                //   }}>
+                //   <Image
+                //     source={icons.PERSON}
+                //     resizeMode="contain"
+                //     style={{
+                //       height: '100%',
+                //       width: '100%',
+                //       // backgroundColor: 'red',
+                //     }}
+                //   />
+                // </Marker>
+                <View></View>
               ) : null}
               {route ? (
                 <>
@@ -947,7 +990,7 @@ const Maps = () => {
                   style={{
                     position: 'absolute',
                     right: wp(5),
-                    bottom: hp(46),
+                    bottom: hp(40),
                   }}>
                   <Image
                     source={icons.CURRENT_LOCATION}

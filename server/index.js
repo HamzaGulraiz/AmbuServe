@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const DB = require("./config");
+const DB = require("./mongodb");
 const userRegister = require("./userRegister");
 const driverRegister = require("./driverRegister");
 const driverOnline = require("./driverOnline");
@@ -10,6 +10,7 @@ const app = express();
 const secretKey = "secretKey";
 const http = require("http");
 const socketIO = require("socket.io");
+const cors = require("cors");
 
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -84,6 +85,7 @@ io.on("connection", (socket) => {
 DB();
 
 app.use(express.json());
+app.use(cors());
 
 ///////////////// user apis //////////////////////////
 app.post("/create", async (req, resp) => {
@@ -199,7 +201,7 @@ app.post("/driver/activity", async (req, resp) => {
   let data = new driverActivity(req.body);
   // console.log("wtf", data);
   const result = await data.save();
-  return resp.send(result);
+  return resp.send(req.body);
 });
 
 app.get("/driver/rides/:driver_contact", async (req, res) => {

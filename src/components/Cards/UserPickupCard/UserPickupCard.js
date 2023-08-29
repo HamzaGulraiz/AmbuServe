@@ -20,7 +20,7 @@ const UserPickupCard = ({driverName, vehicleNumber, phoneCall}) => {
           justifyContent: 'center',
           alignItems: 'center',
           // marginTop: hp(1),
-          marginBottom: hp(2),
+          marginBottom: hp(1),
         }}>
         <Image
           source={images.MESSAGE_IMAGE_1}
@@ -35,7 +35,7 @@ const UserPickupCard = ({driverName, vehicleNumber, phoneCall}) => {
         style={{
           flexDirection: 'row',
           marginHorizontal: wp(6),
-          height: hp(11),
+          height: hp(10),
           borderRadius: wp(2),
           backgroundColor: '#e9eff2',
           // justifyContent: 'center',

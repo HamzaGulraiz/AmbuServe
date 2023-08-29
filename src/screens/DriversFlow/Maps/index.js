@@ -86,8 +86,8 @@ const DriverMap = () => {
   // }, [isFocused]);
 
   const [region, setRegion] = useState({
-    latitude: 31.5204,
-    longitude: 74.3587,
+    latitude: 24.8607,
+    longitude: 67.0011,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
@@ -148,11 +148,23 @@ const DriverMap = () => {
         if (pickUp_location && dropOff_location) {
           setRidePhase1(pickUp_location);
           setRidePhase2(dropOff_location);
-          getInitialMatrix(region, pickUp_location).then(distanceMatrix => {
-            setDestinationDistance(distanceMatrix.distance);
-            setDestinationTime(distanceMatrix.duration);
-            getInitialMatrix(pickUp_location, dropOff_location).then(
-              distanceMatrix => {
+          getCurrentLocation().then(currentLocation => {
+            let userCurrentLocation = {
+              latitude: currentLocation.latitude,
+              longitude: currentLocation.longitude,
+            };
+            getInitialMatrix(
+              userCurrentLocation,
+              pickUp_location,
+              'phaseOne',
+            ).then(distanceMatrix => {
+              setDestinationDistance(distanceMatrix.distance);
+              setDestinationTime(distanceMatrix.duration);
+              getInitialMatrix(
+                pickUp_location,
+                dropOff_location,
+                'phaseTwo',
+              ).then(distanceMatrix => {
                 setTotalDistance(destinationDistance + distanceMatrix.distance);
                 setTotalTime(destinationTime + distanceMatrix.duration);
                 setUserDropOff(distanceMatrix.distance);
@@ -163,8 +175,8 @@ const DriverMap = () => {
                 setUserCNIC(receivedMessage.cnic);
                 setUserToken(receivedMessage.token);
                 setAlertVisible(true);
-              },
-            );
+              });
+            });
           });
         }
       });
@@ -252,6 +264,7 @@ const DriverMap = () => {
         distanceMatrix.title,
         distanceMatrix.message,
         distanceMatrix.route,
+        ridePhase1,
         // distanceMatrix.rideCompleted,
       );
       // setStartRideButton(distanceMatrix.phaseTwo);
@@ -280,6 +293,7 @@ const DriverMap = () => {
         distanceMatrix.title,
         distanceMatrix.message,
         distanceMatrix.route,
+        ridePhase2,
         // distanceMatrix.rideCompleted,
       );
       // setRideCompleted(distanceMatrix.rideCompleted);
@@ -287,13 +301,10 @@ const DriverMap = () => {
   };
 
   const onConfirmRide = () => {
-    // Set the necessary states first
     setRideConnected(true);
     setStartPhaseOne(true);
     setUserDetailCard(true);
     setStartRideButton(true);
-
-    // Now, send the location and hide the alert
     sendLocationOnRideConnected();
     setAlertVisible(false);
   };
@@ -313,6 +324,7 @@ const DriverMap = () => {
             distanceMatrix.title,
             distanceMatrix.message,
             distanceMatrix.route,
+            ridePhase1,
             // distanceMatrix.rideCompleted,
           );
         },
@@ -351,6 +363,7 @@ const DriverMap = () => {
             distanceMatrix.title,
             distanceMatrix.message,
             distanceMatrix.route,
+            ridePhase2,
             // distanceMatrix.rideCompleted,
           );
         },
@@ -367,6 +380,7 @@ const DriverMap = () => {
     title,
     message,
     route,
+    forZoom,
     // rideCompleted,
   ) => {
     console.log('message:', message);
@@ -385,6 +399,7 @@ const DriverMap = () => {
       message: message,
       status: 'active',
       route: route,
+      zoom: forZoom,
       // rideCompleted: rideCompleted,
     };
     const data = JSON.stringify(userReqConnect);
@@ -410,15 +425,72 @@ const DriverMap = () => {
     setUserName('');
     setUserContact('');
     setUserToken('');
+    socket?.disconnect();
   };
 
   const handleRideCompletedButtonClick = () => {
     socket?.emit('ride_completed', 'completed');
-    handleDriversHistory();
+
+    /////////////////////////////////api////////////////////////////////
+    handleDriversHistory(
+      driver_contact,
+      driver_name,
+      company_email,
+      company_name,
+      vehicle_number,
+      office_address,
+      rideType,
+      userName,
+      userEmail,
+      userContact,
+      userEmergencyContact,
+      userCNIC,
+      ridePhase1,
+      ridePhase2,
+      totalDistance,
+      totaltime,
+    );
+    // handleDriversHistory(
+    //   driver_contact,
+    //   driver_name,
+    //   company_email,
+    //   company_name,
+    //   vehicle_number,
+    //   office_address,
+    //   rideType,
+    //   userName,
+    //   userEmail,
+    //   userContact,
+    //   userEmergencyContact,
+    //   userCNIC,
+    //   ridePhase1,
+    //   ridePhase2,
+    //   totalDistance,
+    //   totaltime,
+    // );
+    // socket?.on('disconnect', () => {
+    //   console.log(' driver socket id after disconnect', socket.id); // undefined
+    // });
   };
 
-  const handleDriversHistory = () => {
-    const date = new Date();
+  const handleDriversHistory = (
+    driver_contact,
+    driver_name,
+    company_email,
+    company_name,
+    vehicle_number,
+    office_address,
+    rideType,
+    userName,
+    userEmail,
+    userContact,
+    userEmergencyContact,
+    userCNIC,
+    ridePhase1,
+    ridePhase2,
+    totalDistance,
+    totaltime,
+  ) => {
     const data = JSON.stringify({
       driver_contact: driver_contact,
       driver_name: driver_name,
@@ -436,8 +508,25 @@ const DriverMap = () => {
       dropOff_location: ridePhase2,
       distance_covered: totalDistance,
       total_time: totaltime,
-      date: date,
     });
+    // const data = JSON.stringify({
+    //   driver_contact: 'driver_contact',
+    //   driver_name: 'driver_name',
+    //   company_email: 'company_email',
+    //   company_name: 'company_name',
+    //   vehicle_number: 'vehicle_number',
+    //   office_address: 'office_address',
+    //   type: 'rideType',
+    //   full_name: 'userName',
+    //   email: 'userEmail',
+    //   contact: 'userContact',
+    //   emergency_contact: 'userEmergencyContact',
+    //   cnic: 'userCNIC',
+    //   pickUp_location: 'ridePhase1',
+    //   dropOff_location: 'ridePhase2',
+    //   distance_covered: 'totalDistance',
+    //   total_time: 'totaltime',
+    // });
     console.log('data to send from api: ' + JSON.stringify(data));
     // let config = {
     //   method: 'post',
@@ -470,10 +559,6 @@ const DriverMap = () => {
         setStartPhaseTwo(false);
         setRideConnected(false);
         setUserDetailCard(false);
-        socket?.on('disconnect', () => {
-          console.log(' driver socket id after disconnect', socket.id); // undefined
-        });
-        // console.log(JSON.stringify(response.data));
       })
       .catch(error => {
         setRideCompleted(true);
@@ -482,10 +567,8 @@ const DriverMap = () => {
         setStartPhaseTwo(false);
         setRideConnected(false);
         setUserDetailCard(false);
-        socket?.on('disconnect', () => {
-          console.log(' driver socket id after disconnect', socket.id); // undefined
-        });
-        console.log(error);
+
+        console.log('activity api: ', error);
       });
   };
 
@@ -575,7 +658,6 @@ const DriverMap = () => {
             style={styles.map}
             provider="google"
             ref={mapRef}
-            // showsUserLocation={true}
             // minZoomLevel={13}
             // maxZoomLevel={20}
             // onPress={event => {
@@ -601,6 +683,7 @@ const DriverMap = () => {
             //     );
             //   });
             // }}
+
             region={region}>
             <Marker
               style={{

@@ -16,7 +16,7 @@ const DriverMessageCard = ({title, message}) => {
       style={{
         marginTop: hp(1),
         marginBottom: hp(1),
-        height: hp(10),
+        height: hp(8),
         marginHorizontal: wp(2),
         justifyContent: 'center',
         alignItems: 'center',
