@@ -2,6 +2,8 @@
 
 /yarn
 
+/config
+
 # OSX
 #
 .DS_Store

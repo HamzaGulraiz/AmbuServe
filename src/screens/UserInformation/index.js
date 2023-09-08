@@ -469,7 +469,7 @@ const UserInformation = () => {
             borderRadius: wp(3),
             backgroundColor: 'green',
             bottom: hp(1),
-            right: hp(3),
+            right: hp(1.4),
             zIndex: 1,
           }}></View>
         <Image

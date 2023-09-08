@@ -43,11 +43,15 @@ import UserPickupCard from '../../components/Cards/UserPickupCard/UserPickupCard
 import UserDropoffCard from '../../components/Cards/UserDropoffCard/UserDropoffCard';
 import DriverMessageCard from '../../components/Cards/DriversMessageCard/DriverMessageCard';
 
-import {getDistance, getPreciseDistance} from 'geolib';
+import {useRoute} from '@react-navigation/native';
 
 navigator.geolocation = require('react-native-geolocation-service');
 
 const Maps = () => {
+  // Get the route object to access params
+  const routeForParams = useRoute();
+  const rideTypeFromParams = routeForParams.params;
+  console.log('type======', rideTypeFromParams);
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const mapRef = useRef(null);
@@ -176,30 +180,6 @@ const Maps = () => {
   }, [socket]);
 
   const [defaultRouteForMarker, setDefaultRouteForMarker] = useState('pickup');
-  // useEffect(() => {
-  //   socket?.on('driver_response', response => {
-  //     console.log('Received driver response:', response);
-  //     const driverData = JSON.parse(response);
-  //     setDriversInformation(prevDriversInfo => ({
-  //       ...prevDriversInfo,
-  //       ...driverData,
-  //     }));
-  //     setPhoneNumber(driverData?.contact);
-  //     setDefaultRouteForMarker(driverData?.route);
-  //     if (driverData.currentLocation) {
-  //       ////////////////////////// check this
-  //       setScreenLoading(false);
-  //       setRequestPhase(false);
-  //       setDriverRoute(true);
-  //       setDriverAcceptPhase(true);
-  //       handleMapZoomOnRideConnection(driverData);
-  //     }
-  //     setRoute(false);
-  //     setUserCurrentPosition(false);
-
-  //     // console.log('setUserCurrentPosition false');
-  //   });
-  // }, [socket]);
 
   useEffect(() => {
     const eventHandler = response => {
@@ -331,10 +311,6 @@ const Maps = () => {
   const sendRequest = request => {
     console.log('data sending ======>>>>', request);
     socket?.emit('user_request', request);
-    setTimeout(() => {
-      setScreenLoading(false);
-      setRequestPhase(true);
-    }, 10000);
   };
 
   const sendRequestToAllDrivers = () => {
@@ -348,6 +324,7 @@ const Maps = () => {
         dropOff_location: destinationPlace.location,
         token: token,
         userSocketId: socket.id,
+        rideType: 'normal',
       });
     } else {
       originRef.current.focus();
@@ -380,8 +357,8 @@ const Maps = () => {
     }
   }, [userInfoForRide]);
 
-  const cancelRequestToAllDrivers = () => {
-    setCard2(false);
+  const handleCancelRequest = () => {
+    // setCard2(false);
   };
 
   const requestLocationPermission = async () => {
@@ -442,35 +419,6 @@ const Maps = () => {
     requestLocationPermission();
   }, [isFocused]);
 
-  // useEffect(() => {
-  //   let watchId; // Define watchId outside the if block
-
-  //   watchId = Geolocation.watchPosition(
-  //     position => {
-  //       const {latitude, longitude} = position.coords;
-  //       setRegion(prevRegion => ({
-  //         ...prevRegion,
-  //         latitude: latitude,
-  //         longitude: longitude,
-  //       }));
-  //       // console.log('Watching position current location');
-  //     },
-  //     error => {
-  //       console.error(`Error getting current location: ${error.message}`);
-  //     },
-  //     {
-  //       enableHighAccuracy: true,
-  //       interval: 5000,
-  //       distanceFilter: 5,
-  //       // forceRequestLocation: true,
-  //     },
-  //   );
-
-  //   return () => {
-  //     Geolocation.clearWatch(watchId); // Clear the watch only if watchId is defined
-  //   };
-  // }, []);
-
   const handleShowUserLocation = () => {
     if (userCurrentPosition === true) {
       console.log('userCurrentPosition is true');
@@ -512,28 +460,6 @@ const Maps = () => {
       setUserCurrentPosition(false);
       setRoute(true);
     }
-    // if (originPlace && destinationPlace) {
-    //
-    //   const distance = haversine(
-    //     originPlace.location,
-    //     destinationPlace.location,
-    //   );
-    //   const zoom = calculateZoom(distance);
-    //   setMapZoom(zoom);
-    //   console.log('=============>', {distance, zoom});
-    //   setRegionForZoom(prevRegion => ({
-    //     ...prevRegion,
-    //     latitude:
-    //       (originPlace.location.latitude + destinationPlace.location.latitude) /
-    //       2,
-    //     longitude:
-    //       (originPlace.location.longitude +
-    //         destinationPlace.location.longitude) /
-    //       2,
-    //   }));
-    //   setRoute(true);
-    //   // console.log('useeffect where checking origin and des to set route true ');
-    // }
   }, [originPlace, destinationPlace]);
 
   const cancelRideHandle = () => {};
@@ -556,6 +482,8 @@ const Maps = () => {
     setDriverAcceptPhase(false);
     setRequestPhase(true);
     setRideSuccessfulAlert(false);
+    setOriginPlace(null);
+    setDestinationPlace(null);
   };
 
   const [originPlaceholder, setOriginPlaceholder] = useState('Where from?');
@@ -572,88 +500,11 @@ const Maps = () => {
                 distance={driversInformation?.distance}
                 duration={driversInformation?.duration}
               />
-            ) : // <View
-            //   style={{
-            //     marginTop: hp(2),
-            //     marginHorizontal: wp(5),
-            //     position: 'absolute',
-            //     height: hp(12),
-            //     width: wp(90),
-            //     borderRadius: wp(5),
-            //     borderWidth: wp(0.2),
-            //     borderColor: colors.BLACK,
-            //     zIndex: 1,
-            //     backgroundColor: colors.WHITE,
-            //     justifyContent: 'center',
-            //   }}>
-            //   <View
-            //     style={{
-            //       flexDirection: 'row',
-            //       justifyContent: 'space-between',
-            //       marginHorizontal: wp(5),
-            //     }}>
-            //     <Text
-            //       numberOfLines={1}
-            //       style={{
-            //         fontWeight: '400',
-            //         fontSize: fontsizes.px_22,
-            //         fontFamily: fonts.REGULAR,
-            //         color: colors.BLACK,
-            //         textAlign: 'left',
-            //       }}>
-            //       Distance
-            //     </Text>
-            //     <Text
-            //       numberOfLines={1}
-            //       style={{
-            //         fontWeight: '400',
-            //         fontSize: fontsizes.px_22,
-            //         fontFamily: fonts.REGULAR,
-            //         color: colors.BLACK,
-            //         width: wp(24),
-            //         textAlign: 'right',
-            //       }}>
-            //       {driversInformation?.distance}
-            //     </Text>
-            //   </View>
-            //   <View
-            //     style={{
-            //       flexDirection: 'row',
-            //       justifyContent: 'space-between',
-            //       marginHorizontal: wp(5),
-            //     }}>
-            //     <Text
-            //       numberOfLines={1}
-            //       style={{
-            //         fontWeight: '400',
-            //         fontSize: fontsizes.px_22,
-            //         fontFamily: fonts.REGULAR,
-            //         color: colors.BLACK,
-            //         textAlign: 'left',
-            //       }}>
-            //       Estimate time of travel
-            //     </Text>
-            //     <Text
-            //       numberOfLines={1}
-            //       style={{
-            //         fontWeight: '400',
-            //         fontSize: fontsizes.px_22,
-            //         fontFamily: fonts.REGULAR,
-            //         color: colors.BLACK,
-            //         width: wp(24),
-            //         textAlign: 'right',
-            //       }}>
-            //       {driversInformation?.duration}
-            //     </Text>
-            //   </View>
-            // </View>
-            null}
+            ) : null}
             {requestPhase ? (
               <>
                 <View style={styles.searchBarFrom}>
                   <GooglePlacesAutocomplete
-                    // currentLocation={true}
-                    // currentLocationLabel="Current Location"
                     ref={originRef}
                     placeholder={originPlaceholder}
                     minLength={2}
@@ -665,12 +516,7 @@ const Maps = () => {
 
                         const {location} = geometry;
                         const {lat: latitude, lng: longitude} = location;
-                        // setOriginPlace({
-                        //   location: {
-                        //     latitude: latitude,
-                        //     longitude: longitude,
-                        //   },
-                        // });
+
                         handleOriginPlaceChange({
                           location: {
                             latitude: latitude,
@@ -776,33 +622,7 @@ const Maps = () => {
               zoomEnabled={true}
               // minZoomLevel={mapZoom}
               region={userCurrentPosition ? region : regionForZoom}>
-              {userCurrentPosition ? (
-                // <Marker
-                //   style={{
-                //     // backgroundColor: 'green',
-                //     height: hp(4),
-                //     width: wp(7),
-                //     justifyContent: 'center',
-                //     alignItems: 'center',
-                //   }}
-                //   flat
-                //   anchor={{x: 0.5, y: 0.5}}
-                //   coordinate={{
-                //     latitude: region?.latitude,
-                //     longitude: region?.longitude,
-                //   }}>
-                //   <Image
-                //     source={icons.PERSON}
-                //     resizeMode="contain"
-                //     style={{
-                //       height: '100%',
-                //       width: '100%',
-                //       // backgroundColor: 'red',
-                //     }}
-                //   />
-                // </Marker>
-                <View></View>
-              ) : null}
+              {userCurrentPosition ? <View></View> : null}
               {route ? (
                 <>
                   <View>
@@ -812,6 +632,8 @@ const Maps = () => {
                       apikey={MY_KEY}
                       strokeWidth={3}
                       strokeColor={colors.BLACK}
+                      mode="DRIVING"
+                      resetOnChange={false}
                     />
                     <Marker
                       style={{
@@ -872,6 +694,8 @@ const Maps = () => {
                     apikey={MY_KEY}
                     strokeWidth={3}
                     strokeColor={colors.RED}
+                    mode="DRIVING"
+                    resetOnChange={false}
                   />
                   <Marker
                     style={{
@@ -931,6 +755,8 @@ const Maps = () => {
                     apikey={MY_KEY}
                     strokeWidth={3}
                     strokeColor={colors.RED}
+                    mode="DRIVING"
+                    resetOnChange={false}
                   />
                   <Marker
                     style={{
@@ -990,7 +816,7 @@ const Maps = () => {
                   style={{
                     position: 'absolute',
                     right: wp(5),
-                    bottom: hp(40),
+                    bottom: hp(45),
                   }}>
                   <Image
                     source={icons.CURRENT_LOCATION}
@@ -1006,273 +832,42 @@ const Maps = () => {
                     title={driversInformation?.title}
                     message={driversInformation?.message}
                   />
-                  {/* <View
-                    style={{
-                      marginTop: hp(1),
-                      marginBottom: hp(1),
-                      height: hp(10),
-                      marginHorizontal: wp(2),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      // backgroundColor: 'pink',
-                    }}>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_22,
-                        color: colors.BLACK,
-                        fontWeight: '700',
-                        // textAlign: 'left',
-                      }}>
-                      {driversInformation?.title}
-                    </Text>
-                    <Text
-                      numberOfLines={2}
-                      style={{
-                        marginHorizontal: wp(4),
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_15,
-                        color: colors.GREY,
-                        fontWeight: '500',
-                        textAlign: 'center',
-                      }}>
-                      {driversInformation?.message}
-                    </Text>
-                  </View> */}
-                  {defaultRouteForMarker === 'pickup' ? (
-                    <UserPickupCard
-                      driverName={driversInformation?.driver_name}
-                      vehicleNumber={driversInformation?.vehicle_number}
-                      phoneCall={handlePhoneCall}
-                    />
-                  ) : (
-                    // <>
-                    //   <View
-                    //     style={{
-                    //       width: 'auto',
-                    //       // backgroundColor: 'red',
-                    //       justifyContent: 'center',
-                    //       alignItems: 'center',
-                    //       // marginTop: hp(1),
-                    //       marginBottom: hp(2),
-                    //     }}>
-                    //     <Image
-                    //       source={images.MESSAGE_IMAGE_1}
-                    //       resizeMode="contain"
-                    //       style={{
-                    //         height: hp(16),
-                    //         width: wp(40),
-                    //       }}
-                    //     />
-                    //   </View>
-                    //   <View
-                    //     style={{
-                    //       flexDirection: 'row',
-                    //       marginHorizontal: wp(6),
-                    //       height: hp(11),
-                    //       borderRadius: wp(2),
-                    //       backgroundColor: '#e9eff2',
-                    //       // justifyContent: 'center',
-                    //       alignItems: 'center',
 
-                    //       // justifyContent:'space-between',
-                    //       // alignItems: 'center',
-                    //     }}>
-                    //     <Image
-                    //       source={images.DEFAULT_USER}
-                    //       resizeMode="contain"
-                    //       style={{
-                    //         // backgroundColor: 'green',
-                    //         marginLeft: wp(2),
-                    //         height: hp(8),
-                    //         width: wp(15),
-                    //         // borderRadius: wp(10),
-                    //         // marginRight: wp(5),
-                    //       }}
-                    //     />
-                    //     <View>
-                    //       <Text
-                    //         numberOfLines={1}
-                    //         style={{
-                    //           marginLeft: wp(2),
-                    //           // marg/inTop: hp(1),
-                    //           fontFamily: fonts.REGULAR,
-                    //           fontSize: fontsizes.px_18,
-                    //           color: colors.BLACK,
-                    //           fontWeight: '700',
-                    //           width: wp(30),
-                    //           // backgroundColor: 'pink',
-                    //           // textAlign: 'left',
-                    //         }}>
-                    //         {driversInformation?.driver_name}
-                    //       </Text>
-                    //       <Text
-                    //         numberOfLines={1}
-                    //         style={{
-                    //           marginLeft: wp(2),
-                    //           // marginTop: hp(1),
-                    //           fontFamily: fonts.REGULAR,
-                    //           fontSize: fontsizes.px_12,
-                    //           color: colors.BLACK,
-                    //           fontWeight: '300',
-                    //           width: wp(30),
-                    //           // backgroundColor: 'pink',
-                    //           // textAlign: 'left',
-                    //         }}>
-                    //         {driversInformation?.vehicle_number}
-                    //       </Text>
-                    //     </View>
-                    //     <TouchableOpacity
-                    //       onPress={handlePhoneCall}
-                    //       style={{
-                    //         // backgroundColor: 'red',
-                    //         width: wp(30),
-                    //         alignItems: 'flex-end',
-                    //       }}>
-                    //       <Image
-                    //         source={icons.PHONE_ICON}
-                    //         resizeMode="contain"
-                    //         style={{
-                    //           height: hp(6),
-                    //           width: wp(8),
-                    //         }}
-                    //       />
-                    //     </TouchableOpacity>
-                    //   </View>
-                    // </>
+                  {defaultRouteForMarker === 'pickup' ? (
+                    <>
+                      <UserPickupCard
+                        driverName={driversInformation?.driver_name}
+                        vehicleNumber={driversInformation?.vehicle_number}
+                        phoneCall={handlePhoneCall}
+                      />
+                      <TouchableOpacity
+                        onPress={handleCancelRequest}
+                        style={{
+                          marginTop: hp(1),
+                          width: '100%',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Text
+                          // numberOfLines={1}
+                          style={{
+                            fontFamily: fonts.REGULAR,
+                            fontSize: fontsizes.px_22,
+                            color: colors.BLUE,
+                            fontWeight: '700',
+                            // textAlign: 'center',
+                          }}>
+                          Cancel Request
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
                     <UserDropoffCard
                       driverName={driversInformation?.driver_name}
                       vehicleNumber={driversInformation?.vehicle_number}
                       companyName={driversInformation?.company_name}
                       emergencyCall={handleEmergencyCall}
                     />
-                    // <>
-                    //   <View
-                    //     style={{
-                    //       flexDirection: 'row',
-                    //       marginHorizontal: wp(6),
-                    //       marginTop: wp(4),
-                    //       height: hp(11),
-                    //       borderRadius: wp(2),
-                    //       backgroundColor: '#e9eff2',
-                    //       // justifyContent: 'center',
-                    //       alignItems: 'center',
-
-                    //       // justifyContent:'space-between',
-                    //       // alignItems: 'center',
-                    //     }}>
-                    //     <Image
-                    //       source={images.DEFAULT_USER}
-                    //       resizeMode="contain"
-                    //       style={{
-                    //         // backgroundColor: 'green',
-                    //         marginLeft: wp(2),
-                    //         height: hp(8),
-                    //         width: wp(15),
-                    //         // borderRadius: wp(10),
-                    //         // marginRight: wp(5),
-                    //       }}
-                    //     />
-                    //     <View>
-                    //       <Text
-                    //         numberOfLines={1}
-                    //         style={{
-                    //           marginLeft: wp(2),
-                    //           // marg/inTop: hp(1),
-                    //           fontFamily: fonts.REGULAR,
-                    //           fontSize: fontsizes.px_18,
-                    //           color: colors.BLACK,
-                    //           fontWeight: '700',
-                    //           width: wp(30),
-                    //           // backgroundColor: 'pink',
-                    //           // textAlign: 'left',
-                    //         }}>
-                    //         {driversInformation?.driver_name}
-                    //       </Text>
-                    //       <Text
-                    //         numberOfLines={1}
-                    //         style={{
-                    //           marginLeft: wp(2),
-                    //           // marginTop: hp(1),
-                    //           fontFamily: fonts.REGULAR,
-                    //           fontSize: fontsizes.px_12,
-                    //           color: colors.BLACK,
-                    //           fontWeight: '300',
-                    //           width: wp(30),
-                    //           // backgroundColor: 'pink',
-                    //           // textAlign: 'left',
-                    //         }}>
-                    //         {driversInformation?.vehicle_number}
-                    //       </Text>
-                    //     </View>
-                    //     <Text
-                    //       numberOfLines={1}
-                    //       style={{
-                    //         marginLeft: wp(2),
-                    //         // marginTop: hp(1),
-                    //         fontFamily: fonts.REGULAR,
-                    //         fontSize: fontsizes.px_18,
-                    //         color: colors.BLACK,
-                    //         fontWeight: '300',
-                    //         width: wp(32),
-                    //         // backgroundColor: 'pink',
-                    //         textAlign: 'center',
-                    //       }}>
-                    //       {driversInformation?.company_name}
-                    //     </Text>
-                    //   </View>
-                    //   <View
-                    //     style={{
-                    //       flexDirection: 'row',
-                    //       marginHorizontal: wp(6),
-                    //       marginTop: wp(4),
-                    //       height: hp(11),
-                    //       borderRadius: wp(2),
-                    //       backgroundColor: '#e9eff2',
-                    //       justifyContent: 'space-between',
-                    //       alignItems: 'center',
-                    //       paddingHorizontal: wp(4),
-
-                    //       // justifyContent:'space-between',
-                    //       // alignItems: 'center',
-                    //     }}>
-                    //     <Text
-                    //       numberOfLines={1}
-                    //       style={{
-                    //         // marginLeft: wp(2),
-                    //         // marg/inTop: hp(1),
-                    //         fontFamily: fonts.REGULAR,
-                    //         fontSize: fontsizes.px_22,
-                    //         color: colors.BLUE,
-                    //         fontWeight: '700',
-                    //         width: wp(50),
-                    //         // backgroundColor: 'pink',
-                    //         // textAlign: 'left',
-                    //       }}>
-                    //       Emergency Alerts
-                    //     </Text>
-
-                    //     <TouchableOpacity
-                    //       onPress={handleEmergencyCall}
-                    //       style={
-                    //         {
-                    //           // backgroundColor: 'red',
-                    //           // width: wp(30),
-                    //           // alignItems: 'flex-end',
-                    //         }
-                    //       }>
-                    //       <Image
-                    //         source={icons.PHONE_ICON}
-                    //         resizeMode="contain"
-                    //         style={{
-                    //           height: hp(6),
-                    //           width: wp(8),
-                    //         }}
-                    //       />
-                    //     </TouchableOpacity>
-                    //   </View>
-                    // </>
                   )}
                 </View>
               </>
@@ -1296,159 +891,6 @@ const Maps = () => {
                   />
                 </TouchableOpacity>
                 <UserPaymentCard paymentOnpress={handlePayment} />
-                {/* <View
-                  style={{
-                    // marginTop: hp(2),
-                    // marginHorizontal: wp(5),
-                    // position: 'absolute',
-                    height: hp(49),
-                    width: '100%',
-                    // width: wp(100),
-                    // borderRadius: wp(5),
-                    // borderWidth: wp(0.2),
-                    borderColor: colors.BLACK,
-                    zIndex: 1,
-                    bottom: hp(0),
-                    backgroundColor: colors.WHITE,
-                    // justifyContent: 'center',
-                  }}>
-                  <View
-                    style={{
-                      marginTop: hp(1),
-                      marginBottom: hp(1),
-                      height: hp(10),
-                      marginHorizontal: wp(2),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      // backgroundColor: 'pink',
-                    }}>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_22,
-                        color: colors.BLACK,
-                        fontWeight: '700',
-                        // textAlign: 'left',
-                      }}>
-                      Arrived Destination!
-                    </Text>
-                    <Text
-                      numberOfLines={2}
-                      style={{
-                        marginHorizontal: wp(4),
-                        fontFamily: fonts.REGULAR,
-                        fontSize: fontsizes.px_15,
-                        color: colors.GREY,
-                        fontWeight: '500',
-                        textAlign: 'center',
-                      }}>
-                      AmbuServe is the right choice to serve as your ambulance
-                      service and event medical services provider.
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: 'auto',
-                      // backgroundColor: 'red',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Image
-                      source={images.PAYMENT_PHASE_ICON}
-                      resizeMode="contain"
-                      style={{
-                        height: hp(18),
-                        width: wp(30),
-                      }}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      marginHorizontal: wp(4),
-                      height: hp(11),
-                      borderRadius: wp(2),
-                      backgroundColor: '#e9eff2',
-                      // justifyContent: 'center',
-                      alignItems: 'center',
-
-                      // justifyContent:'space-between',
-                      // alignItems: 'center',
-                    }}>
-                    <View>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          marginLeft: wp(2),
-                          // marg/inTop: hp(1),
-                          fontFamily: fonts.REGULAR,
-                          fontSize: fontsizes.px_18,
-                          color: colors.BLUE,
-                          fontWeight: '700',
-                          width: wp(45),
-                          // backgroundColor: 'pink',
-                          // textAlign: 'left',
-                        }}>
-                        Chosse payment method
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={handlePayment}
-                      style={{
-                        // backgroundColor: 'red',
-                        // width: wp(40),
-                        alignItems: 'flex-end',
-                      }}>
-                      <Image
-                        source={icons.CASH_ICON}
-                        resizeMode="contain"
-                        style={{
-                          marginLeft: wp(10),
-                          height: hp(5),
-                          width: wp(7),
-                          tintColor: colors.BLUE,
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={handlePayment}
-                      style={{
-                        // backgroundColor: 'red',
-                        // width: wp(40),
-                        alignItems: 'flex-end',
-                      }}>
-                      <Image
-                        source={icons.CREDIT_CARD_ICON}
-                        resizeMode="contain"
-                        style={{
-                          marginLeft: wp(4),
-                          height: hp(5),
-                          width: wp(7),
-                          tintColor: colors.BLUE,
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={handlePayment}
-                      style={{
-                        // backgroundColor: 'red',
-                        // width: wp(40),
-                        alignItems: 'flex-end',
-                      }}>
-                      <Image
-                        source={icons.BANK_TRANSFER_ICON}
-                        resizeMode="contain"
-                        style={{
-                          marginLeft: wp(4),
-                          height: hp(5),
-                          width: wp(7),
-                          tintColor: colors.BLUE,
-                        }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View> */}
               </>
             ) : null}
             {requestPhase ? (

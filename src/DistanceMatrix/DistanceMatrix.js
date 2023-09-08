@@ -100,7 +100,7 @@ const getDistanceMatrix = async (origin, destination, phase) => {
             route: 'dropoff',
             rideCompleted: false,
           };
-        } else if (distanceInKm < 0.1) {
+        } else if (distanceInKm < 0.02) {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,

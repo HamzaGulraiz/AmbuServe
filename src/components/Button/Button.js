@@ -40,6 +40,7 @@ const CustomButton = ({
   width,
   marginTop,
   leftIcon,
+  rightIcon,
   marginBottom,
   marginHorizontal,
   textColor,
@@ -67,20 +68,51 @@ const CustomButton = ({
       disabled={disable}
       onPress={onPress}>
       {activityIndicator ? (
-        <ActivityIndicator size="small" color={colors.BLACK} />
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            size="small"
+            color={colors.BLACK}
+            style={
+              {
+                // marginLeft: wp(40),
+                // alignContent: 'center',
+              }
+            }
+          />
+        </View>
       ) : (
         <>
           {leftIcon ? (
-            <Image source={leftIcon} resizeMode="contain" style={styles.icon} />
+            <Image
+              source={leftIcon}
+              resizeMode="contain"
+              tintColor={colors.WHITE}
+              style={{...styles.icon, position: 'absolute', marginLeft: wp(10)}}
+            />
           ) : null}
           <Text
             style={{
               ...styles.text,
               color: textColor ? textColor : colors.BLACK,
-              marginLeft: leftIcon ? wp(2) : 0,
+              width: '100%',
+              textAlign: 'center',
+              // marginLeft: leftIcon ? wp(1) : 0,
             }}>
             {title}
           </Text>
+          {rightIcon ? (
+            <Image
+              source={rightIcon}
+              resizeMode="contain"
+              tintColor={colors.WHITE}
+              style={{...styles.icon, position: 'absolute', right: wp(12)}}
+            />
+          ) : null}
         </>
       )}
     </TouchableOpacity>
@@ -92,7 +124,7 @@ export default CustomButton;
 const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
   },
   text: {
@@ -102,7 +134,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.REGULAR,
   },
   icon: {
-    height: hp(2.7),
-    width: wp(5.8),
+    // backgroundColor: 'red',
+    // height: hp(2.7),
+    height: hp(5.2),
+    width: wp(12),
+    // width: wp(5.8),
   },
 });

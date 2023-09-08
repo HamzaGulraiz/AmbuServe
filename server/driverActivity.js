@@ -12,11 +12,11 @@ const driverActitivySchema = mongoose.Schema({
   contact: String,
   emergency_contact: String,
   cnic: String,
-  pickup_location: String,
+  pickUp_location: String,
   dropOff_location: String,
   distance_covered: String,
   total_time: String,
-  date: String,
+  timeStamp: String,
 });
 
 module.exports = mongoose.model("driver_activities", driverActitivySchema);

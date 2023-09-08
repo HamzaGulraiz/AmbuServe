@@ -28,6 +28,7 @@ import {useDispatch} from 'react-redux';
 import {
   getCurrentLocation,
   watchPosition,
+  getAddress,
 } from '../../../components/Location/GeoLocation';
 import useSocket from '../../../components/Socket/Socket';
 import {setData, getData, removeData} from '../../../asyncStorage/AsyncStorage';
@@ -116,6 +117,9 @@ const DriverMap = () => {
   const [startPhaseTwo, setStartPhaseTwo] = useState(false);
   const [rideConnected, setRideConnected] = useState(false);
 
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [dropoffAddress, setDropoffAddress] = useState('');
+
   // console.log('render', rideConnected, startPhaseOne);
   // useEffect(() => {
   //   console.log('rideConnected:', rideConnected);
@@ -143,11 +147,19 @@ const DriverMap = () => {
 
     if (socket) {
       socket?.on('new_request', request => {
+        let tempDist = {};
+
         const receivedMessage = JSON.parse(request);
         const {pickUp_location, dropOff_location} = receivedMessage;
         if (pickUp_location && dropOff_location) {
           setRidePhase1(pickUp_location);
           setRidePhase2(dropOff_location);
+          getAddress(pickUp_location).then(address => {
+            setPickupAddress(address);
+          });
+          getAddress(dropOff_location).then(address => {
+            setDropoffAddress(address);
+          });
           getCurrentLocation().then(currentLocation => {
             let userCurrentLocation = {
               latitude: currentLocation.latitude,
@@ -158,6 +170,8 @@ const DriverMap = () => {
               pickUp_location,
               'phaseOne',
             ).then(distanceMatrix => {
+              tempDist = distanceMatrix;
+
               setDestinationDistance(distanceMatrix.distance);
               setDestinationTime(distanceMatrix.duration);
               getInitialMatrix(
@@ -165,8 +179,30 @@ const DriverMap = () => {
                 dropOff_location,
                 'phaseTwo',
               ).then(distanceMatrix => {
-                setTotalDistance(destinationDistance + distanceMatrix.distance);
-                setTotalTime(destinationTime + distanceMatrix.duration);
+                // // Parse the JSON strings into objects
+                // const jsonObject1 = JSON.parse(tempDist);
+                // const jsonObject2 = JSON.parse(distanceMatrix);
+
+                // Extract the distance and duration properties
+                const {distance: distance1, duration: duration1} = tempDist;
+                const {distance: distance2, duration: duration2} =
+                  distanceMatrix;
+
+                // Parse the distance strings into floats
+                const distance1Km = parseFloat(distance1);
+                const distance2Km = parseFloat(distance2);
+
+                // Parse the duration strings into integers (minutes)
+                const duration1Minutes = parseInt(duration1);
+                const duration2Minutes = parseInt(duration2);
+
+                // Perform addition
+                const totalDistanceKm = distance1Km + distance2Km;
+                const totalDurationMinutes =
+                  duration1Minutes + duration2Minutes;
+
+                setTotalDistance(`${totalDistanceKm} Km`);
+                setTotalTime(`${totalDurationMinutes} Minutes`);
                 setUserDropOff(distanceMatrix.distance);
                 setUserName(receivedMessage.full_name);
                 setUserEmail(receivedMessage.email);
@@ -174,6 +210,7 @@ const DriverMap = () => {
                 setUserEmergencyContact(receivedMessage.emergency_contact);
                 setUserCNIC(receivedMessage.cnic);
                 setUserToken(receivedMessage.token);
+                setRideType(receivedMessage.rideType);
                 setAlertVisible(true);
               });
             });
@@ -445,8 +482,8 @@ const DriverMap = () => {
       userContact,
       userEmergencyContact,
       userCNIC,
-      ridePhase1,
-      ridePhase2,
+      pickupAddress,
+      dropoffAddress,
       totalDistance,
       totaltime,
     );
@@ -486,8 +523,8 @@ const DriverMap = () => {
     userContact,
     userEmergencyContact,
     userCNIC,
-    ridePhase1,
-    ridePhase2,
+    pickupAddress,
+    dropoffAddress,
     totalDistance,
     totaltime,
   ) => {
@@ -504,39 +541,14 @@ const DriverMap = () => {
       contact: userContact,
       emergency_contact: userEmergencyContact,
       cnic: userCNIC,
-      pickUp_location: ridePhase1,
-      dropOff_location: ridePhase2,
+      // pickUp_location: `${ridePhase1.latitude},${ridePhase1.longitude}`,
+      pickUp_location: pickupAddress,
+      dropOff_location: dropoffAddress,
       distance_covered: totalDistance,
       total_time: totaltime,
     });
-    // const data = JSON.stringify({
-    //   driver_contact: 'driver_contact',
-    //   driver_name: 'driver_name',
-    //   company_email: 'company_email',
-    //   company_name: 'company_name',
-    //   vehicle_number: 'vehicle_number',
-    //   office_address: 'office_address',
-    //   type: 'rideType',
-    //   full_name: 'userName',
-    //   email: 'userEmail',
-    //   contact: 'userContact',
-    //   emergency_contact: 'userEmergencyContact',
-    //   cnic: 'userCNIC',
-    //   pickUp_location: 'ridePhase1',
-    //   dropOff_location: 'ridePhase2',
-    //   distance_covered: 'totalDistance',
-    //   total_time: 'totaltime',
-    // });
+
     console.log('data to send from api: ' + JSON.stringify(data));
-    // let config = {
-    //   method: 'post',
-    //   maxBodyLength: Infinity,
-    //   url: `${BASE_URL}/driver/activity`,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   data: historyData,
-    // };
 
     let config = {
       method: 'post',
@@ -723,6 +735,8 @@ const DriverMap = () => {
                   apikey={GOOGLE_MAPS_APIKEY}
                   strokeWidth={3}
                   strokeColor={colors.RED}
+                  mode="DRIVING"
+                  resetOnChange={false}
                 />
                 <Marker
                   style={{
@@ -764,6 +778,8 @@ const DriverMap = () => {
                   apikey={GOOGLE_MAPS_APIKEY}
                   strokeWidth={3}
                   strokeColor={colors.RED}
+                  mode="DRIVING"
+                  resetOnChange={false}
                 />
                 <Marker
                   style={{

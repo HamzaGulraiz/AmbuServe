@@ -14,19 +14,30 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
   },
+  drawerButton: {
+    backgroundColor: '#c1e1ec',
+    height: hp(5),
+    width: wp(11),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: wp(2),
+  },
+  drawerImage: {height: hp(4), width: wp(5)},
   userImage: {
     height: hp(6),
     width: wp(14),
   },
-  logoutButtonView:{
+  logoutButtonView: {
     // backgroundColor: 'red',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: hp(2),
     marginHorizontal: wp(5),
     marginBottom: hp(8),
-    alignSelf: 'flex-end',
+    // alignSelf: 'flex-end',
   },
   logoutButton: {
-   
     // justifyContent: 'flex-end',
     // alignContent: 'center',
   },
@@ -39,7 +50,7 @@ const styles = StyleSheet.create({
     marginBottom: hp(5),
     // backgroundColor: 'red',
   },
-  SOSButtonView:{
+  SOSButtonView: {
     marginHorizontal: wp(5),
     justifyContent: 'center',
     alignItems: 'center',

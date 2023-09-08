@@ -75,8 +75,8 @@ const UserPaymentCard = ({paymentOnpress}) => {
           source={images.PAYMENT_PHASE_ICON}
           resizeMode="contain"
           style={{
-            height: hp(18),
-            width: wp(30),
+            height: hp(20),
+            width: wp(39),
           }}
         />
       </View>

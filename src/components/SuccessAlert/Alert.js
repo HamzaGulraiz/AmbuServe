@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Modal,
   View,
@@ -18,7 +18,8 @@ import fonts from '../../../assets/fonts/fonts';
 import images from '../../../assets/images/images';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import CustomButton from '../Button/Button';
-// import Stars from 'react-native-stars';
+import {Rating, AirbnbRating} from 'react-native-ratings';
+import {TextInput} from 'react-native-gesture-handler';
 
 // type CustomAlertProps = {
 //   visible?: boolean;
@@ -34,11 +35,19 @@ import CustomButton from '../Button/Button';
 
 const CustomSuccessAlert = ({visible, onPressClose, confirmButton}) => {
   // console.log('alert', pickup?.distance, dropoff?.distance);
-
+  const [text, onChangeText] = useState('');
+  const [complainState, SetComplainState] = useState(false);
+  const handleComplain = () => {
+    SetComplainState(true);
+  };
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <View
+          style={{
+            ...styles.container,
+            height: complainState ? hp(45) : hp(60),
+          }}>
           {/* {onPressClose ? (
             <TouchableOpacity style={styles.closeButton} onPress={onPressClose}>
               <Image
@@ -48,117 +57,139 @@ const CustomSuccessAlert = ({visible, onPressClose, confirmButton}) => {
               />
             </TouchableOpacity>
           ) : null} */}
-          <View
-            style={{
-              alignItems: 'center',
-              marginTop: hp(2),
-            }}>
-            <Image
-              source={images.STAR}
-              resizeMode="contain"
-              style={{
-                height: wp(35),
-                width: wp(35),
-              }}
-            />
-          </View>
-          <Text
-            style={{
-              marginTop: wp(4),
-              fontFamily: fonts.REGULAR,
-              fontSize: fontsizes.px_22,
-              color: colors.BLACK,
-              fontWeight: '700',
-              textAlign: 'center',
-            }}>
-            Ride Successful
-          </Text>
-          <Text
-            style={{
-              marginTop: wp(2),
-              fontFamily: fonts.REGULAR,
-              fontSize: fontsizes.px_18,
-              color: colors.BLACK,
-              fontWeight: '400',
-              textAlign: 'center',
-            }}>
-            how was your trip?
-          </Text>
-          <View
-            style={{
-              alignItems: 'center',
-              marginTop: hp(2),
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginHorizontal: wp(16),
-            }}>
-            <Image
-              source={icons.FULL_STAR}
-              resizeMode="contain"
-              style={{
-                height: hp(5),
-                width: wp(10),
-                tintColor: colors.BLUE,
-              }}
-            />
-            <Image
-              source={icons.FULL_STAR}
-              resizeMode="contain"
-              style={{
-                height: hp(5),
-                width: wp(10),
-                tintColor: colors.BLUE,
-              }}
-            />
-            <Image
-              source={icons.FULL_STAR}
-              resizeMode="contain"
-              style={{
-                height: hp(5),
-                width: wp(10),
-                tintColor: colors.BLUE,
-              }}
-            />
-            <Image
-              source={icons.FULL_STAR}
-              resizeMode="contain"
-              style={{
-                height: hp(5),
-                width: wp(10),
-                tintColor: colors.BLUE,
-              }}
-            />
-            <Image
-              source={icons.FULL_STAR}
-              resizeMode="contain"
-              style={{
-                height: hp(5),
-                width: wp(10),
-                tintColor: colors.BLUE,
-              }}
-            />
-            {/* <Stars
-              default={1}
-              count={5}
-              half={true}
-              starSize={50}
-              fullStar={icons.FULL_STAR}
-              emptyStar={icons.EMPTY_STAR}
-              halfStar={icons.HALF_STAR}
-            /> */}
-          </View>
-          <CustomButton
-            title="Back to Home"
-            textColor={colors.WHITE}
-            backgroundColor={colors.BLUE}
-            // activityIndicator={signInIsLoaded}
-            marginTop={hp(6)}
-            height={hp(6)}
-            width={wp(80)}
-            borderRadius={wp(2)}
-            marginHorizontal={wp(5)}
-            onPress={confirmButton}
-          />
+          {complainState ? (
+            <View>
+              <Text
+                style={{
+                  marginTop: wp(4),
+                  fontFamily: fonts.REGULAR,
+                  fontSize: fontsizes.px_22,
+                  color: colors.BLACK,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                }}>
+                Complain
+              </Text>
+              <TextInput
+                // style={styles.input}
+                onChangeText={onChangeText}
+                value={text}
+                style={{
+                  ...styles.input,
+                  borderColor: colors.BLACK,
+                  // marginBottom: hp(2),
+                  color: colors.BLACK,
+                  textAlignVertical: 'top',
+                }}
+                numberOfLines={10}
+                multiline={true}
+                maxLength={200}
+              />
+              <CustomButton
+                title="Back"
+                textColor={colors.WHITE}
+                backgroundColor={colors.BLUE}
+                // leftIcon={icons.BACK_ARROW_FOR_BUTTON}
+                // activityIndicator={signInIsLoaded}
+                marginTop={hp(3)}
+                height={hp(6)}
+                width={wp(80)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                onPress={() => {
+                  SetComplainState(false);
+                }}
+              />
+              <CustomButton
+                title="Submit"
+                textColor={colors.WHITE}
+                backgroundColor={'#ffb300'}
+                // rightIcon={icons.FORWARD_ARROW_FOR_BUTTON}
+                // activityIndicator={signInIsLoaded}
+                marginTop={hp(2)}
+                height={hp(6)}
+                width={wp(80)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                onPress={confirmButton}
+              />
+            </View>
+          ) : (
+            <>
+              <View
+                style={{
+                  alignItems: 'center',
+                  marginTop: hp(2),
+                }}>
+                <Image
+                  source={images.STAR}
+                  resizeMode="contain"
+                  style={{
+                    height: wp(35),
+                    width: wp(35),
+                  }}
+                />
+              </View>
+              <Text
+                style={{
+                  marginTop: wp(4),
+                  fontFamily: fonts.REGULAR,
+                  fontSize: fontsizes.px_22,
+                  color: colors.BLACK,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                }}>
+                Ride Successful
+              </Text>
+              <Text
+                style={{
+                  marginTop: wp(2),
+                  fontFamily: fonts.REGULAR,
+                  fontSize: fontsizes.px_18,
+                  color: colors.BLACK,
+                  fontWeight: '400',
+                  textAlign: 'center',
+                }}>
+                how was your trip?
+              </Text>
+
+              <AirbnbRating
+                reviewColor="black"
+                // selectedColor="#1e90ff"
+                selectedColor={colors.BLUE}
+                count={5}
+                reviews={['bad', 'OK', 'Good', 'Very Good', 'Amazing']}
+                defaultRating={3}
+                size={30}
+              />
+              <CustomButton
+                title="Back to Home"
+                textColor={colors.WHITE}
+                backgroundColor={colors.BLUE}
+                leftIcon={icons.BACK_ARROW_FOR_BUTTON}
+                // activityIndicator={signInIsLoaded}
+                marginTop={hp(3)}
+                height={hp(6)}
+                width={wp(80)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                onPress={confirmButton}
+              />
+              <CustomButton
+                title="Complain"
+                textColor={colors.WHITE}
+                backgroundColor={'#ffb300'}
+                rightIcon={icons.FORWARD_ARROW_FOR_BUTTON}
+                // activityIndicator={signInIsLoaded}
+                marginTop={hp(2)}
+                height={hp(6)}
+                width={wp(80)}
+                borderRadius={wp(2)}
+                marginHorizontal={wp(5)}
+                onPress={handleComplain}
+              />
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -174,7 +205,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '90%',
-    height: hp(60),
+
     backgroundColor: '#FFFFFF',
     borderRadius: wp(2),
     overflow: 'hidden',
@@ -184,6 +215,16 @@ const styles = StyleSheet.create({
     // marginHorizontal: wp(5),
     borderColor: colors.BLACK,
     zIndex: 1,
+  },
+
+  input: {
+    marginTop: hp(2),
+    marginHorizontal: wp(4),
+    height: hp(15),
+    // margin: 12,
+    borderWidth: 1,
+    borderRadius: wp(2),
+    padding: wp(2),
   },
   closeButton: {
     marginLeft: wp(2),

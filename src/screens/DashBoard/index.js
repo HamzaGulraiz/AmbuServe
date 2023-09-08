@@ -19,7 +19,12 @@ import images from '../../../assets/images/images';
 import colors from '../../../assets/colors/colors';
 
 import CustomButton from '../../components/Button/Button';
-import {MAPS, SPLASH_SCREEN, USER_INFORMATION} from '../../constants/Navigator';
+import {
+  MAPS,
+  MAP_FOR_EMERGENCY,
+  SPLASH_SCREEN,
+  USER_INFORMATION,
+} from '../../constants/Navigator';
 import fontsizes from '../../../assets/fontsizes/fontsizes';
 import fonts from '../../../assets/fonts/fonts';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -37,14 +42,29 @@ import {removeData} from '../../asyncStorage/AsyncStorage';
 const DashBoard = () => {
   const navigation = useNavigation();
   const handleSOS = () => {
-    navigation.navigate(MAPS);
+    navigation.navigate(MAP_FOR_EMERGENCY, {
+      type: 'emergency',
+    });
   };
   const handleChoseHospital = () => {
-    navigation.navigate(MAPS);
+    navigation.navigate(MAPS, {
+      type: 'normal',
+    });
   };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoutButtonView}>
+        <TouchableOpacity
+          style={styles.drawerButton}
+          onPress={() => {
+            // navigation.navigate(USER_INFORMATION);
+          }}>
+          <Image
+            source={images.BARS}
+            resizeMode="contain"
+            style={styles.drawerImage}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={() => {

@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   rideConnectedCardView: {
-    height: hp(39),
+    height: hp(44),
     width: '100%',
     borderColor: colors.BLACK,
     zIndex: 1,

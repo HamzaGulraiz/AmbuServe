@@ -33,7 +33,7 @@ const UserDropoffCard = ({
           // alignItems: 'center',
         }}>
         <Image
-          source={images.DEFAULT_USER}
+          source={images.DRIVER}
           resizeMode="contain"
           style={{
             // backgroundColor: 'green',

@@ -98,14 +98,16 @@ const Activity = () => {
             <View key={item._id} style={styles.card}>
               <Text
                 style={{
+                  marginRight: wp(4),
+                  // backgroundColor: 'red',
                   marginTop: hp(1),
                   textAlign: 'center',
                   color: colors.GREY,
                   fontWeight: '300',
                   fontFamily: fonts.BOLD,
-                  fontSize: fontsizes.px_16,
+                  fontSize: fontsizes.px_12,
                 }}>
-                {item.date}
+                {item.timeStamp}
               </Text>
               <View style={styles.cardInfoView}>
                 <Text
@@ -216,7 +218,7 @@ const Activity = () => {
                     fontSize: fontsizes.px_16,
                     // backgroundColor: 'green',
                   }}>
-                  {item.pickup_location}
+                  {item.pickUp_location}
                 </Text>
               </View>
               <View style={styles.cardInfoView}>
@@ -259,7 +261,7 @@ const Activity = () => {
                     fontSize: fontsizes.px_16,
                     // backgroundColor: 'green',
                   }}>
-                  Distance
+                  Distance Covered
                 </Text>
                 <Text
                   numberOfLines={1}
@@ -284,7 +286,7 @@ const Activity = () => {
                     fontFamily: fonts.REGULAR,
                     fontSize: fontsizes.px_16,
                   }}>
-                  Time
+                  Total Time
                 </Text>
                 <Text
                   numberOfLines={1}

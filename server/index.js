@@ -7,10 +7,10 @@ const driverOnline = require("./driverOnline");
 const driverActivity = require("./driverActivity");
 const jwt = require("jsonwebtoken");
 const app = express();
+const cors = require("cors");
 const secretKey = "secretKey";
 const http = require("http");
 const socketIO = require("socket.io");
-const cors = require("cors");
 
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -30,7 +30,9 @@ io.on("connection", (socket) => {
         driverSocket.emit("new_request", data);
       }
     } else {
-      socket.emit("no_drivers_available", "No drivers available");
+      setTimeout(() => {
+        socket.emit("no_drivers_available", "No drivers available");
+      }, 2000);
     }
   });
 
@@ -197,11 +199,46 @@ app.get("/driver/login", async (req, resp) => {
 
 ///////////////////////////driver activity////////////////////////////
 app.post("/driver/activity", async (req, resp) => {
-  // console.log(req.body);
-  let data = new driverActivity(req.body);
-  // console.log("wtf", data);
-  const result = await data.save();
-  return resp.send(req.body);
+  try {
+    const currentTime = new Date();
+    // // console.log(typeof currentTime, currentTime);
+    // req.body.time = currentTime;
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Extract the day, month, year, and time components
+    const day = currentTime.toLocaleDateString().split(" ")[0]; // Mon
+    const month = months[currentTime.getMonth()]; // Sep
+    const date = currentTime.getDate(); // 04
+    const year = currentTime.getFullYear(); // 2023
+    const time = currentTime.toLocaleTimeString(); // 22:34:00
+
+    // Combine the components into the desired format
+    const formattedDateTime = `${month} ${date} ${year} ${time}`;
+
+    req.body.timeStamp = formattedDateTime;
+
+    const data = new driverActivity(req.body);
+    const result = await data.save();
+
+    console.log(data);
+    return resp.send(result);
+  } catch (error) {
+    console.error("Error saving driver activity:", error);
+    return resp.status(500).send("Internal Server Error");
+  }
 });
 
 app.get("/driver/rides/:driver_contact", async (req, res) => {

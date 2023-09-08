@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {
   DASHBOARD,
   MAPS,
+  MAP_FOR_EMERGENCY,
   MY_BOTTOM_TABS,
   SIGN_IN,
   SIGN_IN_AS_DRIVER,
@@ -23,6 +24,7 @@ import UserInformation from '../../screens/UserInformation';
 
 import MyBottomTabs from '../BottomTabNavigator/Navigators';
 import TermsAndConditions from '../../screens/TermsandConditions';
+import MapForEmergency from '../../screens/MapViewForEmergency';
 
 const Stack = createStackNavigator();
 const StackNavigator = ({routeName}) => {
@@ -48,6 +50,7 @@ const StackNavigator = ({routeName}) => {
       <Stack.Screen name={SIGN_UP} component={SignUp} />
       <Stack.Screen name={DASHBOARD} component={DashBoard} />
       <Stack.Screen name={MAPS} component={Maps} />
+      <Stack.Screen name={MAP_FOR_EMERGENCY} component={MapForEmergency} />
       <Stack.Screen name={USER_INFORMATION} component={UserInformation} />
 
       <Stack.Screen name={SIGN_IN_AS_DRIVER} component={SignInAsDriver} />

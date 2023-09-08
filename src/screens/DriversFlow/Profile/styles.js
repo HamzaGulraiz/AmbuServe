@@ -20,15 +20,15 @@ const styles = StyleSheet.create({
   },
   userImage: {
     height: hp(14),
-    width: wp(30),
+    width: wp(22),
     alignSelf: 'center',
   },
   imageButton: {
-    // backgroundColor: 'red',
     marginHorizontal: wp(35),
     marginBottom: hp(6),
-    // justifyContent: 'flex-end',
-    // alignContent: 'center',
+    borderRadius: wp(20),
+    borderWidth: wp(0.2),
+    borderColor: colors.BLACK,
   },
   editButton: {
     marginHorizontal: wp(5),

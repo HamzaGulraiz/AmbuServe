@@ -5,6 +5,7 @@ export const SIGN_IN = 'SignIn';
 export const SIGN_UP = 'SignUp';
 export const DASHBOARD = 'DashBoard';
 export const MAPS = 'Maps';
+export const MAP_FOR_EMERGENCY = 'MapForEmergency';
 export const USER_INFORMATION = 'UserInformation';
 export const USER_DESTINATION_SEARCH = 'UserDestinationSearch';
 
