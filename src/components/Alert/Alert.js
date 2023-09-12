@@ -65,7 +65,7 @@ const CustomAlert = ({
           ) : null}
           {name ? (
             <View style={styles.labelContaier}>
-              <Text style={styles.title}>Rider name:</Text>
+              <Text style={styles.title}>Patient name:</Text>
               <Text numberOfLines={1} style={styles.text}>
                 {name}
               </Text>

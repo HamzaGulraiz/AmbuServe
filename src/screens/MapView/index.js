@@ -9,6 +9,7 @@ import {
   View,
   TouchableOpacity,
   Modal,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import styles from './styles';
@@ -171,7 +172,6 @@ const Maps = () => {
       // socket?.on('disconnect', () => {
       //   console.log('user disconnect after ride compelete', socket.id); // undefined
       // });
-      setRequestPhase(true);
       setDriverAcceptPhase(false);
       setDriverRoute(false);
       setRoute(false);
@@ -226,7 +226,7 @@ const Maps = () => {
         (driverData?.zoom.longitude + driverData?.currentLocation.longitude) /
         2;
 
-      const mapDelta = distance * 0.02; // Adjust this factor for better coverage
+      const mapDelta = distance * 0.01; // Adjust this factor for better coverage
       // const zoom = calculateZoom(mapDelta);
 
       // setMapZoom(zoom);
@@ -274,7 +274,7 @@ const Maps = () => {
         (driverData?.zoom.longitude + driverData?.currentLocation.longitude) /
         2;
 
-      const mapDelta = distance * 0.02; // Adjust this factor for better coverage
+      const mapDelta = distance * 0.01; // Adjust this factor for better coverage
       // const zoom = calculateZoom(mapDelta);
 
       // setMapZoom(zoom);
@@ -357,8 +357,33 @@ const Maps = () => {
     }
   }, [userInfoForRide]);
 
+  const handleCancelRequestButton = () => {
+    Alert.alert('AmbuServe', 'are you sure you want to cancel', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          handleCancelRequest();
+        },
+      },
+    ]);
+  };
+
   const handleCancelRequest = () => {
-    // setCard2(false);
+    socket?.emit('cancel_ride', 'canceled');
+    socket?.disconnect();
+    // socket?.on('disconnect', () => {
+    //   console.log('user disconnect after ride compelete', socket.id); // undefined
+    // });
+    setDriverAcceptPhase(false);
+    setDriverRoute(false);
+    setRoute(false);
+    // setPaymentPhase(true);
+    setRideDefault();
   };
 
   const requestLocationPermission = async () => {
@@ -446,7 +471,7 @@ const Maps = () => {
         (originPlace.location.longitude + destinationPlace.location.longitude) /
         2;
 
-      const mapDelta = distance * 0.02; // Adjust this factor for better coverage
+      const mapDelta = distance * 0.01; // Adjust this factor for better coverage
       // console.log(mapDelta);
       // const zoom = calculateZoom(mapDelta);
 
@@ -534,7 +559,7 @@ const Maps = () => {
                       },
                       container: {},
                       listView: {
-                        marginTop: hp(6),
+                        marginTop: hp(7),
                       },
                       description: {
                         color: colors.BLACK,
@@ -593,6 +618,9 @@ const Maps = () => {
                       description: {
                         color: colors.BLACK,
                       },
+                      listView: {
+                        marginTop: hp(1),
+                      },
                     }}
                     query={{
                       key: MY_KEY,
@@ -619,10 +647,10 @@ const Maps = () => {
               showsUserLocation={userCurrentPosition ? true : false}
               // minZoomLevel={14}
               // maxZoomLevel={18}
+
               zoomEnabled={true}
               // minZoomLevel={mapZoom}
-              region={userCurrentPosition ? region : regionForZoom}>
-              {userCurrentPosition ? <View></View> : null}
+              region={userCurrentPosition ? region : null}>
               {route ? (
                 <>
                   <View>
@@ -841,7 +869,7 @@ const Maps = () => {
                         phoneCall={handlePhoneCall}
                       />
                       <TouchableOpacity
-                        onPress={handleCancelRequest}
+                        onPress={handleCancelRequestButton}
                         style={{
                           marginTop: hp(1),
                           width: '100%',
@@ -989,7 +1017,10 @@ const Maps = () => {
       ) : null}
 
       {screenLoading === true ? (
-        <CustomScreenLoading visible={screenLoading} />
+        <CustomScreenLoading
+          visible={screenLoading}
+          // emergency={'Finding nearest available ambulance and hospital'}
+        />
       ) : null}
     </>
   );

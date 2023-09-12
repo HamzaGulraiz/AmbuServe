@@ -26,16 +26,45 @@ import CustomButton from '../Button/Button';
 //   visible?: boolean;
 // };
 
-const CustomScreenLoading = ({visible}) => {
+const CustomScreenLoading = ({visible, emergency}) => {
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <View
+          style={{...styles.container, height: emergency ? hp(30) : hp(20)}}>
           <Image
             source={images.LOGO}
             resizeMode="contain"
             style={styles.icon}
           />
+          {emergency ? (
+            <>
+              <Text
+                style={{
+                  //  marginTop: hp(1),
+                  //  marginBottom: hp(2),
+                  fontFamily: fonts.REGULAR,
+                  fontSize: fontsizes.px_18,
+                  color: colors.BLACK,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                }}>
+                Please wait
+              </Text>
+              <Text
+                style={{
+                  marginTop: hp(1),
+                  marginBottom: hp(2),
+                  fontFamily: fonts.REGULAR,
+                  fontSize: fontsizes.px_18,
+                  color: colors.BLACK,
+                  fontWeight: '400',
+                  textAlign: 'center',
+                }}>
+                {emergency}
+              </Text>
+            </>
+          ) : null}
           <ActivityIndicator size="large" color={colors.BLACK} />
 
           <View></View>
@@ -56,7 +85,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '60%',
-    height: hp(20),
+    // height: hp(20),
     backgroundColor: '#FFFFFF',
     borderRadius: wp(2),
     overflow: 'hidden',

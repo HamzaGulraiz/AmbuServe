@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   drawerButton: {
-    backgroundColor: '#c1e1ec',
+    backgroundColor: '#0174CF',
     height: hp(5),
     width: wp(11),
     justifyContent: 'center',
@@ -24,7 +24,16 @@ const styles = StyleSheet.create({
   },
   drawerImage: {height: hp(4), width: wp(5)},
   userImage: {
-    height: hp(6),
+    height: hp(4.5),
+    width: wp(12),
+  },
+  logoutButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: wp(14),
+    borderWidth: wp(0.2),
+    borderColor: colors.BLACK,
+    height: hp(7),
     width: wp(14),
   },
   logoutButtonView: {
@@ -36,10 +45,6 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(5),
     marginBottom: hp(8),
     // alignSelf: 'flex-end',
-  },
-  logoutButton: {
-    // justifyContent: 'flex-end',
-    // alignContent: 'center',
   },
   image: {
     marginHorizontal: wp(5),

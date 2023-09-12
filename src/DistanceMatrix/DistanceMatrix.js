@@ -71,7 +71,7 @@ const getDistanceMatrix = async (origin, destination, phase) => {
           return {
             distance: response.data.rows[0].elements[0].distance.text,
             duration: response.data.rows[0].elements[0].duration.text,
-            title: 'To your destination',
+            title: 'Driving to your destination',
             message:
               'We provide emergency and non-emergency ambulance service and event medical coverage.',
             phaseTwo: false,

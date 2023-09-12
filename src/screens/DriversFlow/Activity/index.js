@@ -36,7 +36,8 @@ const Activity = () => {
     state => state.reducer.driverActivity,
   );
   const driverActivity = driverActivityObject.drivers;
-  console.log(typeof driverActivity, 'driverActivity', driverActivity);
+
+  // console.log(typeof driverActivity, 'driverActivity', driverActivity);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -149,7 +150,7 @@ const Activity = () => {
                     fontSize: fontsizes.px_16,
                     // backgroundColor: 'green',
                   }}>
-                  Rider Name
+                  Patient Name
                 </Text>
                 <Text
                   numberOfLines={1}
@@ -177,7 +178,7 @@ const Activity = () => {
                     fontSize: fontsizes.px_16,
                     // backgroundColor: 'green',
                   }}>
-                  Rider Number
+                  Patient Number
                 </Text>
                 <Text
                   numberOfLines={1}
@@ -205,7 +206,7 @@ const Activity = () => {
                     fontSize: fontsizes.px_16,
                     // backgroundColor: 'green',
                   }}>
-                  Rider Pickup
+                  Patient Pick up
                 </Text>
                 <Text
                   numberOfLines={1}
@@ -233,7 +234,7 @@ const Activity = () => {
                     fontSize: fontsizes.px_16,
                     // backgroundColor: 'green',
                   }}>
-                  Rider DropOff
+                  Patient Drop off
                 </Text>
                 <Text
                   numberOfLines={1}

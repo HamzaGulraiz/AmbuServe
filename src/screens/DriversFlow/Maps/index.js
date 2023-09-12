@@ -3,7 +3,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {Image, Text, SafeAreaView, View, TouchableOpacity} from 'react-native';
+import {
+  Image,
+  Text,
+  SafeAreaView,
+  View,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import styles from './styles';
 import {useNavigation} from '@react-navigation/native';
@@ -16,7 +23,6 @@ import colors from '../../../../assets/colors/colors';
 import CustomAlert from '../../../components/Alert/Alert';
 import {BASE_URL, GOOGLE_API_KEY, WEB_SOCKET} from '../../../../config';
 import MapViewDirections from 'react-native-maps-directions';
-import io from 'socket.io-client';
 import getDistanceMatrix from '../../../DistanceMatrix/DistanceMatrix';
 import CustomScreenLoading from '../../../components/ScreenLoading/ScreenLoading';
 import Geolocation from 'react-native-geolocation-service';
@@ -34,6 +40,8 @@ import useSocket from '../../../components/Socket/Socket';
 import {setData, getData, removeData} from '../../../asyncStorage/AsyncStorage';
 import CustomButton from '../../../components/Button/Button';
 import axios from 'axios';
+import io from 'socket.io-client';
+import {sendSMS} from '../../../../assets/utils/sms';
 
 const DriverMap = () => {
   const isFocused = useIsFocused();
@@ -127,7 +135,51 @@ const DriverMap = () => {
   //   console.log('startPhaseTwo:', startPhaseTwo);
   // }, [rideConnected, startPhaseOne, startPhaseTwo]);
 
-  const socket = useSocket(WEB_SOCKET);
+  const [socket, setSocket] = useState(null);
+  const [online, setOnline] = useState(false);
+
+  const handleDriverOnline = () => {
+    if (online) {
+      // If online, disconnect the socket and set online to false
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+      }
+      setOnline(false);
+    } else {
+      // If offline, connect the socket and set online to true
+      const newSocket = io(socketUrl, {transports: ['websocket']});
+      newSocket.emit('identify', {type: 'driver', driverId: newSocket.id});
+      setSocket(newSocket);
+      setOnline(true);
+    }
+  };
+
+  // Replace socketUrl with your actual socket URL
+  const socketUrl = WEB_SOCKET;
+
+  // const socketUrl = WEB_SOCKET; // Replace with your actual socket URL
+  // const socket = useSocket(socketUrl);
+  // const socket = useSocket(WEB_SOCKET);
+  // const handleDriverOnline = () => {
+  //   setOnline(prevState => !prevState);
+  // };
+
+  // useEffect(() => {
+  //   if (online) {
+  //     // Connect the socket when "online" becomes true
+  //     socket?.connect();
+  //   } else {
+  //     // Disconnect the socket when "online" becomes false
+  //     socket?.disconnect();
+  //   }
+
+  //   // Make sure to return a cleanup function
+  //   return () => {
+  //     // Disconnect the socket when the component unmounts
+  //     socket?.disconnect();
+  //   };
+  // }, [online, socket]);
 
   // useEffect(() => {
   //   // Connect to the server as a driver
@@ -216,6 +268,31 @@ const DriverMap = () => {
             });
           });
         }
+      });
+    }
+  }, [socket]);
+
+  const [rideFailedFromUser, setRideFailedFromUser] = useState(false);
+  useEffect(() => {
+    if (socket) {
+      socket.on('end_ride', response => {
+        Alert.alert('AmbuServe', 'user cancelled the ride', [
+          {
+            text: 'OK',
+            onPress: () => {
+              setOnline(false);
+              setRideFailedFromUser(true);
+              setStartRideButton(false);
+              setRideCompleted(true);
+              setRideCompleteButton(false);
+              setStartPhaseOne(false);
+              setStartPhaseTwo(false);
+              setRideConnected(false);
+              setUserDetailCard(false);
+              // handleRideCompleted();
+            },
+          },
+        ]);
       });
     }
   }, [socket]);
@@ -344,6 +421,8 @@ const DriverMap = () => {
     setStartRideButton(true);
     sendLocationOnRideConnected();
     setAlertVisible(false);
+    ///////////////////SMS///////////////////////
+    sendSMS(userName, driver_contact, pickupAddress, dropoffAddress);
   };
 
   const sendLocationOnRideConnected = () => {
@@ -453,7 +532,9 @@ const DriverMap = () => {
   };
 
   const handleRideCompleted = () => {
+    setOnline(false);
     setRideCompleted(false);
+    setRideFailedFromUser(false);
     setRidePhase1({latitude: 0, longitude: 0});
     setRidePhase2({latitude: 0, longitude: 0});
     setDestinationDistance(null);
@@ -808,6 +889,48 @@ const DriverMap = () => {
               </>
             ) : null}
           </MapView>
+          {rideConnected === false ? (
+            <>
+              <TouchableOpacity
+                onPress={handleDriverOnline}
+                style={{
+                  position: 'absolute',
+                  left: wp(24),
+                  bottom: hp(2),
+                  height: wp(15),
+                  width: wp(50),
+                  borderRadius: wp(2),
+                  backgroundColor: online ? '#FF4C4C' : 'green',
+                  justifyContent: 'center',
+                }}>
+                {online ? (
+                  <Text
+                    style={{
+                      fontWeight: '400',
+                      fontSize: fontsizes.px_18,
+                      fontFamily: fonts.REGULAR,
+                      color: colors.WHITE,
+                      // width: wp(24),
+                      textAlign: 'center',
+                    }}>
+                    Go Offline
+                  </Text>
+                ) : (
+                  <Text
+                    style={{
+                      fontWeight: '400',
+                      fontSize: fontsizes.px_18,
+                      fontFamily: fonts.REGULAR,
+                      color: colors.WHITE,
+                      // width: wp(24),
+                      textAlign: 'center',
+                    }}>
+                    Go Online
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </>
+          ) : null}
           {startRideButton === true ? (
             <TouchableOpacity
               onPress={handleRidePhase2}
@@ -834,6 +957,7 @@ const DriverMap = () => {
               </Text>
             </TouchableOpacity>
           ) : null}
+
           <TouchableOpacity
             onPress={handleShowUserLocation}
             style={{
@@ -924,31 +1048,63 @@ const DriverMap = () => {
                   // backgroundColor: 'red',
                 }}
               />
-              <Text
-                // numberOfLines={1}
-                style={{
-                  marginTop: hp(4),
-                  fontWeight: '400',
-                  fontSize: fontsizes.px_22,
-                  fontFamily: fonts.SEMI_BOLD,
-                  color: colors.BLACK,
-                  textAlign: 'center',
-                }}>
-                Ride Successful
-              </Text>
-              <Text
-                numberOfLines={4}
-                style={{
-                  marginTop: hp(2),
-                  fontWeight: '400',
-                  fontSize: fontsizes.px_22,
-                  fontFamily: fonts.LIGHT,
-                  color: colors.BLACK,
-                  textAlign: 'center',
-                }}>
-                Thank you for completing your trip. company will transfer your
-                payment to your account
-              </Text>
+              {rideFailedFromUser ? (
+                <>
+                  <Text
+                    // numberOfLines={1}
+                    style={{
+                      marginTop: hp(4),
+                      fontWeight: '400',
+                      fontSize: fontsizes.px_22,
+                      fontFamily: fonts.SEMI_BOLD,
+                      color: colors.BLACK,
+                      textAlign: 'center',
+                    }}>
+                    Ride failed
+                  </Text>
+                  <Text
+                    numberOfLines={4}
+                    style={{
+                      marginTop: hp(2),
+                      fontWeight: '400',
+                      fontSize: fontsizes.px_22,
+                      fontFamily: fonts.LIGHT,
+                      color: colors.BLACK,
+                      textAlign: 'center',
+                    }}>
+                    sorry for inconvenience. company will transfer your payment
+                    to your account
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text
+                    // numberOfLines={1}
+                    style={{
+                      marginTop: hp(4),
+                      fontWeight: '400',
+                      fontSize: fontsizes.px_22,
+                      fontFamily: fonts.SEMI_BOLD,
+                      color: colors.BLACK,
+                      textAlign: 'center',
+                    }}>
+                    Ride Successful
+                  </Text>
+                  <Text
+                    numberOfLines={4}
+                    style={{
+                      marginTop: hp(2),
+                      fontWeight: '400',
+                      fontSize: fontsizes.px_22,
+                      fontFamily: fonts.LIGHT,
+                      color: colors.BLACK,
+                      textAlign: 'center',
+                    }}>
+                    Thank you for completing your trip. company will transfer
+                    your payment to your account
+                  </Text>
+                </>
+              )}
               <CustomButton
                 title="Done"
                 textColor={colors.WHITE}

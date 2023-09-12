@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   searchBarTo: {
-    marginTop: hp(8),
+    marginTop: hp(8.5),
     paddingHorizontal: wp(5),
     position: 'absolute',
     // height: hp(6),

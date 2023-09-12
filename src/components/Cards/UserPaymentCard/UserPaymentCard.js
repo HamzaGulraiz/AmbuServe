@@ -70,6 +70,7 @@ const UserPaymentCard = ({paymentOnpress}) => {
           // backgroundColor: 'red',
           justifyContent: 'center',
           alignItems: 'center',
+          marginBottom: hp(1),
         }}>
         <Image
           source={images.PAYMENT_PHASE_ICON}
@@ -77,6 +78,7 @@ const UserPaymentCard = ({paymentOnpress}) => {
           style={{
             height: hp(20),
             width: wp(39),
+            // backgroundColor: 'red',
           }}
         />
       </View>
@@ -107,7 +109,7 @@ const UserPaymentCard = ({paymentOnpress}) => {
               // backgroundColor: 'pink',
               // textAlign: 'left',
             }}>
-            Chosse payment method
+            Choose payment method
           </Text>
         </View>
         <TouchableOpacity

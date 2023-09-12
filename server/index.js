@@ -44,6 +44,17 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("cancel_ride", (data) => {
+    const driverIds = drivers[drivers.driverId];
+    if (driverIds) {
+      // console.log("found drivers");
+      // for (const driverId of driverIds) {
+      // const driverSocket = drivers[driverId];
+      driverIds.emit("end_ride", data);
+      // }
+    }
+  });
+
   socket.on("ride_completed", (data) => {
     const userSocket = users[data.userId];
     if (userSocket) {
@@ -184,7 +195,7 @@ app.get("/driver/login", async (req, resp) => {
   const { driver_name, password } = req.query;
   console.log({ driver_name, password });
   let data = await driverRegister.findOne({ driver_name });
-  console.log(data);
+  console.log("phone number", data);
   if (data == null) {
     resp.send("Email does not exist");
   } else {
@@ -233,7 +244,7 @@ app.post("/driver/activity", async (req, resp) => {
     const data = new driverActivity(req.body);
     const result = await data.save();
 
-    console.log(data);
+    console.log("activity data", data);
     return resp.send(result);
   } catch (error) {
     console.error("Error saving driver activity:", error);
@@ -244,7 +255,7 @@ app.post("/driver/activity", async (req, resp) => {
 app.get("/driver/rides/:driver_contact", async (req, res) => {
   try {
     const driver_contact = req.params.driver_contact;
-    console.log(driver_contact);
+    console.log("driver phone number", driver_contact);
     const drivers = await driverActivity.find({
       driver_contact: driver_contact,
     });
@@ -284,6 +295,10 @@ app.get("/driver/list", async (req, resp) => {
   resp.send(data);
 });
 /////////////////////////////////////////////////////////////////////////////
+
+app.get("/", (req, resp) => {
+  resp.send("server is online");
+});
 
 const port = process.env.PORT || 8080;
 server.listen(port, () => {

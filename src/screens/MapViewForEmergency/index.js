@@ -9,6 +9,7 @@ import {
   View,
   TouchableOpacity,
   Modal,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 import styles from './styles';
@@ -604,8 +605,33 @@ const MapForEmergency = () => {
   //   // }
   // }, [originPlace, destinationPlace]);
 
+  const handleCancelRequestButton = () => {
+    Alert.alert('AmbuServe', 'are you sure you want to cancel', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          handleCancelRequest();
+        },
+      },
+    ]);
+  };
+
   const handleCancelRequest = () => {
-    // setCard2(false);
+    socket?.emit('cancel_ride', 'canceled');
+    socket?.disconnect();
+    // socket?.on('disconnect', () => {
+    //   console.log('user disconnect after ride compelete', socket.id); // undefined
+    // });
+    setDriverAcceptPhase(false);
+    setDriverRoute(false);
+    setRoute(false);
+    // setPaymentPhase(true);
+    setRideDefault();
   };
 
   // const handleOriginPlaceChange = location => {
@@ -771,7 +797,7 @@ const MapForEmergency = () => {
             // maxZoomLevel={18}
             zoomEnabled={true}
             // minZoomLevel={mapZoom}
-            region={userCurrentPosition ? region : regionForZoom}>
+            region={userCurrentPosition ? region : null}>
             {/* {userCurrentPosition ? (
                 // <Marker
                 //   style={{
@@ -1016,7 +1042,7 @@ const MapForEmergency = () => {
                       phoneCall={handlePhoneCall}
                     />
                     <TouchableOpacity
-                      onPress={handleCancelRequest}
+                      onPress={handleCancelRequestButton}
                       style={{
                         marginTop: hp(1),
                         width: '100%',
@@ -1166,7 +1192,10 @@ const MapForEmergency = () => {
       ) : null}
 
       {screenLoading === true ? (
-        <CustomScreenLoading visible={screenLoading} />
+        <CustomScreenLoading
+          visible={screenLoading}
+          emergency={'Finding nearest available ambulance and hospital'}
+        />
       ) : null}
     </>
   );
