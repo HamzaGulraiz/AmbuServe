@@ -16,17 +16,17 @@ export const sendSMS = (
   );
   let data = JSON.stringify({
     from: '+19876543210',
-    to: ['+923131180228'],
+    to: ['+923042245806'],
     body: `Your First Relative ${userName} is in Emergency Siutation ,going from ${pickupAddress} to ${dropoffAddress} in Ambuserve ambulance, Driver contact is ${driverNumber} `,
   });
 
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `https://us.sms.api.sinch.com/xms/v1/${SMS_PLAN_ID}/batches`,
+    url: 'https://us.sms.api.sinch.com/xms/v1/3b741582a500489fab0d46f82dab4301/batches',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${SMS_PLAN_TOKEN}`,
+      Authorization: 'Bearer e00116645bf944fc994a4b9de9afa696',
     },
     data: data,
   };
